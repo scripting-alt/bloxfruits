@@ -6,6 +6,8 @@ local CombatUtil = require(ReplicatedStorage.Modules.CombatUtil)
 
 require(ReplicatedStorage.Modules.WeaponData)
 
+print("[Load] CombatController")
+
 local Main = require(ReplicatedStorage.Util.CameraShaker.Main)
 local CameraShaker = require(ReplicatedStorage.Util.CameraShaker)
 local PlayAnimationSequence = require(ReplicatedStorage.Modules.PlayAnimationSequence)
