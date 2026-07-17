@@ -41,7 +41,7 @@ elseif game.PlaceId == 79091703265657 then
 elseif game.PlaceId == 7449423635 then
     World3 = true
     warn("[REDZ HUB] SEA 3")
-end
+endken
 
 local Window
 local RunService = game:GetService("RunService")
@@ -173,7 +173,7 @@ function BringMob(MobName)
             Humanoid.WalkSpeed = 0
             HumanoidRootPart:SetNetworkOwner(game.Players.LocalPlayer)
             HumanoidRootPart.Transparency = 1
-            HumanoidRootPart.CanCollide = false
+            --HumanoidRootPart.CanCollide = false
 
             local Head = Enemy:FindFirstChild("Head")
             if Head then
@@ -1051,7 +1051,7 @@ spawn(function()
                             end
 
                             if StuckTime >= 15 then
-                                Humanoid.Health = 0
+                                --Humanoid.Health = 0
                                 break
                             end
 
@@ -1061,7 +1061,7 @@ spawn(function()
                             EquipWeapon(_G.SelectTool)
                             BringMob(Mon)
 
-                            EnemyHRP.CanCollide = false
+                            --EnemyHRP.CanCollide = false
                             Humanoid.WalkSpeed = 0
 
                             local Head = Enemy:FindFirstChild("Head")
@@ -1790,8 +1790,8 @@ Tab_Misc:AddSlider({
   Max = 10,
   Increment = 1,
   Default = 1,
-  Flag = "Speed_flag",
   Callback = function(Value)
+    game.Players.LocalPlayer.Character:SetAttribute("SpeedMultiplier",_G.Speed)
     _G.Speed = Value
   end
 })
