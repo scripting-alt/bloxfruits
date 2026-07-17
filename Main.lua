@@ -34,10 +34,13 @@ TweenON = false
 
 if game.PlaceId == 2753915549 then
     World1 = true
-elseif game.PlaceId == 4442272183 then
+    warn("[REDZ HUB] SEA 1")
+elseif game.PlaceId == 79091703265657 then
     World2 = true
+    warn("[REDZ HUB] SEA 2")
 elseif game.PlaceId == 7449423635 then
     World3 = true
+    warn("[REDZ HUB] SEA 3")
 end
 
 local Window
@@ -1206,7 +1209,8 @@ function reload()
             storageFruit(v)
         end
     end)
-    
+    workspace._WorldOrigin["Foam;"].CanCollide = _G.WaterWalk
+    game.Players.LocalPlayer.Character:SetAttribute("SpeedMultiplier",_G.Speed)
     game.Players.LocalPlayer.Character.ChildAdded:Connect(function(v)
         if _G.AutoStorageFruits then
             storageFruit(v)
@@ -1492,7 +1496,7 @@ spawn(function()
                     local Door = workspace.Map.Ice.Door
                     Debug("Door -> CanCollide:", Door.CanCollide, "| Transparency:", Door.Transparency)
 
-                    if Door.CanCollide == false and Door.Transparency == 1 then
+                    if Door.CanCollide == true and Door.Transparency == 0 then
                         Debug("Porta aberta")
 
                         local CFrame1 = CFrame.new(4849.29883,5.65138149,719.611877)
@@ -1769,6 +1773,38 @@ Tab_Misc:AddSlider({
   end
 })
 
+Tab_Misc:AddSection("Player")
+
+Tab_Misc:AddToggle({
+  Name = "Water Walk",
+  Default = false,
+  Callback = function(Value)
+    _G.WaterWalk = Value
+    workspace._WorldOrigin["Foam;"].CanCollide = _G.WaterWalk
+  end
+})
+
+Tab_Misc:AddSlider({
+  Name = "Walk Speed",
+  Min = 1,
+  Max = 10,
+  Increment = 1,
+  Default = 1,
+  Flag = "Speed_flag",
+  Callback = function(Value)
+    _G.Speed = Value
+  end
+})
+
+Tab_Misc:AddSection("Server")
+Tab_Misc:AddButton({
+  Name = "Rejoin Server",
+  Debounce = 0.5,
+  Callback = function()
+    game.ReplicatedStorage:WaitForChild("__ServerBrowser"):InvokeServer("teleport", game.JobId)
+  end
+})
+
 Tab_Stats:AddSection("Auto Stats")
 Tab_Stats:AddToggle({Name = "Auto Stats Melee",Default = false,Flag = "statsMelee_flag",
 Callback = function(Value)
@@ -1837,3 +1873,9 @@ spawn(function()
         end
     end
 end)
+
+local Queue = queue_on_teleport or syn and syn.queue_on_teleport
+
+if Queue then
+    Queue('loadstring(game:HttpGet("https://raw.githubusercontent.com/scripting-alt/bloxfruits/refs/heads/main/Main.lua"))()')
+end
