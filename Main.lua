@@ -1550,7 +1550,7 @@ spawn(function()
                                                 AutoHaki()
                                                 EquipWeapon(_G.SelectTool)
 
-                                                v.HumanoidRootPart.CanCollide = false
+                                                --v.HumanoidRootPart.CanCollide = false
                                                 v.Head.CanCollide = false
                                                 v.Humanoid.WalkSpeed = 0
                                                 v.HumanoidRootPart.CFrame = OldCFrameSecond
