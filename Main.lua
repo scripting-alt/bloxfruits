@@ -49,6 +49,13 @@ local RegisterHit = Net["RE/RegisterHit"]
 local LastHealth = nil
 local StuckTime = 0
 
+function checkEnemySpawns(EnemyName)
+    if workspace._WorldOrigin.EnemySpawns:FindFirstChild(EnemyName) then
+        return true, workspace._WorldOrigin.EnemySpawns:FindFirstChild(EnemyName).CFrame
+    end
+    return false
+end
+
 function checkStopFarm()
     for _, v in pairs(_G.ConfigStopFarm) do
         if v == true then
@@ -327,7 +334,7 @@ function topos(TargetCFrame)
 
     local Tween = game:GetService("TweenService"):Create(
         PartTele,
-        TweenInfo.new(Distance / 360, Enum.EasingStyle.Linear),
+        TweenInfo.new(Distance / _G.TweenSpeed, Enum.EasingStyle.Linear),
         {
             CFrame = TargetCFrame
         }
@@ -656,7 +663,7 @@ function CheckQuest()
             NameMon = "Ship Deckhand"
             CFrameQuest = CFrame.new(1037.80127, 125.092171, 32911.6016)         
             CFrameMon = CFrame.new(1212.0111083984375, 150.79205322265625, 33059.24609375)    
-            if _G.AutoFarmLevel and (CFrameQuest.Position - game.Players.LocalPlayer.Character.HumanoidRootPart.Position).Magnitude > 10000 then
+            if _G.AutoFarmLevel or not checkStopFarm() and (CFrameQuest.Position - game.Players.LocalPlayer.Character.HumanoidRootPart.Position).Magnitude > 10000 then
                 game:GetService("ReplicatedStorage").Remotes.CommF_:InvokeServer("requestEntrance",Vector3.new(923.21252441406, 126.9760055542, 32852.83203125))
             end
         elseif MyLevel == 1275 or MyLevel <= 1299 then
@@ -666,7 +673,7 @@ function CheckQuest()
             NameMon = "Ship Engineer"
             CFrameQuest = CFrame.new(1037.80127, 125.092171, 32911.6016)   
             CFrameMon = CFrame.new(919.4786376953125, 43.54401397705078, 32779.96875)   
-            if _G.AutoFarmLevel and (CFrameQuest.Position - game.Players.LocalPlayer.Character.HumanoidRootPart.Position).Magnitude > 10000 then
+            if _G.AutoFarmLevel or not checkStopFarm() and (CFrameQuest.Position - game.Players.LocalPlayer.Character.HumanoidRootPart.Position).Magnitude > 10000 then
                 game:GetService("ReplicatedStorage").Remotes.CommF_:InvokeServer("requestEntrance",Vector3.new(923.21252441406, 126.9760055542, 32852.83203125))
             end             
         elseif MyLevel == 1300 or MyLevel <= 1324 then
@@ -676,7 +683,7 @@ function CheckQuest()
             NameMon = "Ship Steward"
             CFrameQuest = CFrame.new(968.80957, 125.092171, 33244.125)         
             CFrameMon = CFrame.new(919.4385375976562, 129.55599975585938, 33436.03515625)      
-            if _G.AutoFarmLevel and (CFrameQuest.Position - game.Players.LocalPlayer.Character.HumanoidRootPart.Position).Magnitude > 10000 then
+            if _G.AutoFarmLevel or not checkStopFarm() and (CFrameQuest.Position - game.Players.LocalPlayer.Character.HumanoidRootPart.Position).Magnitude > 10000 then
                 game:GetService("ReplicatedStorage").Remotes.CommF_:InvokeServer("requestEntrance",Vector3.new(923.21252441406, 126.9760055542, 32852.83203125))
             end
         elseif MyLevel == 1325 or MyLevel <= 1349 then
@@ -686,7 +693,7 @@ function CheckQuest()
             NameMon = "Ship Officer"
             CFrameQuest = CFrame.new(968.80957, 125.092171, 33244.125)
             CFrameMon = CFrame.new(1036.0179443359375, 181.4390411376953, 33315.7265625)
-            if _G.AutoFarmLevel and (CFrameQuest.Position - game.Players.LocalPlayer.Character.HumanoidRootPart.Position).Magnitude > 10000 then
+            if _G.AutoFarmLevel or not checkStopFarm() and (CFrameQuest.Position - game.Players.LocalPlayer.Character.HumanoidRootPart.Position).Magnitude > 10000 then
                 game:GetService("ReplicatedStorage").Remotes.CommF_:InvokeServer("requestEntrance",Vector3.new(923.21252441406, 126.9760055542, 32852.83203125))
             end
         elseif MyLevel == 1350 or MyLevel <= 1374 then
@@ -696,7 +703,7 @@ function CheckQuest()
             NameMon = "Arctic Warrior"
             CFrameQuest = CFrame.new(5667.6582, 26.7997818, -6486.08984, -0.933587909, 0, -0.358349502, 0, 1, 0, 0.358349502, 0, -0.933587909)
             CFrameMon = CFrame.new(5966.24609375, 62.97002029418945, -6179.3828125)
-            if _G.AutoFarmLevel and (CFrameQuest.Position - game.Players.LocalPlayer.Character.HumanoidRootPart.Position).Magnitude > 10000 then
+            if _G.AutoFarmLevel or not checkStopFarm() and (CFrameQuest.Position - game.Players.LocalPlayer.Character.HumanoidRootPart.Position).Magnitude > 10000 then
                 game:GetService("ReplicatedStorage").Remotes.CommF_:InvokeServer("requestEntrance",Vector3.new(-6508.5581054688, 5000.034996032715, -132.83953857422))
             end
         elseif MyLevel == 1375 or MyLevel <= 1424 then
@@ -1373,6 +1380,7 @@ LevelFarmToggle = Tab_Farm:AddToggle({
   Flag = "farmLevel_flag",
   Callback = function(Value)
     _G.AutoFarmLevel = Value
+    stopTeleport()
     --topos(CFrame.new(-1103.513427734375, 13.752052307128906, 3896.091064453125))
   end
 })
@@ -1384,6 +1392,7 @@ Tab_Farm:AddToggle({
   Flag = "farmNearest_flag",
   Callback = function(Value)
     _G.AutoFarmNear = Value
+    stopTeleport()
   end
 })
 
@@ -1432,6 +1441,7 @@ Tab_Fruit:AddToggle({
   Flag = "getFruits_flag",
   Callback = function(Value)
     _G.getFruits = Value
+    stopTeleport()
   end
 })
 Tab_Fruit:AddToggle({
@@ -1448,10 +1458,147 @@ Tab_Quests:AddSection("Quest Sword")
 Tab_Quests:AddToggle({
   Name = "Auto Get Saber",
   Default = false,
+  Description = "Level 200",
   Callback = function(Value)
     _G.AutoSaber = Value
+    stopTeleport()
   end
 })
+Tab_Quests:AddToggle({
+  Name = "Auto Second Sea",
+  Default = false,
+  Description = "Level 700",
+  Callback = function(Value)
+    _G.AutoSecondSea = Value
+    stopTeleport()
+  end
+})
+local function Debug(...)
+    print("[AutoSecondSea]", ...)
+end
+
+spawn(function()
+    while task.wait() do
+        if _G.AutoSecondSea then
+            pcall(function()
+                local Player = game.Players.LocalPlayer
+                local MyLevel = Player.Data.Level.Value
+
+                Debug("Loop iniciado | Level:", MyLevel)
+
+                if MyLevel >= 700 and World1 then
+                    Debug("No World1")
+
+                    local Door = workspace.Map.Ice.Door
+                    Debug("Door -> CanCollide:", Door.CanCollide, "| Transparency:", Door.Transparency)
+
+                    if Door.CanCollide == false and Door.Transparency == 1 then
+                        Debug("Porta aberta")
+
+                        local CFrame1 = CFrame.new(4849.29883,5.65138149,719.611877)
+                        repeat
+                            topos(CFrame1)
+                            task.wait()
+                        until (CFrame1.Position - Player.Character.HumanoidRootPart.Position).Magnitude <= 3 or not _G.AutoSecondSea
+
+                        Debug("Chegou no primeiro ponto")
+
+                        task.wait(1.1)
+
+                        local Result = game.ReplicatedStorage.Remotes.CommF_:InvokeServer("DressrosaQuestProgress","Detective")
+                        Debug("DressrosaQuestProgress:", Result)
+
+                        task.wait(0.5)
+
+                        Debug("Equipando Key")
+                        EquipWeapon("Key")
+
+                        repeat
+                            topos(CFrame.new(1347.7124,37.3751602,-1325.6488))
+                            task.wait()
+                        until (Vector3.new(1347.7124,37.3751602,-1325.6488) - Player.Character.HumanoidRootPart.Position).Magnitude <= 3 or not _G.AutoSecondSea
+
+                        Debug("Chegou na porta")
+
+                    else
+                        Debug("Entrou no ELSE")
+
+                        if Door.CanCollide == false and Door.Transparency == 1 then
+                            Debug("Porta aberta novamente")
+
+                            local Ice = workspace.Enemies:FindFirstChild("Ice Admiral")
+
+                            if Ice then
+                                Debug("Ice Admiral encontrado")
+
+                                for _,v in ipairs(workspace.Enemies:GetChildren()) do
+                                    if v.Name == "Ice Admiral" then
+                                        Debug("HP:", v.Humanoid.Health)
+
+                                        if v.Humanoid.Health > 0 then
+                                            Debug("Começando ataque")
+
+                                            OldCFrameSecond = v.HumanoidRootPart.CFrame
+
+                                            repeat
+                                                task.wait()
+
+                                                AutoHaki()
+                                                EquipWeapon(_G.SelectTool)
+
+                                                v.HumanoidRootPart.CanCollide = false
+                                                v.Head.CanCollide = false
+                                                v.Humanoid.WalkSpeed = 0
+                                                v.HumanoidRootPart.CFrame = OldCFrameSecond
+
+                                                topos(v.HumanoidRootPart.CFrame * Pos)
+
+                                                sethiddenproperty(Player,"SimulationRadius",math.huge)
+
+                                            until not _G.AutoSecondSea or not v.Parent or v.Humanoid.Health <= 0
+
+                                            Debug("Ice Admiral derrotado")
+                                        else
+                                            Debug("Boss morto, viajando para Dressrosa")
+                                            game.ReplicatedStorage.Remotes.CommF_:InvokeServer("TravelDressrosa")
+                                        end
+                                    end
+                                end
+                            else
+                                Debug("Ice Admiral NÃO encontrado")
+
+                                local Spawn = game.ReplicatedStorage:FindFirstChild("FortBuilderReplicatedSpawnPositionsFolder")
+
+                                if Spawn and Spawn:FindFirstChild("Ice Admiral") then
+                                    Debug("Indo até o spawn do Ice Admiral")
+
+                                    topos(
+                                        Spawn["Ice Admiral"].HumanoidRootPart.CFrame *
+                                        CFrame.new(5,10,7)
+                                    )
+                                else
+                                    Debug("Spawn do Ice Admiral não encontrado")
+                                end
+                            end
+                        else
+                            Debug("Porta fechada")
+                        end
+                    end
+                else
+                    Debug("Condição falhou | World1:", World1)
+                end
+            end)
+        end
+    end
+end)
+
+--if workspace._WorldOrigin["SABER EXPERT Respawn Marker"] and workspace._WorldOrigin["SABER EXPERT Respawn Marker"].RespawnTimer.Frame.Timer then
+--    local time = workspace._WorldOrigin["SABER EXPERT Respawn Marker"].RespawnTimer.Frame.Timer.Text
+--    text = <font color="rgb(255,0,0)">[06:18]</font>
+--end
+
+
+
 spawn(function()
         while task.wait() do
             if _G.AutoSaber and game.Players.LocalPlayer.Data.Level.Value >= 200 then
@@ -1549,7 +1696,7 @@ spawn(function()
                         else
                             topos(CFrame.new(-1612.55884, 36.9774132, 148.719543, 0.37091279, 3.0717151e-9, -0.928667724, 3.97099491e-8, 1, 1.91679348e-8, 0.928667724, -4.39869794e-8, 0.37091279))
                         end
-                    elseif game:GetService('Workspace').Enemies:FindFirstChild('Saber Expert') or game:GetService('ReplicatedStorage'):FindFirstChild('Saber Expert') then
+                    elseif game:GetService('Workspace').Enemies:FindFirstChild('Saber Expert') or checkEnemySpawns("Saber Expert [Lv. 200] [Boss]") then
                         local v891, v892, v893 = pairs(game:GetService('Workspace').Enemies:GetChildren())
 
                         while true do
@@ -1565,13 +1712,14 @@ spawn(function()
                                     task.wait()
                                     EquipWeapon(_G.SelectTool)
                                     topos(v894.HumanoidRootPart.CFrame * CFrame.new(0, 30, 0))
-
+                                    AutoHaki()
                                     v894.HumanoidRootPart.Transparency = 1
                                     v894.Humanoid.JumpPower = 0
                                     v894.Humanoid.WalkSpeed = 0
                                     v894.HumanoidRootPart.CanCollide = false
                                     FarmPos = v894.HumanoidRootPart.CFrame
                                     MonFarm = v894.Name
+                                    _G.ConfigStopFarm.SaberSpawn = true
                                 until v894.Humanoid.Health <= 0 or not _G.AutoSaber
 
                                 if v894.Humanoid.Health <= 0 then
@@ -1579,6 +1727,8 @@ spawn(function()
                                 end
                             end
                         end
+                        else
+                            _G.ConfigStopFarm.SaberSpawn = false
                     end
                 end)
             end
@@ -1604,3 +1754,86 @@ Tab_Misc:AddDropdown({
      _G.FarmType = Value
   end
 })
+
+Tab_Misc:AddSection("Config")
+
+Tab_Misc:AddSlider({
+  Name = "Tween Speed",
+  Min = 50,
+  Max = 600,
+  Increment = 1,
+  Default = 350,
+  Flag = "tweenSpeed_flag",
+  Callback = function(Value)
+    _G.TweenSpeed = Value
+  end
+})
+
+Tab_Stats:AddSection("Auto Stats")
+Tab_Stats:AddToggle({Name = "Auto Stats Melee",Default = false,Flag = "statsMelee_flag",
+Callback = function(Value)
+    melee = Value
+end})
+Tab_Stats:AddToggle({Name = "Auto Stats Defense",Default = false,Flag = "statsDefense_flag",
+Callback = function(Value)
+    defense = Value
+end})
+Tab_Stats:AddToggle({Name = "Auto Stats Sword",Default = false,Flag = "statsSword_flag",
+Callback = function(Value)
+    sword = Value
+end})
+Tab_Stats:AddToggle({Name = "Auto Stats Gun",Default = false,Flag = "statsGun_flag",
+Callback = function(Value)
+    gun = Value
+end})
+Tab_Stats:AddToggle({Name = "Auto Stats Fruit",Default = false,Flag = "statsFruit_flag",
+Callback = function(Value)
+    fruit = Value
+end})
+
+spawn(function()
+    while wait() do
+        if game.Players.localPlayer.Data.Points.Value >= 1 then
+            if melee then
+                local args = {
+                    [1] = "AddPoint",
+                    [2] = "Melee",
+                    [3] = 1
+                }
+                game:GetService("ReplicatedStorage").Remotes.CommF_:InvokeServer(unpack(args))
+            end 
+            if defense then
+                local args = {
+                    [1] = "AddPoint",
+                    [2] = "Defense",
+                    [3] = 1
+                }
+                game:GetService("ReplicatedStorage").Remotes.CommF_:InvokeServer(unpack(args))
+            end 
+            if sword then
+                local args = {
+                    [1] = "AddPoint",
+                    [2] = "Sword",
+                    [3] = 1
+                }
+                game:GetService("ReplicatedStorage").Remotes.CommF_:InvokeServer(unpack(args))
+            end 
+            if gun then
+                local args = {
+                    [1] = "AddPoint",
+                    [2] = "Gun",
+                    [3] = 1
+                }
+                game:GetService("ReplicatedStorage").Remotes.CommF_:InvokeServer(unpack(args))
+            end 
+            if fruit then
+                local args = {
+                    [1] = "AddPoint",
+                    [2] = "Demon Fruit",
+                    [3] = 1
+                }
+                game:GetService("ReplicatedStorage").Remotes.CommF_:InvokeServer(unpack(args))
+            end
+        end
+    end
+end)
