@@ -2,7 +2,7 @@
 local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/tlredz/Library/refs/heads/main/redz-V5-remake/main.luau"))()
 
 ScriptVersion = {
-    Version = "v1.0.0",
+    Version = "v1.0.1",
     Date = "2026-07-18"
 }
 
@@ -655,15 +655,15 @@ function CheckQuest()
             LevelQuest = 1
             NameQuest = "FireSideQuest"
             NameMon = "Magma Ninja"
-            CFrameQuest = CFrame.new(-5428.03174, 15.0622921, -5299.43457, -0.882952213, 0, 0.469463557, 0, 1, 0, -0.469463557, 0, -0.882952213)
-            CFrameMon = CFrame.new(-5449.6728515625, 76.65874481201172, -5808.20068359375)
+            CFrameQuest = CFrame.new(-5401.63232, 29.3890209, -5371.26221, 0.513783574, -1.93253147e-08, 0.857919812, -1.8253143e-08, 1, 3.34570665e-08, -0.857919812, -3.28494245e-08, 0.513783574)
+            CFrameMon = CFrame.new(-5770.48974609375, 76.585693359375, -5664.71484375)
         elseif MyLevel == 1200 or MyLevel <= 1249 then
             Mon = "Lava Pirate"
             LevelQuest = 2
             NameQuest = "FireSideQuest"
             NameMon = "Lava Pirate"
-            CFrameQuest = CFrame.new(-5428.03174, 15.0622921, -5299.43457, -0.882952213, 0, 0.469463557, 0, 1, 0, -0.469463557, 0, -0.882952213)
-            CFrameMon = CFrame.new(-5213.33154296875, 49.73788070678711, -4701.451171875)
+            CFrameQuest = CFrame.new(-5401.63232, 29.3890209, -5371.26221, 0.513783574, -1.93253147e-08, 0.857919812, -1.8253143e-08, 1, 3.34570665e-08, -0.857919812, -3.28494245e-08, 0.513783574)
+            CFrameMon = CFrame.new(-5033.35009765625, 85.82057189941406, -5009.0732421875)
         elseif MyLevel == 1250 or MyLevel <= 1274 then
             Mon = "Ship Deckhand"
             LevelQuest = 1
