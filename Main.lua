@@ -16,6 +16,7 @@ _G.ConfigStopFarm = {
     PirateRaid = false,
     Saw = false,
     Factory = false,
+    RenGokuKey = false,
 }
 _G.FarmType = "Up"
 
@@ -58,10 +59,18 @@ local LastHealth = nil
 local StuckTime = 0
 
 function checkEnemySpawns(EnemyName)
-    if workspace._WorldOrigin.EnemySpawns:FindFirstChild(EnemyName) then
-        return true, workspace._WorldOrigin.EnemySpawns:FindFirstChild(EnemyName).CFrame
+    if ReplicatedStorage:FindFirstChild("FortBuilderReplicatedSpawnPositionsFolder"):FindFirstChild(EnemyName) then
+        return true, ReplicatedStorage:FindFirstChild("FortBuilderReplicatedSpawnPositionsFolder"):FindFirstChild(EnemyName).CFrame
     end
     return false
+end
+
+function CheckItem(itemName)
+    for _, item in ipairs(game:GetService("ReplicatedStorage").Remotes.CommF_:InvokeServer("getInventory")) do
+        if item.Name == itemName then
+            return item
+        end
+    end
 end
 
 function checkStopFarm()
@@ -1001,8 +1010,9 @@ spawn(function()
 
         pcall(function()
             local Player = game.Players.LocalPlayer
+            local Character = Player.Character
+            local HRP = Character and Character:FindFirstChild("HumanoidRootPart")
             local QuestGui = Player.PlayerGui.Main.Quest
-            local HRP = Player.Character and Player.Character:FindFirstChild("HumanoidRootPart")
 
             if not HRP then
                 return
@@ -1016,85 +1026,94 @@ spawn(function()
                 LevelFarmToggle.Description = "Level Farm"
             end
 
+            CheckQuest()
+
             if not QuestGui.Visible then
                 StartMagnet = false
-                CheckQuest()
-
                 topos(CFrameQuest)
 
                 if (HRP.Position - CFrameQuest.Position).Magnitude <= 5 then
                     game.ReplicatedStorage.Remotes.CommF_:InvokeServer("StartQuest", NameQuest, LevelQuest)
                 end
-            else
-                CheckQuest()
-                LevelFarmToggle.Description = "Level Farm : "..Mon
-                for _, Enemy in ipairs(workspace.Enemies:GetChildren()) do
-                    local Humanoid = Enemy:FindFirstChild("Humanoid")
-                    local EnemyHRP = Enemy:FindFirstChild("HumanoidRootPart")
 
-                    if Enemy.Name == Mon
-                    and Humanoid
-                    and EnemyHRP
-                    and Humanoid.Health > 0
-                    and string.find(QuestTitle, NameMon) then
+                return
+            end
 
-                        LastHealth = Humanoid.Health
-                        StuckTime = 0
+            LevelFarmToggle.Description = "Level Farm : " .. Mon
 
-                        repeat
-                            task.wait(_G.Fast_Delay)
+            local Target
 
-                            if not Enemy.Parent then
-                                break
-                            end
+            for _, Enemy in ipairs(workspace.Enemies:GetChildren()) do
+                local Humanoid = Enemy:FindFirstChild("Humanoid")
+                local EnemyHRP = Enemy:FindFirstChild("HumanoidRootPart")
 
-                            if Humanoid.Health == LastHealth then
-                                StuckTime += 1
-                            else
-                                LastHealth = Humanoid.Health
-                                StuckTime = 0
-                            end
-
-                            if StuckTime >= 15 then
-                                --Humanoid.Health = 0
-                                break
-                            end
-
-                            BringPos = EnemyHRP.CFrame
-                            topos(EnemyHRP.CFrame * Pos)
-                            AutoHaki()
-                            EquipWeapon(_G.SelectTool)
-                            BringMob(Mon)
-
-                            --EnemyHRP.CanCollide = false
-                            Humanoid.WalkSpeed = 0
-
-                            local Head = Enemy:FindFirstChild("Head")
-                            if Head then
-                                Head.CanCollide = false
-                            end
-
-                            StartMagnet = true
-
-                        until not _G.AutoFarmLevel
-                            or Humanoid.Health <= 0
-                            or not Enemy.Parent
-                            or not QuestGui.Visible
-
-                        break
-                    end
-                end
-
-                if not workspace.Enemies:FindFirstChild(Mon) then
-                    StartMagnet = false
-                    topos(CFrameMon)
-
-                    local Respawn = game.ReplicatedStorage:FindFirstChild(Mon)
-                    if Respawn then
-                        topos(Respawn.HumanoidRootPart.CFrame * CFrame.new(15, 10, 2))
-                    end
+                if Enemy.Name == Mon
+                and Humanoid
+                and EnemyHRP
+                and Humanoid.Health > 0
+                and string.find(QuestTitle, NameMon) then
+                    Target = Enemy
+                    break
                 end
             end
+
+            if not Target then
+                StartMagnet = false
+
+                local Respawn = checkEnemySpawns(Mon)
+                if Respawn and Respawn:FindFirstChild("HumanoidRootPart") then
+                    topos(Respawn.HumanoidRootPart.CFrame * CFrame.new(15, 10, 2))
+                else
+                    topos(CFrameMon)
+                end
+
+                return
+            end
+
+            local Humanoid = Target.Humanoid
+            local EnemyHRP = Target.HumanoidRootPart
+
+            LastHealth = Humanoid.Health
+            StuckTime = 0
+
+            repeat
+                task.wait(_G.Fast_Delay)
+
+                if not Target.Parent then
+                    break
+                end
+
+                if Humanoid.Health == LastHealth then
+                    StuckTime += 1
+                else
+                    LastHealth = Humanoid.Health
+                    StuckTime = 0
+                end
+
+                if StuckTime >= 15 then
+                    break
+                end
+
+                BringPos = EnemyHRP.CFrame
+                StartMagnet = true
+
+                topos(EnemyHRP.CFrame * Pos)
+                AutoHaki()
+                EquipWeapon(_G.SelectTool)
+                BringMob(Mon)
+
+                Humanoid.WalkSpeed = 0
+
+                local Head = Target:FindFirstChild("Head")
+                if Head then
+                    Head.CanCollide = false
+                end
+
+            until not _G.AutoFarmLevel
+                or not checkStopFarm()
+                or not QuestGui.Visible
+                or not Target.Parent
+                or Humanoid.Health <= 0
         end)
     end
 end)
@@ -1487,6 +1506,15 @@ if World1 then
       end
     })
 elseif World2 then
+    Tab_Quests:AddSection("Quest Sword")
+    Tab_Quests:AddToggle({
+              Name = "Auto Get Sword Rengoku",
+              Default = false,
+              Callback = function(Value)
+                _G.AutoRengoku = Value
+              end
+            })
+
     Tab_Quests:AddSection("Legendary Sword")
     Tab_Quests:AddParagraph("Legendary Sword Dealer")
     Tab_Quests:AddToggle({
@@ -1499,6 +1527,47 @@ elseif World2 then
 elseif World3 then
 
 end
+
+spawn(function()
+        pcall(function()
+            while wait() do
+                if _G.AutoRengoku then
+                    if game:GetService('Players').LocalPlayer.Backpack:FindFirstChild('Hidden Key') or game:GetService('Players').LocalPlayer.Character:FindFirstChild('Hidden Key') then
+                        EquipWeapon('Hidden Key')
+                        topos(CFrame.new(6571.1201171875, 299.23028564453, -6967.841796875))
+                        _G.ConfigStopFarm.RenGokuKey = true
+                    elseif checkEnemySpawns("Awakened Ice Admiral") then
+                        local v964, v965, v966 = pairs(game:GetService('Workspace').Enemies:GetChildren())
+
+                        while true do
+                            local v967
+
+                            v966, v967 = v964(v965, v966)
+
+                            if v966 == nil then
+                                break
+                            end
+                            if v967.Name == 'Awakened Ice Admiral' and (v967:FindFirstChild('Humanoid') and (v967:FindFirstChild('HumanoidRootPart') and v967.Humanoid.Health > 0)) then
+                                repeat
+                                    task.wait()
+                                    EquipWeapon(_G.SelectTool)
+                                    AutoHaki()
+                                    v967.HumanoidRootPart.Size = Vector3.new(50, 50, 50)
+                                    PosMon = v967.HumanoidRootPart.CFrame
+                                    MonFarm = v967.Name
+                                    topos(v967.HumanoidRootPart.CFrame * CFrame.new(0, 30, 0)
+                                until game:GetService('Players').LocalPlayer.Backpack:FindFirstChild('Hidden Key') or (_G.AutoRengoku == false or (not v967.Parent or v967.Humanoid.Health <= 0))
+                            end
+                        end
+                    else
+                        StartBring = false
+                        _G.RenGokuKey = false
+                        topos(CFrame.new(5439.716796875, 84.420944213867, -6715.1635742188))
+                    end
+                end
+            end
+        end)
+    end)
 
 spawn(function()
         while wait() do
