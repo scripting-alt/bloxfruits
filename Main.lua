@@ -636,15 +636,15 @@ function CheckQuest()
             LevelQuest = 1
             NameQuest = "IceSideQuest"
             NameMon = "Lab Subordinate"
-            CFrameQuest = CFrame.new(-6064.06885, 15.2422857, -4902.97852, 0.453972578, -0, -0.891015649, 0, 1, -0, 0.891015649, 0, 0.453972578)
-            CFrameMon = CFrame.new(-5707.4716796875, 15.951709747314453, -4513.39208984375)
+            CFrameQuest = CFrame.new(-6231.22803, 82.2736664, -4852.95801, -0.908178151, 7.81125564e-09, 0.41858381, 5.5849001e-09, 1, -6.54390142e-09, -0.41858381, -3.60527963e-09, -0.908178151)
+            CFrameMon = CFrame.new(-5782.05419921875, 383.233642578125, -4553.45751953125)
         elseif MyLevel == 1125 or MyLevel <= 1174 then
             Mon = "Horned Warrior"
             LevelQuest = 2
             NameQuest = "IceSideQuest"
             NameMon = "Horned Warrior"
-            CFrameQuest = CFrame.new(-6064.06885, 15.2422857, -4902.97852, 0.453972578, -0, -0.891015649, 0, 1, -0, 0.891015649, 0, 0.453972578)
-            CFrameMon = CFrame.new(-6341.36669921875, 15.951770782470703, -5723.162109375)
+            CFrameQuest = CFrame.new(-6231.22803, 82.2736664, -4852.95801, -0.908178151, 7.81125564e-09, 0.41858381, 5.5849001e-09, 1, -6.54390142e-09, -0.41858381, -3.60527963e-09, -0.908178151)
+            CFrameMon = CFrame.new(-6568.48681640625, 83.62020874023438, -5817.66357421875)
         elseif MyLevel == 1175 or MyLevel <= 1199 then
             Mon = "Magma Ninja"
             LevelQuest = 1
