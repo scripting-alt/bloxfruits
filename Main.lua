@@ -41,7 +41,7 @@ elseif game.PlaceId == 79091703265657 then
 elseif game.PlaceId == 7449423635 then
     World3 = true
     warn("[REDZ HUB] SEA 3")
-endken
+end
 
 local Window
 local RunService = game:GetService("RunService")
@@ -1291,7 +1291,7 @@ spawn(function()
                         BringMob(Enemy.Name)
 
                         EnemyHRP.Transparency = 1
-                        EnemyHRP.CanCollide = false
+                        --EnemyHRP.CanCollide = false
 
                         Humanoid.WalkSpeed = 0
                         Humanoid.JumpPower = 0
@@ -1633,7 +1633,7 @@ spawn(function()
                                                                 AutoHaki()
                                                                 EquipWeapon(_G.SelectTool)
 
-                                                                v890.HumanoidRootPart.CanCollide = false
+                                                                --v890.HumanoidRootPart.CanCollide = false
                                                                 v890.Humanoid.WalkSpeed = 0
                                                                 v890.HumanoidRootPart.Size = Vector3.new(80, 80, 80)
 
@@ -1720,7 +1720,7 @@ spawn(function()
                                     v894.HumanoidRootPart.Transparency = 1
                                     v894.Humanoid.JumpPower = 0
                                     v894.Humanoid.WalkSpeed = 0
-                                    v894.HumanoidRootPart.CanCollide = false
+                                    --v894.HumanoidRootPart.CanCollide = false
                                     FarmPos = v894.HumanoidRootPart.CFrame
                                     MonFarm = v894.Name
                                     _G.ConfigStopFarm.SaberSpawn = true
