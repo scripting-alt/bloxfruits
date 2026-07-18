@@ -2,7 +2,7 @@
 local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/tlredz/Library/refs/heads/main/redz-V5-remake/main.luau"))()
 
 ScriptVersion = {
-    Version = "v1.1.4",
+    Version = "v1.1.2",
     Date = "2026-07-18"
 }
 
@@ -16,7 +16,6 @@ _G.ConfigStopFarm = {
     PirateRaid = false,
     Saw = false,
     Factory = false,
-    RenGokuKey = false,
 }
 _G.FarmType = "Up"
 
@@ -63,14 +62,6 @@ function checkEnemySpawns(EnemyName)
         return true, ReplicatedStorage:FindFirstChild("FortBuilderReplicatedSpawnPositionsFolder"):FindFirstChild(EnemyName).CFrame
     end
     return false
-end
-
-function CheckItem(itemName)
-    for _, item in ipairs(game:GetService("ReplicatedStorage").Remotes.CommF_:InvokeServer("getInventory")) do
-        if item.Name == itemName then
-            return item
-        end
-    end
 end
 
 function checkStopFarm()
@@ -1501,7 +1492,7 @@ elseif World2 then
               Name = "Auto Get Sword Rengoku",
               Default = false,
               Callback = function(Value)
-                _G.AutoRengoku = Value
+                _G.AutoLengendary = Value
               end
             })
 
@@ -1517,47 +1508,6 @@ elseif World2 then
 elseif World3 then
 
 end
-
-spawn(function()
-        pcall(function()
-            while wait() do
-                if _G.AutoRengoku then
-                    if game:GetService('Players').LocalPlayer.Backpack:FindFirstChild('Hidden Key') or game:GetService('Players').LocalPlayer.Character:FindFirstChild('Hidden Key') then
-                        EquipWeapon('Hidden Key')
-                        topos(CFrame.new(6571.1201171875, 299.23028564453, -6967.841796875))
-                        _G.ConfigStopFarm.RenGokuKey = true
-                    elseif checkEnemySpawns("Awakened Ice Admiral") then
-                        local v964, v965, v966 = pairs(game:GetService('Workspace').Enemies:GetChildren())
-
-                        while true do
-                            local v967
-
-                            v966, v967 = v964(v965, v966)
-
-                            if v966 == nil then
-                                break
-                            end
-                            if v967.Name == 'Awakened Ice Admiral' and (v967:FindFirstChild('Humanoid') and (v967:FindFirstChild('HumanoidRootPart') and v967.Humanoid.Health > 0)) then
-                                repeat
-                                    task.wait()
-                                    EquipWeapon(_G.SelectTool)
-                                    AutoHaki()
-                                    v967.HumanoidRootPart.Size = Vector3.new(50, 50, 50)
-                                    PosMon = v967.HumanoidRootPart.CFrame
-                                    MonFarm = v967.Name
-                                    topos(v967.HumanoidRootPart.CFrame * CFrame.new(0, 30, 0)
-                                until game:GetService('Players').LocalPlayer.Backpack:FindFirstChild('Hidden Key') or (_G.AutoRengoku == false or (not v967.Parent or v967.Humanoid.Health <= 0))
-                            end
-                        end
-                    else
-                        StartBring = false
-                        _G.RenGokuKey = false
-                        topos(CFrame.new(5439.716796875, 84.420944213867, -6715.1635742188))
-                    end
-                end
-            end
-        end)
-    end)
 
 spawn(function()
         while wait() do
