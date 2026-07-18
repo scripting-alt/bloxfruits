@@ -1,6 +1,11 @@
 
 local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/tlredz/Library/refs/heads/main/redz-V5-remake/main.luau"))()
 
+ScriptVersion = {
+    Version = "v1.0.0",
+    Date = "2026-07-18"
+}
+
 _G.SelectTool = "Melee"
 _G.FastAttack = true
 _G.FastAttackSpeed = 0.1
@@ -1349,6 +1354,8 @@ Tab_Discord:AddDiscordInvite({
     Members = 470000, -- Optional
     Online = 20000, -- Optional
 })
+Tab_Discord:AddParagraph("Version:", ScriptVersion.Version)
+Tab_Discord:AddParagraph("Date:", ScriptVersion.Date)
 
 Tab_Farm:AddDropdown({
   Name = "Select Tool",
