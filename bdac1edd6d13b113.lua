@@ -2402,7 +2402,7 @@ else
             return ___namecall(...)
         end
 
-        v142[2] = CFrame.new(0,0,0)
+        v142[2] = AimBotSkillPosition
 
         return ___namecall(unpack(v142))
     end)
@@ -4213,7 +4213,7 @@ else
                                                         game:GetService('Players').LocalPlayer.Character.Humanoid:FindFirstChild(''):InvokeServer('TAP', Vector3.new(ShootPosition.Position))
 
                                                         UseGunSkill = true
-                                                        Skillaimbot = true
+                                                        SkillaimbSkillaimboot = true
                                                     end
                                                 end
 
@@ -4618,8 +4618,8 @@ else
     })
 
     local v390, v391, v392 = pairs(game:GetService('ReplicatedStorage'):GetChildren())
-    local u393 = u127
-    local u394 = u169
+    local u393 = u169
+    local u394 = u127
     local u395 = {}
 
     while true do
@@ -6341,7 +6341,7 @@ else
                 break
             end
 
-            u394:MakeNotification({
+            u393:MakeNotification({
                 Name = 'Tinh Linh Hub',
                 Content = 'You Have Max Points',
                 Image = 'rbxassetid://16730867128',
@@ -8176,7 +8176,7 @@ else
                         game:GetService('Players'):FindFirstChild(TargetPlayerAim).Character.HumanoidRootPart.Position,
                     }
 
-                    game:GetService('Players').LocalPlayer.Character[game.Players.LocalPlayer.Character:FindFirstChildOfClass('Tool').Name].RemoteEvent:FireServer(game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame)
+                    game:GetService('Players').LocalPlayer.Character[game.Players.LocalPlayer.Character:FindFirstChildOfClass('Tool').Name].RemoteEvent:FireServer(unpack(v776))
                 end
             end)
         end)
@@ -8649,7 +8649,7 @@ else
                                 if true then
                                     wait()
 
-                                    local _CFrame = v834.EngineSkillaimbot.CFrame
+                                    local _CFrame = v834.Engine.CFrame
 
                                     if (_CFrame.Position - game.Players.LocalPlayer.Character.HumanoidRootPart.Position).Magnitude > 50 then
                                         SeaSkill = false
@@ -9435,7 +9435,7 @@ else
         Name = 'Pull Lever',
         Callback = function()
             PullLever()
-            u394:MakeNotification({
+            u393:MakeNotification({
                 Name = 'Tinh Linh Hub',
                 Content = 'Pull Lever Complete!',
                 Image = 'rbxassetid://16730867128',
@@ -9476,8 +9476,8 @@ else
     v181:AddButton({
         Name = 'Teleport To Clock',
         Callback = function()
-            if (game.Players.LocalPlayer.Character.HumanoidRootPart.Position - u393.Position).Magnitude <= 1000 then
-                if (game.Players.LocalPlayer.Character.HumanoidRootPart.Position - u393.Position).Magnitude < 1000 then
+            if (game.Players.LocalPlayer.Character.HumanoidRootPart.Position - u394.Position).Magnitude <= 1000 then
+                if (game.Players.LocalPlayer.Character.HumanoidRootPart.Position - u394.Position).Magnitude < 1000 then
                     wait(0.1)
                     Tween(CFrame.new(29551.9941, 15069.002, -85.5179291))
                 end
@@ -9491,8 +9491,8 @@ else
     v181:AddButton({
         Name = 'Teleport To Anclient One',
         Callback = function()
-            if (game.Players.LocalPlayer.Character.HumanoidRootPart.Position - u393.Position).Magnitude <= 1000 then
-                if (game.Players.LocalPlayer.Character.HumanoidRootPart.Position - u393.Position).Magnitude < 1000 then
+            if (game.Players.LocalPlayer.Character.HumanoidRootPart.Position - u394.Position).Magnitude <= 1000 then
+                if (game.Players.LocalPlayer.Character.HumanoidRootPart.Position - u394.Position).Magnitude < 1000 then
                     wait(0.1)
                     Tween(CFrame.new(28973.0879, 14889.9756, -120.298691))
                 end
@@ -9533,8 +9533,8 @@ else
     v181:AddButton({
         Name = 'Teleport To Race Doors',
         Callback = function()
-            if (game.Players.LocalPlayer.Character.HumanoidRootPart.Position - u393.Position).Magnitude <= 1000 then
-                if (game.Players.LocalPlayer.Character.HumanoidRootPart.Position - u393.Position).Magnitude < 1000 then
+            if (game.Players.LocalPlayer.Character.HumanoidRootPart.Position - u394.Position).Magnitude <= 1000 then
+                if (game.Players.LocalPlayer.Character.HumanoidRootPart.Position - u394.Position).Magnitude < 1000 then
                     wait(0.1)
                     RaceDoors()
                 end
@@ -10726,7 +10726,7 @@ else
         Name = 'Copy Server Job-Id',
         Callback = function()
             setclipboard(tostring(game.JobId))
-            u394:MakeNotification({
+            u393:MakeNotification({
                 Name = 'Tinh Linh Hub',
                 Content = 'Copied Server Job-Id!',
                 Image = 'rbxassetid://16730867128',
@@ -11179,7 +11179,7 @@ else
             end
         end,
     })
-    u394:MakeNotification({
+    u393:MakeNotification({
         Name = 'Tinh Linh Hub',
         Content = 'Script Loaded Successfully!',
         Image = 'rbxassetid://16730867128',
@@ -11188,11 +11188,3 @@ else
 
     return
 end
-
-
-
-
-
-
-
-

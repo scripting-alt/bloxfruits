@@ -12322,8 +12322,8 @@ gg.__namecall = newcclosure(function(...)
 	if tostring(method) == "FireServer" then
 		if tostring(args[1]) == "RemoteEvent" then
 			if tostring(args[2]) ~= "true" and tostring(args[2]) ~= "false" then
-				if Skillaimbot then
-					args[2] = AimBotSkillPosition
+				if true then
+					args[2] = game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame * Vector3.new(0,5,0)
 					return old(unpack(args))
 				end
 			end

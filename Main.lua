@@ -230,7 +230,7 @@ function CheckNearestTeleporter(TargetCFrame)
             UnderwaterExit = Vector3.new(4050, -1, -1814),
         },
 
-        [4442272183] = {
+        [79091703265657] = {
             ["Swan Mansion"] = Vector3.new(-390, 332, 673),
             ["Swan Room"] = Vector3.new(2285, 15, 905),
             ["Cursed Ship"] = Vector3.new(923, 126, 32852),
@@ -666,7 +666,7 @@ function CheckQuest()
             NameMon = "Ship Deckhand"
             CFrameQuest = CFrame.new(1037.80127, 125.092171, 32911.6016)         
             CFrameMon = CFrame.new(1212.0111083984375, 150.79205322265625, 33059.24609375)    
-            if _G.AutoFarmLevel or not checkStopFarm() and (CFrameQuest.Position - game.Players.LocalPlayer.Character.HumanoidRootPart.Position).Magnitude > 10000 then
+            if _G.AutoFarmLevel and (CFrameQuest.Position - game.Players.LocalPlayer.Character.HumanoidRootPart.Position).Magnitude > 10000 then
                 game:GetService("ReplicatedStorage").Remotes.CommF_:InvokeServer("requestEntrance",Vector3.new(923.21252441406, 126.9760055542, 32852.83203125))
             end
         elseif MyLevel == 1275 or MyLevel <= 1299 then
@@ -676,7 +676,7 @@ function CheckQuest()
             NameMon = "Ship Engineer"
             CFrameQuest = CFrame.new(1037.80127, 125.092171, 32911.6016)   
             CFrameMon = CFrame.new(919.4786376953125, 43.54401397705078, 32779.96875)   
-            if _G.AutoFarmLevel or not checkStopFarm() and (CFrameQuest.Position - game.Players.LocalPlayer.Character.HumanoidRootPart.Position).Magnitude > 10000 then
+            if _G.AutoFarmLevel and (CFrameQuest.Position - game.Players.LocalPlayer.Character.HumanoidRootPart.Position).Magnitude > 10000 then
                 game:GetService("ReplicatedStorage").Remotes.CommF_:InvokeServer("requestEntrance",Vector3.new(923.21252441406, 126.9760055542, 32852.83203125))
             end             
         elseif MyLevel == 1300 or MyLevel <= 1324 then
@@ -686,7 +686,7 @@ function CheckQuest()
             NameMon = "Ship Steward"
             CFrameQuest = CFrame.new(968.80957, 125.092171, 33244.125)         
             CFrameMon = CFrame.new(919.4385375976562, 129.55599975585938, 33436.03515625)      
-            if _G.AutoFarmLevel or not checkStopFarm() and (CFrameQuest.Position - game.Players.LocalPlayer.Character.HumanoidRootPart.Position).Magnitude > 10000 then
+            if _G.AutoFarmLevel and (CFrameQuest.Position - game.Players.LocalPlayer.Character.HumanoidRootPart.Position).Magnitude > 10000 then
                 game:GetService("ReplicatedStorage").Remotes.CommF_:InvokeServer("requestEntrance",Vector3.new(923.21252441406, 126.9760055542, 32852.83203125))
             end
         elseif MyLevel == 1325 or MyLevel <= 1349 then
@@ -696,7 +696,7 @@ function CheckQuest()
             NameMon = "Ship Officer"
             CFrameQuest = CFrame.new(968.80957, 125.092171, 33244.125)
             CFrameMon = CFrame.new(1036.0179443359375, 181.4390411376953, 33315.7265625)
-            if _G.AutoFarmLevel or not checkStopFarm() and (CFrameQuest.Position - game.Players.LocalPlayer.Character.HumanoidRootPart.Position).Magnitude > 10000 then
+            if _G.AutoFarmLevel and (CFrameQuest.Position - game.Players.LocalPlayer.Character.HumanoidRootPart.Position).Magnitude > 10000 then
                 game:GetService("ReplicatedStorage").Remotes.CommF_:InvokeServer("requestEntrance",Vector3.new(923.21252441406, 126.9760055542, 32852.83203125))
             end
         elseif MyLevel == 1350 or MyLevel <= 1374 then
@@ -706,7 +706,7 @@ function CheckQuest()
             NameMon = "Arctic Warrior"
             CFrameQuest = CFrame.new(5667.6582, 26.7997818, -6486.08984, -0.933587909, 0, -0.358349502, 0, 1, 0, 0.358349502, 0, -0.933587909)
             CFrameMon = CFrame.new(5966.24609375, 62.97002029418945, -6179.3828125)
-            if _G.AutoFarmLevel or not checkStopFarm() and (CFrameQuest.Position - game.Players.LocalPlayer.Character.HumanoidRootPart.Position).Magnitude > 10000 then
+            if _G.AutoFarmLevel and (CFrameQuest.Position - game.Players.LocalPlayer.Character.HumanoidRootPart.Position).Magnitude > 10000 then
                 game:GetService("ReplicatedStorage").Remotes.CommF_:InvokeServer("requestEntrance",Vector3.new(-6508.5581054688, 5000.034996032715, -132.83953857422))
             end
         elseif MyLevel == 1375 or MyLevel <= 1424 then
@@ -1226,13 +1226,15 @@ spawn(function()
         if _G.randomFruits then
             game:GetService("ReplicatedStorage").Remotes.CommF_:InvokeServer("Cousin","Buy")
         end
+
         if _G.getFruits then
-            for i,v in pairs(game.Workspace:GetChildren()) do
-                if string.find(v.Name, "Fruit") then
-                    topos(v.Handle.CFrame)
+            _G.ConfigStopFarm.FruitSpawn = false
+
+            for _,v in ipairs(workspace:GetChildren()) do
+                if v.Name:find("Fruit") and v:FindFirstChild("Handle") then
                     _G.ConfigStopFarm.FruitSpawn = true
-                else
-                    _G.ConfigStopFarm.FruitSpawn = false 
+                    topos(v.Handle.CFrame)
+                    break
                 end
             end
         end
