@@ -1001,8 +1001,9 @@ spawn(function()
 
         pcall(function()
             local Player = game.Players.LocalPlayer
+            local Character = Player.Character
+            local HRP = Character and Character:FindFirstChild("HumanoidRootPart")
             local QuestGui = Player.PlayerGui.Main.Quest
-            local HRP = Player.Character and Player.Character:FindFirstChild("HumanoidRootPart")
 
             if not HRP then
                 return
@@ -1016,85 +1017,94 @@ spawn(function()
                 LevelFarmToggle.Description = "Level Farm"
             end
 
+            CheckQuest()
+
             if not QuestGui.Visible then
                 StartMagnet = false
-                CheckQuest()
-
                 topos(CFrameQuest)
 
                 if (HRP.Position - CFrameQuest.Position).Magnitude <= 5 then
                     game.ReplicatedStorage.Remotes.CommF_:InvokeServer("StartQuest", NameQuest, LevelQuest)
                 end
-            else
-                CheckQuest()
-                LevelFarmToggle.Description = "Level Farm : "..Mon
-                for _, Enemy in ipairs(workspace.Enemies:GetChildren()) do
-                    local Humanoid = Enemy:FindFirstChild("Humanoid")
-                    local EnemyHRP = Enemy:FindFirstChild("HumanoidRootPart")
 
-                    if Enemy.Name == Mon
-                    and Humanoid
-                    and EnemyHRP
-                    and Humanoid.Health > 0
-                    and string.find(QuestTitle, NameMon) then
+                return
+            end
 
-                        LastHealth = Humanoid.Health
-                        StuckTime = 0
+            LevelFarmToggle.Description = "Level Farm : " .. Mon
 
-                        repeat
-                            task.wait(_G.Fast_Delay)
+            local Target
 
-                            if not Enemy.Parent then
-                                break
-                            end
+            for _, Enemy in ipairs(workspace.Enemies:GetChildren()) do
+                local Humanoid = Enemy:FindFirstChild("Humanoid")
+                local EnemyHRP = Enemy:FindFirstChild("HumanoidRootPart")
 
-                            if Humanoid.Health == LastHealth then
-                                StuckTime += 1
-                            else
-                                LastHealth = Humanoid.Health
-                                StuckTime = 0
-                            end
-
-                            if StuckTime >= 15 then
-                                --Humanoid.Health = 0
-                                break
-                            end
-
-                            BringPos = EnemyHRP.CFrame
-                            topos(EnemyHRP.CFrame * Pos)
-                            AutoHaki()
-                            EquipWeapon(_G.SelectTool)
-                            BringMob(Mon)
-
-                            --EnemyHRP.CanCollide = false
-                            Humanoid.WalkSpeed = 0
-
-                            local Head = Enemy:FindFirstChild("Head")
-                            if Head then
-                                Head.CanCollide = false
-                            end
-
-                            StartMagnet = true
-
-                        until not _G.AutoFarmLevel
-                            or Humanoid.Health <= 0
-                            or not Enemy.Parent
-                            or not QuestGui.Visible
-
-                        break
-                    end
-                end
-
-                if not workspace.Enemies:FindFirstChild(Mon) then
-                    StartMagnet = false
-                    topos(CFrameMon)
-
-                    local Respawn = game.ReplicatedStorage:FindFirstChild(Mon)
-                    if Respawn then
-                        topos(Respawn.HumanoidRootPart.CFrame * CFrame.new(15, 10, 2))
-                    end
+                if Enemy.Name == Mon
+                and Humanoid
+                and EnemyHRP
+                and Humanoid.Health > 0
+                and string.find(QuestTitle, NameMon) then
+                    Target = Enemy
+                    break
                 end
             end
+
+            if not Target then
+                StartMagnet = false
+
+                local Respawn = checkEnemySpawns(Mon)
+                if Respawn and Respawn:FindFirstChild("HumanoidRootPart") then
+                    topos(Respawn.HumanoidRootPart.CFrame * CFrame.new(15, 10, 2))
+                else
+                    topos(CFrameMon)
+                end
+
+                return
+            end
+
+            local Humanoid = Target.Humanoid
+            local EnemyHRP = Target.HumanoidRootPart
+
+            LastHealth = Humanoid.Health
+            StuckTime = 0
+
+            repeat
+                task.wait(_G.Fast_Delay)
+
+                if not Target.Parent then
+                    break
+                end
+
+                if Humanoid.Health == LastHealth then
+                    StuckTime += 1
+                else
+                    LastHealth = Humanoid.Health
+                    StuckTime = 0
+                end
+
+                if StuckTime >= 15 then
+                    break
+                end
+
+                BringPos = EnemyHRP.CFrame
+                StartMagnet = true
+
+                topos(EnemyHRP.CFrame * Pos)
+                AutoHaki()
+                EquipWeapon(_G.SelectTool)
+                BringMob(Mon)
+
+                Humanoid.WalkSpeed = 0
+
+                local Head = Target:FindFirstChild("Head")
+                if Head then
+                    Head.CanCollide = false
+                end
+
+            until not _G.AutoFarmLevel
+                or not checkStopFarm()
+                or not QuestGui.Visible
+                or not Target.Parent
+                or Humanoid.Health <= 0
         end)
     end
 end)
