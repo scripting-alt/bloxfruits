@@ -172,7 +172,7 @@ function BringMob(MobName)
         and Humanoid
         and HumanoidRootPart
         and Humanoid.Health > 0
-        and (HumanoidRootPart.Position - game.Players.LocalPlayer.Character.HumanoidRootPart.Position).Magnitude <= 350 then
+        and (HumanoidRootPart.Position - game.Players.LocalPlayer.Character.HumanoidRootPart.Position).Magnitude <= _G.BringDistance then
             HumanoidRootPart.CFrame = BringPos
             Humanoid.JumpPower = 0
             Humanoid.WalkSpeed = 0
@@ -1779,6 +1779,16 @@ Tab_Misc:AddSlider({
   Flag = "tweenSpeed_flag",
   Callback = function(Value)
     _G.TweenSpeed = Value
+  end
+})
+Tab_Misc:AddSlider({
+  Name = "Bring Distance",
+  Min = 50,
+  Max = 600,
+  Increment = 1,
+  Default = 350,
+  Callback = function(Value)
+    _G.BringDistance = Value
   end
 })
 
