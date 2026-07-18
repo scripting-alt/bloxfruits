@@ -2,7 +2,7 @@
 local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/tlredz/Library/refs/heads/main/redz-V5-remake/main.luau"))()
 
 ScriptVersion = {
-    Version = "v1.0.1",
+    Version = "v1.1.2",
     Date = "2026-07-18"
 }
 
@@ -1466,26 +1466,59 @@ Tab_Fruit:AddToggle({
   end
 })
 
-Tab_Quests:AddSection("Quest Sword")
+if World1 then
+    Tab_Quests:AddSection("Quest Sword")
+    Tab_Quests:AddToggle({
+      Name = "Auto Get Saber",
+      Default = false,
+      Description = "Level 200",
+      Callback = function(Value)
+        _G.AutoSaber = Value
+        stopTeleport()
+      end
+    })
+    Tab_Quests:AddToggle({
+      Name = "Auto Second Sea",
+      Default = false,
+      Description = "Level 700",
+      Callback = function(Value)
+        _G.AutoSecondSea = Value
+        stopTeleport()
+      end
+    })
+elseif World2 then
+    Tab_Quests:AddSection("Legendary Sword")
+    Tab_Quests:AddParagraph("Legendary Sword Dealer")
+    Tab_Quests:AddToggle({
+          Name = "Auto Buy Legendary Sword",
+          Default = false,
+          Callback = function(Value)
+            _G.AutoLengendary = Value
+          end
+        })
+elseif World3 then
 
-Tab_Quests:AddToggle({
-  Name = "Auto Get Saber",
-  Default = false,
-  Description = "Level 200",
-  Callback = function(Value)
-    _G.AutoSaber = Value
-    stopTeleport()
-  end
-})
-Tab_Quests:AddToggle({
-  Name = "Auto Second Sea",
-  Default = false,
-  Description = "Level 700",
-  Callback = function(Value)
-    _G.AutoSecondSea = Value
-    stopTeleport()
-  end
-})
+end
+
+spawn(function()
+        while wait() do
+            if _G.AutoLengendary then
+                game:GetService('ReplicatedStorage').Remotes.CommF_:InvokeServer(unpack({
+                    'LegendarySwordDealer',
+                    '1',
+                }))
+                game:GetService('ReplicatedStorage').Remotes.CommF_:InvokeServer(unpack({
+                    'LegendarySwordDealer',
+                    '2',
+                }))
+                game:GetService('ReplicatedStorage').Remotes.CommF_:InvokeServer(unpack({
+                    'LegendarySwordDealer',
+                    '3',
+                }))
+            end
+        end
+    end)
+
 local function Debug(...)
     print("[AutoSecondSea]", ...)
 end
@@ -1796,7 +1829,8 @@ Tab_Misc:AddSection("Player")
 
 Tab_Misc:AddToggle({
   Name = "Water Walk",
-  Default = false,
+  Default = true,
+  Flag = "waterWalk_flag",
   Callback = function(Value)
     _G.WaterWalk = Value
     workspace._WorldOrigin["Foam;"].CanCollide = _G.WaterWalk
