@@ -2142,7 +2142,7 @@ end
 Tab_Teleport:AddDropdown({
   Name = "Select Island",
   Options = teleportsWorlds,
-  Default = nil",
+  Default = nil,
   Callback = function(Value)
     _G.SelectIsland = Value
   end
@@ -2252,7 +2252,7 @@ Callback = function(Value)
             end
         until not _G.TeleportIsland
     end
-    StopTween()
+    stopTeleport()
 end})
 
 local Queue = queue_on_teleport or syn and syn.queue_on_teleport
