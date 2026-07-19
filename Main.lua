@@ -43,7 +43,7 @@ if game.PlaceId == 2753915549 then
 elseif game.PlaceId == 79091703265657 then
     World2 = true
     warn("[REDZ HUB] SEA 2")
-elseif game.PlaceId == 7449423635 then
+elseif game.PlaceId == 100117331123089 then
     World3 = true
     warn("[REDZ HUB] SEA 3")
 end
@@ -242,7 +242,7 @@ function CheckNearestTeleporter(TargetCFrame)
             ["Zombie Island"] = Vector3.new(-6509, 83, -133),
         },
 
-        [7449423635] = {
+        [100117331123089] = {
             ["Floating Turtle"] = Vector3.new(-12462, 375, -7552),
             ["Hydra Island"] = Vector3.new(5657.88623046875, 1013.0790405273438, -335.4996337890625),
             Mansion = Vector3.new(-12462, 375, -7552),
@@ -2151,7 +2151,7 @@ Tab_Teleport:AddDropdown({
 Tab_Teleport:AddToggle({Name = "Teleport To Selected Island",Default = false,
 Callback = function(Value)
     _G.TeleportIsland = Value
-    if _G.TeleportIsland == true and not checkStopFarm() and not _G.AutoFarmLevel and not _G.AutoFarmNear then
+    if _G.TeleportIsland == true then
         repeat wait()
             if _G.SelectIsland == "WindMill" then
                 topos(CFrame.new(979.79895019531, 16.516613006592, 1429.0466308594))
