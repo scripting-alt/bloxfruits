@@ -2,7 +2,7 @@
 local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/tlredz/Library/refs/heads/main/redz-V5-remake/main.luau"))()
 
 ScriptVersion = {
-    Version = "v1.2.6",
+    Version = "v1.2.8",
     Date = "2026-07-18"
 }
 
@@ -1110,7 +1110,7 @@ spawn(function()
             continue
         end
 
-        if _G.AutoFarmLevel or _G.AutoFarmNear or TweenON then
+        if _G.AutoFarmLevel or _G.AutoFarmNear or TweenON or _G.AutoBartilo then
             if not HRP:FindFirstChild("BodyClip") then
                 local BodyVelocity = Instance.new("BodyVelocity")
                 BodyVelocity.Name = "BodyClip"
@@ -1528,17 +1528,17 @@ spawn(function()
                         if game:GetService("Workspace").Enemies:FindFirstChild("Swan Pirate") then
                             Ms = "Swan Pirate"
                             for i,v in pairs(game:GetService("Workspace").Enemies:GetChildren()) do
-                                if v.Name == Ms then
+                                if v.Name == Ms and v:FindFirstChildOfClass("Humanoid").Health > 0 then
                                     pcall(function()
                                         repeat task.wait()
                                             sethiddenproperty(game:GetService("Players").LocalPlayer, "SimulationRadius", math.huge)
                                             EquipWeapon(_G.SelectTool)
                                             AutoHaki()
                                             v.HumanoidRootPart.Transparency = 1
-                                            topos(v.HumanoidRootPart.CFrame * Pos)													
+                                            BringPos = v.HumanoidRootPart.CFrame
+                                            topos(v.HumanoidRootPart.CFrame * Pos)
+                                            BringMob("Swan Pirate")													
                                             PosMonBarto =  v.HumanoidRootPart.CFrame
-                                            game:GetService'VirtualUser':CaptureController()
-                                            game:GetService'VirtualUser':Button1Down(Vector2.new(1280, 672))
                                             AutoBartiloBring = true
                                         until not v.Parent or v.Humanoid.Health <= 0 or _G.AutoBartilo == false or game:GetService("Players").LocalPlayer.PlayerGui.Main.Quest.Visible == false
                                         AutoBartiloBring = false
@@ -1572,7 +1572,7 @@ spawn(function()
                                 until not v.Parent or v.Humanoid.Health <= 0 or _G.AutoBartilo == false
                             end
                         end
-                    elseif checkEnemySpawns("Jeremy") then
+                    elseif game.ReplicatedStorage:FindFirstChild("Jeremy") then
                         repeat topos(CFrame.new(-456.28952, 73.0200958, 299.895966)) wait() until not _G.AutoBartilo or (game:GetService("Players").LocalPlayer.Character.HumanoidRootPart.Position-Vector3.new(-456.28952, 73.0200958, 299.895966)).Magnitude <= 10
                         wait(1.1)
                         game:GetService("ReplicatedStorage").Remotes.CommF_:InvokeServer("BartiloQuestProgress","Bartilo")
