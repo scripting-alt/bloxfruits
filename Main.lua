@@ -1285,9 +1285,10 @@ spawn(function()
                     repeat
                         task.wait(_G.Fast_Delay)
 
-                        if not Enemy.Parent then
-                            break
+                        if not Enemy.Parent or Humanoid.Health <= 0 then
+                                break
                         end
+
                         if Humanoid.Health == LastHealth then
                             StuckTime += 1
                         else
