@@ -1575,7 +1575,7 @@ elseif World2 then
                 })
 elseif World3 then
     Tab_Quests:AddSection("Elite Hunter")
-    EliteHunterKill = Tab_Quests:Label("Check Elite Hunter kill")
+    EliteHunterKill = Tab_Quests:AddParagraph("Teste", "Algo")
     Tab_Quests:AddToggle({
               Name = "Auto Elite Hunter",
               Default = false,
