@@ -2,7 +2,7 @@
 local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/tlredz/Library/refs/heads/main/redz-V5-remake/main.luau"))()
 
 ScriptVersion = {
-    Version = "v1.4.4",
+    Version = "v1.4.6",
     Date = "2026-07-20"
 }
 
@@ -1362,7 +1362,7 @@ Tab_Discord:AddParagraph("Date:", ScriptVersion.Date)
 Tab_Farm:AddDropdown({
   Name = "Select Tool",
   MultiSelect = false,
-  Options = {"Melee", "Sword", "Blox Fruit"},
+  Options = {"Melee", "Sword", "Demon Fruit"},
   Default = {"Melee"},
   Flag = "selectTool_flag",
   Callback = function(Value)
