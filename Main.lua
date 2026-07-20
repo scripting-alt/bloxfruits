@@ -2,7 +2,7 @@
 local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/tlredz/Library/refs/heads/main/redz-V5-remake/main.luau"))()
 
 ScriptVersion = {
-    Version = "v1.4.1",
+    Version = "v1.4.4",
     Date = "2026-07-20"
 }
 
@@ -756,29 +756,29 @@ function CheckQuest()
             LevelQuest = 1
             NameQuest = "AmazonQuest"
             NameMon = "Dragon Crew Warrior"
-            CFrameQuest = CFrame.new(5832.83594, 51.6806107, -1101.51563, 0.898790359, -0, -0.438378751, 0, 1, -0, 0.438378751, 0, 0.898790359)
-            CFrameMon = CFrame.new(6141.140625, 51.35136413574219, -1340.738525390625)
+            CFrameQuest = CFrame.new(6736.88916, 127.604462, -712.792236, -0.514472246, 1.2276959e-08, 0.85750705, -8.18380883e-08, 1, -6.34168345e-08, -0.85750705, -1.02802936e-07, -0.514472246)
+            CFrameMon = CFrame.new(6815.59716796875, 80.9439582824707, -876.7154541015625)
         elseif MyLevel == 1600 or MyLevel <= 1624 then 
-            Mon = "Dragon Crew Archer [Lv. 1600]"
+            Mon = "Dragon Crew Archer"
             NameQuest = "AmazonQuest"
             LevelQuest = 2
             NameMon = "Dragon Crew Archer"
-            CFrameQuest = CFrame.new(5833.1147460938, 51.60498046875, -1103.0693359375)
-            CFrameMon = CFrame.new(6616.41748046875, 441.7670593261719, 446.0469970703125)
+            CFrameQuest = CFrame.new(6736.88916, 127.604462, -712.792236, -0.514472246, 1.2276959e-08, 0.85750705, -8.18380883e-08, 1, -6.34168345e-08, -0.85750705, -1.02802936e-07, -0.514472246)
+            CFrameMon = CFrame.new(6842.4072265625, 707.8894653320312, 321.57464599609375)
         elseif MyLevel == 1625 or MyLevel <= 1649 then
-            Mon = "Female Islander"
+            Mon = "Hydra Enforcer"
             NameQuest = "AmazonQuest2"
             LevelQuest = 1
-            NameMon = "Female Islander"
-            CFrameQuest = CFrame.new(5446.8793945313, 601.62945556641, 749.45672607422)
-            CFrameMon = CFrame.new(4685.25830078125, 735.8078002929688, 815.3425903320312)
+            NameMon = "Hydra Enforcer"
+            CFrameQuest = CFrame.new(5213.0244140625, 1004.29248046875, 756.0917358398438)
+            CFrameMon = CFrame.new(4539.60107421875, 1127.4263916015625, 422.863525390625)
         elseif MyLevel == 1650 or MyLevel <= 1699 then 
-            Mon = "Giant Islander [Lv. 1650]"
+            Mon = "Venomous Assailant"
             NameQuest = "AmazonQuest2"
             LevelQuest = 2
-            NameMon = "Giant Islander"
-            CFrameQuest = CFrame.new(5446.8793945313, 601.62945556641, 749.45672607422)
-            CFrameMon = CFrame.new(4729.09423828125, 590.436767578125, -36.97627639770508)
+            NameMon = "Venomous Assailant"
+            CFrameQuest = CFrame.new(5213.0244140625, 1004.29248046875, 756.0917358398438)
+            CFrameMon = CFrame.new(4591.84814453125, 1139.4951171875, 882.6480712890625)
         elseif MyLevel == 1700 or MyLevel <= 1724 then
             Mon = "Marine Commodore"
             LevelQuest = 1
@@ -1574,8 +1574,74 @@ elseif World2 then
                     end
                 })
 elseif World3 then
+    Tab_Quests:AddSection("Elite Hunter")
+    EliteHunterKill = Tab_Quests:Label("Check Elite Hunter kill")
+    Tab_Quests:AddToggle({
+              Name = "Auto Elite Hunter",
+              Default = false,
+              Flag = "EliteHunter_Flags",
+              Callback = function(Value)
+                _G.AutoEliteHunter = Value
+                _G.ConfigStopFarm.EliteSpawn = false
+              end
+            })
 
+    spawn(function()
+        while wait() do
+            pcall(function()
+                if game:GetService("ReplicatedStorage"):FindFirstChild("Diablo") or game:GetService("ReplicatedStorage"):FindFirstChild("Deandre") or game:GetService("ReplicatedStorage"):FindFirstChild("Urban") or game:GetService("Workspace").Enemies:FindFirstChild("Diablo") or game:GetService("Workspace").Enemies:FindFirstChild("Deandre") or game:GetService("Workspace").Enemies:FindFirstChild("Urban") then
+                    EliteHunterKill:Set("Number of kills  : "..game:GetService("ReplicatedStorage").Remotes.CommF_:InvokeServer("EliteHunter","Progress"))
+                else
+                    EliteHunterKill:Set("Number of kills  : "..game:GetService("ReplicatedStorage").Remotes.CommF_:InvokeServer("EliteHunter","Progress"))	
+                end
+            end)
+        end
+    end)
 end
+
+spawn(function()
+    while wait() do
+        if _G.AutoEliteHunter and World3 then
+            pcall(function()
+                if game:GetService("Players").LocalPlayer.PlayerGui.Main.Quest.Visible == true then
+                    if string.find(game:GetService("Players").LocalPlayer.PlayerGui.Main.Quest.Container.QuestTitle.Title.Text,"Diablo") or string.find(game:GetService("Players").LocalPlayer.PlayerGui.Main.Quest.Container.QuestTitle.Title.Text,"Deandre") or string.find(game:GetService("Players").LocalPlayer.PlayerGui.Main.Quest.Container.QuestTitle.Title.Text,"Urban") then
+                        _G.ConfigStopFarm.EliteSpawn = true
+                        if game:GetService("Workspace").Enemies:FindFirstChild("Diablo") or game:GetService("Workspace").Enemies:FindFirstChild("Deandre") or game:GetService("Workspace").Enemies:FindFirstChild("Urban") then
+                            for i,v in pairs(game:GetService("Workspace").Enemies:GetChildren()) do
+                                if v.Name == "Diablo" or v.Name == "Deandre" or v.Name == "Urban" then
+                                    if v:FindFirstChild("Humanoid") and v:FindFirstChild("HumanoidRootPart") and v.Humanoid.Health > 0 then
+                                        repeat wait()
+                                            AutoHaki()
+                                            EquipWeapon(_G.SelectTool)
+                                            v.Humanoid.WalkSpeed = 0
+                                            
+                                            topos(v.HumanoidRootPart.CFrame * Pos)
+                                            sethiddenproperty(game:GetService("Players").LocalPlayer,"SimulationRadius",math.huge)
+                                        until _G.AutoEliteHunter == false or v.Humanoid.Health <= 0 or not v.Parent
+                                    end
+                                end
+                            end
+                        else
+                            if game:GetService("ReplicatedStorage"):FindFirstChild("Diablo") then
+                                topos(game:GetService("ReplicatedStorage"):FindFirstChild("Diablo").HumanoidRootPart.CFrame * CFrame.new(2,20,2))
+                            elseif game:GetService("ReplicatedStorage"):FindFirstChild("Deandre") then
+                                topos(game:GetService("ReplicatedStorage"):FindFirstChild("Deandre").HumanoidRootPart.CFrame * CFrame.new(2,20,2))
+                            elseif game:GetService("ReplicatedStorage"):FindFirstChild("Urban") then
+                                topos(game:GetService("ReplicatedStorage"):FindFirstChild("Urban").HumanoidRootPart.CFrame * CFrame.new(2,20,2))
+                            end
+                        end                    
+                    end
+                else					
+                    if game:GetService("ReplicatedStorage").Remotes["CommF_"]:InvokeServer("EliteHunter") == "I don't have anything for you right now. Come back later." then
+                        _G.ConfigStopFarm.EliteSpawn = false
+                    else
+                        game:GetService("ReplicatedStorage").Remotes.CommF_:InvokeServer("EliteHunter")
+                    end
+                end
+            end)
+        end
+    end
+end)
 
 spawn(function()
     while wait() do

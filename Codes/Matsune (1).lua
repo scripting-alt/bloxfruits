@@ -7408,17 +7408,7 @@ end
   
     EliteHunterKill = Items:Label("Check Elite Hunter kill")
      
-     spawn(function()
-    while wait() do
-        pcall(function()
-            if game:GetService("ReplicatedStorage"):FindFirstChild("Diablo") or game:GetService("ReplicatedStorage"):FindFirstChild("Deandre") or game:GetService("ReplicatedStorage"):FindFirstChild("Urban") or game:GetService("Workspace").Enemies:FindFirstChild("Diablo") or game:GetService("Workspace").Enemies:FindFirstChild("Deandre") or game:GetService("Workspace").Enemies:FindFirstChild("Urban") then
-                EliteHunterKill:Set("Number of kills  : "..game:GetService("ReplicatedStorage").Remotes.CommF_:InvokeServer("EliteHunter","Progress"))
-            else
-               EliteHunterKill:Set("Number of kills  : "..game:GetService("ReplicatedStorage").Remotes.CommF_:InvokeServer("EliteHunter","Progress"))	
-            end
-        end)
-    end
-end)
+
      
          EliteHunter = Items:Label("Check Elite Hunter")
      
@@ -10900,8 +10890,8 @@ end)
                 pcall(function()
                     game:GetService("Players").LocalPlayer.Character[SelectWeaponGun].Cooldown.Value = 0
                     local args = {
-                        [1] = game:GetService("Players"):FindFirstChild(PlayerSelectAimbot).Character.HumanoidRootPart.Position,
-                        [2] = game:GetService("Players"):FindFirstChild(PlayerSelectAimbot).Character.HumanoidRootPart
+                        [1] = workspace.Enemies:GetChildren()[11].HumanoidRootPart.Position,
+                        [2] = workspace.Enemies:GetChildren()[11].HumanoidRootPart
                     }
                     game:GetService("Players").LocalPlayer.Character[SelectWeaponGun].RemoteFunctionShoot:InvokeServer(unpack(args))
                     game:GetService'VirtualUser':CaptureController()
