@@ -2,8 +2,8 @@
 local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/tlredz/Library/refs/heads/main/redz-V5-remake/main.luau"))()
 
 ScriptVersion = {
-    Version = "v1.3.1",
-    Date = "2026-07-19"
+    Version = "v1.4.1",
+    Date = "2026-07-20"
 }
 
 _G.SelectTool = "Melee"
@@ -1467,6 +1467,57 @@ Tab_Fruit:AddToggle({
     _G.randomFruits = Value
   end
 })
+
+Tab_Fruit:AddSection("Raids")
+
+Tab_Fruit:AddToggle({
+  Name = "Auto Raid",
+  Default = false,
+  Callback = function(Value)
+    _G.Dungeon = Value
+  end
+})
+
+ function IsIslandRaid(cu)
+    if game:GetService("Workspace")["_WorldOrigin"].Locations:FindFirstChild("Island " .. cu) then
+        min = 4500
+        for r, v in pairs(game:GetService("Workspace")["_WorldOrigin"].Locations:GetChildren()) do
+            if
+                v.Name == "Island " .. cu and
+                    (v.Position - game.Players.LocalPlayer.Character.HumanoidRootPart.Position).Magnitude < min
+            then
+                min = (v.Position - game.Players.LocalPlayer.Character.HumanoidRootPart.Position).Magnitude
+            end
+        end
+        for r, v in pairs(game:GetService("Workspace")["_WorldOrigin"].Locations:GetChildren()) do
+            if
+                v.Name == "Island " .. cu and
+                    (v.Position - game.Players.LocalPlayer.Character.HumanoidRootPart.Position).Magnitude <= min
+            then
+                return v
+            end
+        end
+    end
+end
+
+function getNextIsland()
+    TableIslandsRaid = {5, 4, 3, 2, 1}
+    for r, v in pairs(TableIslandsRaid) do
+        if IsIslandRaid(v) and (IsIslandRaid(v).Position - game.Players.LocalPlayer.Character.HumanoidRootPart.Position).Magnitude <= 4500 then
+            return IsIslandRaid(v)
+        end
+    end
+end
+
+spawn(function()
+    while wait() do
+        if _G.Dungeon then
+            if getNextIsland() then
+                spawn(topos(getNextIsland().CFrame * CFrame.new(0, 60, 0)), 1)
+            end
+        end
+    end
+end)
 
 if World1 then
     Tab_Quests:AddSection("Quest Sword")
