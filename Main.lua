@@ -754,27 +754,27 @@ function CheckQuest()
         elseif MyLevel == 1575 or MyLevel <= 1599 then
             Mon = "Dragon Crew Warrior"
             LevelQuest = 1
-            NameQuest = "AmazonQuest"
+            NameQuest = "DragonCrewQuest"
             NameMon = "Dragon Crew Warrior"
             CFrameQuest = CFrame.new(6736.88916, 127.604462, -712.792236, -0.514472246, 1.2276959e-08, 0.85750705, -8.18380883e-08, 1, -6.34168345e-08, -0.85750705, -1.02802936e-07, -0.514472246)
             CFrameMon = CFrame.new(6815.59716796875, 80.9439582824707, -876.7154541015625)
         elseif MyLevel == 1600 or MyLevel <= 1624 then 
             Mon = "Dragon Crew Archer"
-            NameQuest = "AmazonQuest"
+            NameQuest = "DragonCrewQuest"
             LevelQuest = 2
             NameMon = "Dragon Crew Archer"
             CFrameQuest = CFrame.new(6736.88916, 127.604462, -712.792236, -0.514472246, 1.2276959e-08, 0.85750705, -8.18380883e-08, 1, -6.34168345e-08, -0.85750705, -1.02802936e-07, -0.514472246)
             CFrameMon = CFrame.new(6842.4072265625, 707.8894653320312, 321.57464599609375)
         elseif MyLevel == 1625 or MyLevel <= 1649 then
             Mon = "Hydra Enforcer"
-            NameQuest = "AmazonQuest2"
+            NameQuest = "VenomCrewQuest"
             LevelQuest = 1
             NameMon = "Hydra Enforcer"
             CFrameQuest = CFrame.new(5213.0244140625, 1004.29248046875, 756.0917358398438)
             CFrameMon = CFrame.new(4539.60107421875, 1127.4263916015625, 422.863525390625)
         elseif MyLevel == 1650 or MyLevel <= 1699 then 
             Mon = "Venomous Assailant"
-            NameQuest = "AmazonQuest2"
+            NameQuest = "VenomCrewQuest"
             LevelQuest = 2
             NameMon = "Venomous Assailant"
             CFrameQuest = CFrame.new(5213.0244140625, 1004.29248046875, 756.0917358398438)
@@ -1583,6 +1583,7 @@ elseif World3 then
               Callback = function(Value)
                 _G.AutoEliteHunter = Value
                 _G.ConfigStopFarm.EliteSpawn = false
+                stopTeleport()
               end
             })
 
@@ -1590,9 +1591,9 @@ elseif World3 then
         while wait() do
             pcall(function()
                 if game:GetService("ReplicatedStorage"):FindFirstChild("Diablo") or game:GetService("ReplicatedStorage"):FindFirstChild("Deandre") or game:GetService("ReplicatedStorage"):FindFirstChild("Urban") or game:GetService("Workspace").Enemies:FindFirstChild("Diablo") or game:GetService("Workspace").Enemies:FindFirstChild("Deandre") or game:GetService("Workspace").Enemies:FindFirstChild("Urban") then
-                    EliteHunterKill:Set("Number of kills  : "..game:GetService("ReplicatedStorage").Remotes.CommF_:InvokeServer("EliteHunter","Progress"))
+                    EliteHunterKill:Set({Title = "Progress", Content = "Number of kills  : "..game:GetService("ReplicatedStorage").Remotes.CommF_:InvokeServer("EliteHunter","Progress")})	
                 else
-                    EliteHunterKill:Set("Number of kills  : "..game:GetService("ReplicatedStorage").Remotes.CommF_:InvokeServer("EliteHunter","Progress"))	
+                    EliteHunterKill:Set({Title = "Progress", Content = "Number of kills  : "..game:GetService("ReplicatedStorage").Remotes.CommF_:InvokeServer("EliteHunter","Progress")})	
                 end
             end)
         end
