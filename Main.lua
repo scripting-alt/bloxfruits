@@ -2,7 +2,7 @@
 local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/tlredz/Library/refs/heads/main/redz-V5-remake/main.luau"))()
 
 ScriptVersion = {
-    Version = "v1.4.6",
+    Version = "v1.4.7",
     Date = "2026-07-20"
 }
 
@@ -199,7 +199,7 @@ function BringMob(MobName)
                 BodyVelocity.Velocity = Vector3.zero
             end
 
-            sethiddenproperty(plr, "SimulationRadius", math.huge)
+           -- sethiddenproperty(plr, "SimulationRadius", math.huge)
 
             Humanoid:ChangeState(11)
         end
@@ -244,7 +244,7 @@ function CheckNearestTeleporter(TargetCFrame)
 
         [100117331123089] = {
             ["Floating Turtle"] = Vector3.new(-12462, 375, -7552),
-            ["Hydra Island"] = Vector3.new(5657.88623046875, 1013.0790405273438, -335.4996337890625),
+            ["Hydra Island"] = Vector3.new(5660.03125, 1013.2661743164062, -337.931884765625),
             Mansion = Vector3.new(-12462, 375, -7552),
             Castle = Vector3.new(-5036, 315, -3179),
             ["Dimensional Shift"] = Vector3.new(-2097.3447265625, 4776.24462890625, -15013.4990234375),
@@ -784,15 +784,15 @@ function CheckQuest()
             LevelQuest = 1
             NameQuest = "MarineTreeIsland"
             NameMon = "Marine Commodore"
-            CFrameQuest = CFrame.new(2180.54126, 27.8156815, -6741.5498, -0.965929747, 0, 0.258804798, 0, 1, 0, -0.258804798, 0, -0.965929747)
-            CFrameMon = CFrame.new(2286.0078125, 73.13391876220703, -7159.80908203125)
+            CFrameQuest = CFrame.new(2485.2705078125, 74.4573974609375, -6786.09375)
+            CFrameMon = CFrame.new(2599.41796875, 127.60929870605469, -7929.2021484375)
         elseif MyLevel == 1725 or MyLevel <= 1774 then
-            Mon = "Marine Rear Admiral [Lv. 1725]"
+            Mon = "Marine Rear Admiral"
             NameMon = "Marine Rear Admiral"
             NameQuest = "MarineTreeIsland"
             LevelQuest = 2
-            CFrameQuest = CFrame.new(2179.98828125, 28.731239318848, -6740.0551757813)
-            CFrameMon = CFrame.new(3656.773681640625, 160.52406311035156, -7001.5986328125)
+            CFrameQuest = CFrame.new(2485.2705078125, 74.4573974609375, -6786.09375)
+            CFrameMon = CFrame.new()
         elseif MyLevel == 1775 or MyLevel <= 1799 then
             Mon = "Fishman Raider"
             LevelQuest = 1
@@ -1588,55 +1588,87 @@ elseif World3 then
             })
 
     spawn(function()
-        while wait() do
-            pcall(function()
-                if game:GetService("ReplicatedStorage"):FindFirstChild("Diablo") or game:GetService("ReplicatedStorage"):FindFirstChild("Deandre") or game:GetService("ReplicatedStorage"):FindFirstChild("Urban") or game:GetService("Workspace").Enemies:FindFirstChild("Diablo") or game:GetService("Workspace").Enemies:FindFirstChild("Deandre") or game:GetService("Workspace").Enemies:FindFirstChild("Urban") then
-                    EliteHunterKill:Set({Title = "Progress", Content = "Number of kills  : "..game:GetService("ReplicatedStorage").Remotes.CommF_:InvokeServer("EliteHunter","Progress")})	
-                else
-                    EliteHunterKill:Set({Title = "Progress", Content = "Number of kills  : "..game:GetService("ReplicatedStorage").Remotes.CommF_:InvokeServer("EliteHunter","Progress")})	
-                end
-            end)
-        end
+        while wait(1) do
+           pcall(function()
+               --if game:GetService("ReplicatedStorage"):FindFirstChild("Diablo") or game:GetService("ReplicatedStorage"):FindFirstChild("Deandre") or game:GetService("ReplicatedStorage"):FindFirstChild("Urban") or game:GetService("Workspace").Enemies:FindFirstChild("Diablo") or game:GetService("Workspace").Enemies:FindFirstChild("Deandre") or game:GetService("Workspace").Enemies:FindFirstChild("Urban") then
+                --   EliteHunterKill:Set({Title = "Progress", Content = "Number of kills  : "..game:GetService("ReplicatedStorage").Remotes.CommF_:InvokeServer("EliteHunter","Progress")})	
+                --else
+                    EliteHunterKill:SetValues({Title = "Progress", Content = "Number of kills  : "..game:GetService("ReplicatedStorage").Remotes.CommF_:InvokeServer("EliteHunter","Progress")})	
+               -- end
+           end)
+       end
     end)
 end
 
 spawn(function()
-    while wait() do
+    while task.wait() do
         if _G.AutoEliteHunter and World3 then
             pcall(function()
-                if game:GetService("Players").LocalPlayer.PlayerGui.Main.Quest.Visible == true then
-                    if string.find(game:GetService("Players").LocalPlayer.PlayerGui.Main.Quest.Container.QuestTitle.Title.Text,"Diablo") or string.find(game:GetService("Players").LocalPlayer.PlayerGui.Main.Quest.Container.QuestTitle.Title.Text,"Deandre") or string.find(game:GetService("Players").LocalPlayer.PlayerGui.Main.Quest.Container.QuestTitle.Title.Text,"Urban") then
-                        _G.ConfigStopFarm.EliteSpawn = true
-                        if game:GetService("Workspace").Enemies:FindFirstChild("Diablo") or game:GetService("Workspace").Enemies:FindFirstChild("Deandre") or game:GetService("Workspace").Enemies:FindFirstChild("Urban") then
-                            for i,v in pairs(game:GetService("Workspace").Enemies:GetChildren()) do
-                                if v.Name == "Diablo" or v.Name == "Deandre" or v.Name == "Urban" then
-                                    if v:FindFirstChild("Humanoid") and v:FindFirstChild("HumanoidRootPart") and v.Humanoid.Health > 0 then
-                                        repeat wait()
-                                            AutoHaki()
-                                            EquipWeapon(_G.SelectTool)
-                                            v.Humanoid.WalkSpeed = 0
-                                            
-                                            topos(v.HumanoidRootPart.CFrame * Pos)
-                                            sethiddenproperty(game:GetService("Players").LocalPlayer,"SimulationRadius",math.huge)
-                                        until _G.AutoEliteHunter == false or v.Humanoid.Health <= 0 or not v.Parent
-                                    end
-                                end
-                            end
-                        else
-                            if game:GetService("ReplicatedStorage"):FindFirstChild("Diablo") then
-                                topos(game:GetService("ReplicatedStorage"):FindFirstChild("Diablo").HumanoidRootPart.CFrame * CFrame.new(2,20,2))
-                            elseif game:GetService("ReplicatedStorage"):FindFirstChild("Deandre") then
-                                topos(game:GetService("ReplicatedStorage"):FindFirstChild("Deandre").HumanoidRootPart.CFrame * CFrame.new(2,20,2))
-                            elseif game:GetService("ReplicatedStorage"):FindFirstChild("Urban") then
-                                topos(game:GetService("ReplicatedStorage"):FindFirstChild("Urban").HumanoidRootPart.CFrame * CFrame.new(2,20,2))
-                            end
-                        end                    
+                local Player = game.Players.LocalPlayer
+                local Quest = Player.PlayerGui.Main.Quest
+                local Enemies = workspace.Enemies
+                local ReplicatedStorage = game.ReplicatedStorage
+                local EliteNames = {"Diablo", "Deandre", "Urban"}
+                local QuestTitle = Quest.Container.QuestTitle.Title.Text
+                local Elite
+
+                for _, Name in ipairs(EliteNames) do
+                    if string.find(QuestTitle, Name) then
+                        Elite = Name
+                        break
                     end
-                else					
-                    if game:GetService("ReplicatedStorage").Remotes["CommF_"]:InvokeServer("EliteHunter") == "I don't have anything for you right now. Come back later." then
+                end
+
+                local SpawnedElite
+
+                for _, Name in ipairs(EliteNames) do
+                    if Enemies:FindFirstChild(Name) or ReplicatedStorage:FindFirstChild(Name) then
+                        SpawnedElite = Name
+                        break
+                    end
+                end
+
+                if Quest.Visible then
+                    if SpawnedElite and not Elite then
+                        ReplicatedStorage.Remotes.CommF_:InvokeServer("AbandonQuest")
+                        return
+                    end
+
+                    if not Elite then
+                        return
+                    end
+
+                    _G.ConfigStopFarm.EliteSpawn = true
+
+                    local Enemy = Enemies:FindFirstChild(Elite)
+
+                    if Enemy and Enemy:FindFirstChild("Humanoid") and Enemy:FindFirstChild("HumanoidRootPart") then
+                        local Humanoid = Enemy.Humanoid
+
+                        if Humanoid.Health > 0 then
+                            repeat
+                                task.wait()
+                                AutoHaki()
+                                EquipWeapon(_G.SelectTool)
+
+                                Humanoid.WalkSpeed = 0
+                                topos(Enemy.HumanoidRootPart.CFrame * Pos)
+                            until not _G.AutoEliteHunter or Humanoid.Health <= 0 or not Enemy.Parent
+                        end
+                    else
+                        local Spawn = ReplicatedStorage:FindFirstChild(Elite)
+
+                        if Spawn and Spawn:FindFirstChild("HumanoidRootPart") then
+                            topos(Spawn.HumanoidRootPart.CFrame * CFrame.new(2, 20, 2))
+                        end
+                    end
+                else
+                    local Result = ReplicatedStorage.Remotes.CommF_:InvokeServer("EliteHunter")
+
+                    if Result == "I don't have anything for you right now. Come back later." then
                         _G.ConfigStopFarm.EliteSpawn = false
                     else
-                        game:GetService("ReplicatedStorage").Remotes.CommF_:InvokeServer("EliteHunter")
+                        ReplicatedStorage.Remotes.CommF_:InvokeServer("EliteHunter")
                     end
                 end
             end)
@@ -1668,7 +1700,7 @@ spawn(function()
                                         v.HumanoidRootPart.CFrame = OldCFrameThird
                                         v.Humanoid.WalkSpeed = 0
                                         game:GetService("ReplicatedStorage").Remotes.CommF_:InvokeServer("TravelZou")
-                                        sethiddenproperty(game:GetService("Players").LocalPlayer,"SimulationRadius",math.huge)
+                                        --sethiddenproperty(game:GetService("Players").LocalPlayer,"SimulationRadius",math.huge)
                                     until _G.AutoThirdSea == false or v.Humanoid.Health <= 0 or not v.Parent
                                 end
                             end
@@ -1694,7 +1726,7 @@ spawn(function()
                                 if v.Name == Ms then
                                     pcall(function()
                                         repeat task.wait()
-                                            sethiddenproperty(game:GetService("Players").LocalPlayer, "SimulationRadius", math.huge)
+                                            --sethiddenproperty(game:GetService("Players").LocalPlayer, "SimulationRadius", math.huge)
                                             EquipWeapon(_G.SelectTool)
                                             AutoHaki()
                                             v.HumanoidRootPart.Transparency = 1
@@ -1723,7 +1755,7 @@ spawn(function()
                             if v.Name == Ms then
                                 OldCFrameBartlio = v.HumanoidRootPart.CFrame
                                 repeat task.wait()
-                                    sethiddenproperty(game:GetService("Players").LocalPlayer, "SimulationRadius", math.huge)
+                                    --sethiddenproperty(game:GetService("Players").LocalPlayer, "SimulationRadius", math.huge)
                                     EquipWeapon(_G.SelectTool)
                                     AutoHaki()
                                     v.HumanoidRootPart.Transparency = 1
@@ -1731,7 +1763,7 @@ spawn(function()
                                     topos(v.HumanoidRootPart.CFrame * Pos)
                                     game:GetService'VirtualUser':CaptureController()
                                     game:GetService'VirtualUser':Button1Down(Vector2.new(1280, 672))
-                                    sethiddenproperty(game:GetService("Players").LocalPlayer,"SimulationRadius",math.huge)
+                                    --sethiddenproperty(game:GetService("Players").LocalPlayer,"SimulationRadius",math.huge)
                                 until not v.Parent or v.Humanoid.Health <= 0 or _G.AutoBartilo == false
                             end
                         end
@@ -1866,7 +1898,7 @@ spawn(function()
 
                                                 topos(v.HumanoidRootPart.CFrame * Pos)
 
-                                                sethiddenproperty(Player,"SimulationRadius",math.huge)
+                                                --sethiddenproperty(Player,"SimulationRadius",math.huge)
 
                                             until not _G.AutoSecondSea or not v.Parent or v.Humanoid.Health <= 0
 
@@ -1949,7 +1981,7 @@ spawn(function()
                                                                 topos(v890.HumanoidRootPart.CFrame * CFrame.new(0, 30, 0))
                                                                 game:GetService('VirtualUser'):CaptureController()
                                                                 game:GetService('VirtualUser'):Button1Down(Vector2.new(1280, 672))
-                                                                sethiddenproperty(game:GetService('Players').LocalPlayer, 'SimulationRadius', math.huge)
+                                                                --sethiddenproperty(game:GetService('Players').LocalPlayer, 'SimulationRadius', math.huge)
                                                             until v890.Humanoid.Health <= 0 or not _G.AutoSaber
                                                         end
                                                         if game:GetService('ReplicatedStorage'):FindFirstChild('Mob Leader [Lv. 120] [Boss]') then
