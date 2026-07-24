@@ -2,7 +2,7 @@
 local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/tlredz/Library/refs/heads/main/redz-V5-remake/main.luau"))()
 
 ScriptVersion = {
-    Version = "v1.4.9",
+    Version = "v1.5.0",
     Date = "2026-07-24"
 }
 
@@ -995,8 +995,8 @@ end
 
 spawn(function()
     while task.wait() do
-        if not _G.AutoFarmLevel or not checkStopFarm() then
-            continue
+        if _G.AutoFarmLevel or checkStopFarm() then
+            return
         end
 
         pcall(function()
@@ -1077,6 +1077,7 @@ spawn(function()
                             StartMagnet = true
 
                         until not _G.AutoFarmLevel
+                            or not checkStopFarm()
                             or Humanoid.Health <= 0
                             or not Enemy.Parent
                             or not QuestGui.Visible
