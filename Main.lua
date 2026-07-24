@@ -1337,7 +1337,7 @@ local Minimizer = Window:NewMinimizer({
 local MobileButton = Minimizer:CreateMobileMinimizer({
   Image = "rbxassetid://80424431930361",
   BackgroundColor3 = Color3.fromRGB(0, 0, 0),
-  Corner = .25
+  Corner = UDim.new(0, 8)
 })
 
 local Tab_Discord = Window:MakeTab({ "Discord", "info" })
