@@ -256,11 +256,17 @@ function CheckNearestTeleporter(TargetCFrame)
             Mansion = Vector3.new(-12462, 375, -7552),
             Castle = Vector3.new(-5036, 315, -3179),
             ["Dimensional Shift"] = Vector3.new(-2097.3447265625, 4776.24462890625, -15013.4990234375),
-            ["Beautiful Pirate"] = Vector3.new(5319, 23, -93),
-            ["Beautiful Room"] = Vector3.new(5314.58203, 22.5364361, -125.942276),
+            --["Beautiful Room"] = Vector3.new(5314.58203, 22.5364361, -125.942276),
             ["Temple of Time"] = Vector3.new(28286, 14897, 103),
+            ["Tiki Outpost"] = Vector3.new(-16811.107421875, 58.47794723510742, 294.60333251953125),
         }
     }
+    local MyLevel = game:GetService("Players").LocalPlayer.Data.Level.Value
+    if MyLevel >= 1900 then
+        TeleportPositions[placeIDS.Sea3]["Beautiful Pirate"] = Vector3.new(-11993.7744140625, 332.02947998046875, -8844.185546875)
+        TeleportPositions[placeIDS.Sea3]["Beautiful Room"] = Vector3.new(5368.9970703125, 25.411880493164062, -502.53009033203125)
+        --TeleportPositions[placeIDS.Sea3]["Temple of Time"] = Vector3.new(28286, 14897, 103)
+    end
 
     local Positions = TeleportPositions[game.PlaceId]
     if not Positions then
@@ -2436,10 +2442,10 @@ Callback = function(Value)
                 topos(CFrame.new(-1884.7747802734375, 19.327526092529297, -11666.8974609375))
             elseif _G.SelectIsland == "Cocoa Island" then
                 topos(CFrame.new(87.94276428222656, 73.55451202392578, -12319.46484375))
-            elseif _G.SelectIsland == "Candy Island New⛄" then
+            elseif _G.SelectIsland == "Candy Island New" then
                 topos(CFrame.new(-1014.4241943359375, 149.11068725585938, -14555.962890625))
             elseif _G.SelectIsland == "Tiki Outpost" then
-                topos(CFrame.new(-1149.328, 13.5759039, -14445.6143, -0.156446099, 0, -0.987686574, 0, 1, 0, 0.987686574, 0, -0.156446099))
+                topos(CFrame.new(-16477.42578125, 527.9754028320312, 513.0838623046875))
             end
         until not _G.TeleportIsland
     end
