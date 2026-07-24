@@ -2,7 +2,7 @@
 local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/tlredz/Library/refs/heads/main/redz-V5-remake/main.luau"))()
 
 ScriptVersion = {
-    Version = "v1.5.1",
+    Version = "v1.5.2",
     Date = "2026-07-24"
 }
 
@@ -993,9 +993,10 @@ function CheckQuest()
     end
 end
 
+
 spawn(function()
     while task.wait() do
-        if _G.AutoFarmLevel or checkStopFarm() then
+        if _G.AutoFarmLevel and checkStopFarm() then
             pcall(function()
             local Player = game.Players.LocalPlayer
             local QuestGui = Player.PlayerGui.Main.Quest
