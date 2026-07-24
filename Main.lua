@@ -220,6 +220,7 @@ end
 
 function CheckNearestTeleporter(TargetCFrame)
     if not TargetCFrame then
+        warn("[REDZ HUB] TargetCFrame is nil. Cannot check nearest teleporter.")
         return
     end
 
@@ -228,6 +229,7 @@ function CheckNearestTeleporter(TargetCFrame)
     local HRP = Character and Character:FindFirstChild("HumanoidRootPart")
 
     if not HRP then
+        warn("[REDZ HUB] HumanoidRootPart not found for player: " .. Player.Name)
         return
     end
 
@@ -262,6 +264,7 @@ function CheckNearestTeleporter(TargetCFrame)
 
     local Positions = TeleportPositions[game.PlaceId]
     if not Positions then
+        warn("[REDZ HUB] No teleport positions defined for this place ID: " .. tostring(game.PlaceId))
         return
     end
 
@@ -316,6 +319,7 @@ function topos(TargetCFrame)
     local NearestTeleporter = CheckNearestTeleporter(TargetCFrame)
     if NearestTeleporter then
         requestEntrance(NearestTeleporter)
+        warn("[REDZ HUB] Teleported to nearest teleporter: " .. tostring(NearestTeleporter))
     end
 
     local PartTele = Character:FindFirstChild("PartTele")
@@ -1333,7 +1337,7 @@ local Minimizer = Window:NewMinimizer({
 local MobileButton = Minimizer:CreateMobileMinimizer({
   Image = "rbxassetid://80424431930361",
   BackgroundColor3 = Color3.fromRGB(0, 0, 0),
-  BackgroundTransparency = 1
+  Corner = .25
 })
 
 local Tab_Discord = Window:MakeTab({ "Discord", "info" })
@@ -1582,7 +1586,7 @@ elseif World2 then
                 })
 elseif World3 then
     Tab_Quests:AddSection("Elite Hunter")
-    EliteHunterKill = Tab_Quests:AddParagraph("Teste", "Algo")
+    EliteHunterKill = Tab_Quests:AddParagraph("Progress", "Algo")
     Tab_Quests:AddToggle({
               Name = "Auto Elite Hunter",
               Default = false,
@@ -1600,7 +1604,7 @@ elseif World3 then
                --if game:GetService("ReplicatedStorage"):FindFirstChild("Diablo") or game:GetService("ReplicatedStorage"):FindFirstChild("Deandre") or game:GetService("ReplicatedStorage"):FindFirstChild("Urban") or game:GetService("Workspace").Enemies:FindFirstChild("Diablo") or game:GetService("Workspace").Enemies:FindFirstChild("Deandre") or game:GetService("Workspace").Enemies:FindFirstChild("Urban") then
                 --   EliteHunterKill:Set({Title = "Progress", Content = "Number of kills  : "..game:GetService("ReplicatedStorage").Remotes.CommF_:InvokeServer("EliteHunter","Progress")})	
                 --else
-                    EliteHunterKill:SetValues({Title = "Progress", Content = "Number of kills  : "..game:GetService("ReplicatedStorage").Remotes.CommF_:InvokeServer("EliteHunter","Progress")})	
+                    EliteHunterKill:SetDescription("Number of kills  : "..game:GetService("ReplicatedStorage").Remotes.CommF_:InvokeServer("EliteHunter","Progress"))	
                -- end
            end)
        end
