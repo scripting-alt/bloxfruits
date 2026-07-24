@@ -339,7 +339,7 @@ function topos(TargetCFrame)
 
             local Root = WaitHRP(Player)
             if Root then
-                Root.CFrame = PartTele.CFrame
+                --Root.CFrame = PartTele.CFrame
             end
         end)
     end
