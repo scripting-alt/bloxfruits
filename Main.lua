@@ -37,13 +37,19 @@ BringPos = CFrame.new(0,0,0)
 PosY = 30
 TweenON = false
 
-if game.PlaceId == 2753915549 then
+local placeIDS = {
+    Sea1 = 2753915549,
+    Sea2 = 79091703265657,
+    Sea3 = 100117331123089
+}
+
+if game.PlaceId == placeIDS.Sea1 then
     World1 = true
     warn("[REDZ HUB] SEA 1")
-elseif game.PlaceId == 79091703265657 then
+elseif game.PlaceId == placeIDS.Sea2 then
     World2 = true
     warn("[REDZ HUB] SEA 2")
-elseif game.PlaceId == 100117331123089 then
+elseif game.PlaceId == placeIDS.Sea3 then
     World3 = true
     warn("[REDZ HUB] SEA 3")
 end
@@ -226,7 +232,7 @@ function CheckNearestTeleporter(TargetCFrame)
     end
 
     local TeleportPositions = {
-        [2753915549] = {
+        [placeIDS.Sea1] = {
             Sky3 = Vector3.new(-7894, 5547, -380),
             Sky3Exit = Vector3.new(-4607, 874, -1667),
             UnderWater = Vector3.new(61163, 11, 1819),
@@ -235,14 +241,14 @@ function CheckNearestTeleporter(TargetCFrame)
             UnderwaterExit = Vector3.new(4050, -1, -1814),
         },
 
-        [79091703265657] = {
+        [placeIDS.Sea2] = {
             ["Swan Mansion"] = Vector3.new(-390, 332, 673),
             ["Swan Room"] = Vector3.new(2285, 15, 905),
             ["Cursed Ship"] = Vector3.new(923, 126, 32852),
             ["Zombie Island"] = Vector3.new(-6509, 83, -133),
         },
 
-        [100117331123089] = {
+        [placeIDS.Sea3] = {
             ["Floating Turtle"] = Vector3.new(-12462, 375, -7552),
             ["Hydra Island"] = Vector3.new(5660.03125, 1013.2661743164062, -337.931884765625),
             Mansion = Vector3.new(-12462, 375, -7552),
@@ -1325,7 +1331,7 @@ local Minimizer = Window:NewMinimizer({
 })
 
 local MobileButton = Minimizer:CreateMobileMinimizer({
-  Image = "rbxassetid://0",
+  Image = "rbxassetid://80424431930361",
   BackgroundColor3 = Color3.fromRGB(0, 0, 0)
 })
 
