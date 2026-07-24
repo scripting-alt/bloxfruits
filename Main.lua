@@ -263,8 +263,8 @@ function CheckNearestTeleporter(TargetCFrame)
     }
     local MyLevel = game:GetService("Players").LocalPlayer.Data.Level.Value
     if MyLevel >= 1900 then
-        TeleportPositions[placeIDS.Sea3]["Beautiful Pirate"] = Vector3.new(-11993.7744140625, 332.02947998046875, -8844.185546875)
-        TeleportPositions[placeIDS.Sea3]["Beautiful Room"] = Vector3.new(5368.9970703125, 25.411880493164062, -502.53009033203125)
+        --TeleportPositions[placeIDS.Sea3]["Beautiful Pirate"] = Vector3.new(-11993.7744140625, 332.02947998046875, -8844.185546875)
+        --TeleportPositions[placeIDS.Sea3]["Beautiful Room"] = Vector3.new(5368.9970703125, 25.411880493164062, -502.53009033203125)
         --TeleportPositions[placeIDS.Sea3]["Temple of Time"] = Vector3.new(28286, 14897, 103)
     end
 
@@ -1363,6 +1363,7 @@ local Tab_Teleport = Window:MakeTab({ "Teleport", "locate" })
 local Tab_Visual = Window:MakeTab({ "Visual", "user" })
 local Tab_Shop = Window:MakeTab({ "Shop", "shoppingcart" })
 local Tab_Misc = Window:MakeTab({ "Misc", "settings" })
+local Tab_Dev = Window:MakeTab({ "Dev", "laptop" })
 
 Tab_Discord:AddDiscordInvite({
     Title = "redz Hub | Community",
@@ -2451,6 +2452,22 @@ Callback = function(Value)
     end
     stopTeleport()
 end})
+
+Tab_Teleport:AddSection("Positions")
+Tab_Dev:AddButton({
+  Name = "Copy CFrame",
+  Debounce = 0.5,
+  Callback = function()
+    copyclipboard(tostring(game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame))
+  end
+})
+Tab_Dev:AddButton({
+  Name = "Copy Position",
+  Debounce = 0.5,
+  Callback = function()
+    copyclipboard(tostring(game.Players.LocalPlayer.Character.HumanoidRootPart.Position))
+  end
+})
 
 local Queue = queue_on_teleport or syn and syn.queue_on_teleport
 
