@@ -3,7 +3,7 @@ local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/tlred
 
 ScriptVersion = {
     Version = "v1.4.9",
-    Date = "2026-07-20"
+    Date = "2026-07-24"
 }
 
 _G.SelectTool = "Melee"
@@ -2127,6 +2127,15 @@ Tab_Misc:AddSlider({
 Tab_Misc:AddSection("Player")
 
 Tab_Misc:AddToggle({
+  Name = "Auto Haki",
+  Default = true,
+  Flag = "autoHaki_flag",
+  Callback = function(Value)
+    _G.AutoHaki = Value
+  end
+})
+
+Tab_Misc:AddToggle({
   Name = "Water Walk",
   Default = true,
   Flag = "waterWalk_flag",
@@ -2156,6 +2165,27 @@ Tab_Misc:AddButton({
     game.ReplicatedStorage:WaitForChild("__ServerBrowser"):InvokeServer("teleport", game.JobId)
   end
 })
+
+Tab_Misc:AddSection("Misc")
+Tab_Misc:AddToggle({
+  Name = "Anti AFK",
+  Default = true,
+  Callback = function(Value)
+    _G.AntiAFK = Value
+  end
+})
+
+spawn(function()
+    local VirtualUser = game:GetService("VirtualUser")
+    game:GetService("Players").LocalPlayer.Idled:Connect(function()
+        pcall(function()
+            if _G.AntiAFK then
+                VirtualUser:CaptureController()
+                VirtualUser:ClickButton2(Vector2.new())
+            end
+        end)
+    end)
+end)
 
 Tab_Stats:AddSection("Auto Stats")
 Tab_Stats:AddToggle({Name = "Auto Stats Melee",Default = false,Flag = "statsMelee_flag",

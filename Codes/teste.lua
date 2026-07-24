@@ -10385,14 +10385,7 @@ Misc:Toggle("Graphic",false,function(v)
     Misc:Seperator("Misc")
 
 Misc:Toggle("Anti AFK", true, function()
-local vu = game:GetService("VirtualUser")
-repeat wait() until game:IsLoaded() 
-	game:GetService("Players").LocalPlayer.Idled:connect(function()
-    game:GetService("VirtualUser"):ClickButton2(Vector2.new())
-		vu:Button2Down(Vector2.new(0,0),workspace.CurrentCamera.CFrame)
-		wait(1)
-		vu:Button2Up(Vector2.new(0,0),workspace.CurrentCamera.CFrame)
-   end)
+
 end)
 
 	Misc:Toggle("Auto Rejoin",true,function(value)
