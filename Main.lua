@@ -2455,33 +2455,18 @@ end})
 
 Tab_Dev:AddSection("Positions")
 Tab_Dev:AddButton({
-    Name = "Copy CFrame",
-    Debounce = 0.5,
-    Callback = function()
-        local Player = game.Players.LocalPlayer
-        local CFrame = Player.Character.HumanoidRootPart.CFrame
-        copyclipboard(string.format(
-            "%s, %s, %s",
-            CFrame.X,
-            CFrame.Y,
-            CFrame.Z
-        ))
-    end
+  Name = "Copy CFrame",
+  Debounce = 0.5,
+  Callback = function()
+    setclipboard(tostring(game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame))
+  end
 })
 Tab_Dev:AddButton({
-    Name = "Copy Position",
-    Debounce = 0.5,
-    Callback = function()
-        local Player = game.Players.LocalPlayer
-        local Position = Player.Character.HumanoidRootPart.Position
-
-        copyclipboard(string.format(
-            "%s, %s, %s",
-            Position.X,
-            Position.Y,
-            Position.Z
-        ))
-    end
+  Name = "Copy Position",
+  Debounce = 0.5,
+  Callback = function()
+    setclipboard(tostring(game.Players.LocalPlayer.Character.HumanoidRootPart.Position))
+  end
 })
 
 local Queue = queue_on_teleport or syn and syn.queue_on_teleport
