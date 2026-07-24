@@ -2,7 +2,7 @@
 local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/tlredz/Library/refs/heads/main/redz-V5-remake/main.luau"))()
 
 ScriptVersion = {
-    Version = "v1.5.0",
+    Version = "v1.5.1",
     Date = "2026-07-24"
 }
 
@@ -996,10 +996,7 @@ end
 spawn(function()
     while task.wait() do
         if _G.AutoFarmLevel or checkStopFarm() then
-            return
-        end
-
-        pcall(function()
+            pcall(function()
             local Player = game.Players.LocalPlayer
             local QuestGui = Player.PlayerGui.Main.Quest
             local HRP = Player.Character and Player.Character:FindFirstChild("HumanoidRootPart")
@@ -1099,6 +1096,7 @@ spawn(function()
                 end
             end
         end)
+        end
     end
 end)
 
