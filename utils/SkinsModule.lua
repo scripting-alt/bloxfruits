@@ -41,7 +41,7 @@ local FruitSkins = {
         Shifted_Color1 = Color3.fromRGB(82, 55, 255),
         Shifted_Color2 = Color3.fromRGB(28, 14, 95),
         Shifted_Color3 = Color3.fromRGB(112, 117, 255),
-        GrayscaleToColorSequence = ColorSequence.new({ ColorSequenceKeypoint.new(0, Color3.fromRGB(255, 255, 255)), ColorSequenceKeypoint.new(1, Color3.fromRGB(255, 255, 255)) })
+        GrayscaleToColorSequence = ColorSequence.new({ ColorSequenceKeypoint.new(0, Color3.fromRGB(255, 255, 255)), ColorSequenceKeypoint.new(1, Color3.fromRGB(255, 255, 255)) }),
         GrayscaleToColorStrength = 1,
     },
     SuperSpirit = {
