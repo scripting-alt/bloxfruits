@@ -71,7 +71,7 @@ local FruitSkins = {
             GrayscaleToColorStrength = 0,
         },
 
-        Dark = {
+        DarkG = {
             Default_Color1 = Color3.fromRGB(120, 0, 255),
             Default_Color2 = Color3.fromRGB(40, 0, 100),
             Default_Color3 = Color3.fromRGB(200, 100, 255),
