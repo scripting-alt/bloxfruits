@@ -36,20 +36,20 @@ Pos = CFrame.new(0,0,0)
 BringPos = CFrame.new(0,0,0)
 PosY = 30
 TweenON = false
-
+local WorldSea = workspace:GetAttribute("MAP") or "Sea1"
 local placeIDS = {
     Sea1 = 2753915549,
     Sea2 = 79091703265657,
     Sea3 = 100117331123089
 }
 
-if game.PlaceId == placeIDS.Sea1 then
+if WorldSea == "Sea1" then
     World1 = true
     warn("[REDZ HUB] SEA 1")
-elseif game.PlaceId == placeIDS.Sea2 then
+elseif WorldSea == "Sea2" then
     World2 = true
     warn("[REDZ HUB] SEA 2")
-elseif game.PlaceId == placeIDS.Sea3 then
+elseif WorldSea == "Sea3" then
     World3 = true
     warn("[REDZ HUB] SEA 3")
 end
@@ -163,7 +163,10 @@ local function AttackAll()
             end
             args[2][i] = {v, v.HumanoidRootPart}
         end
-        
+        if game.Players.LocalPlayer.Character:FindFirstChildOfClass("Tool") and game.Players.LocalPlayer.Character:FindFirstChildOfClass("Tool"):FindFirstChild("LeftClickRemote") then
+            game.Players.LocalPlayer.Character:FindFirstChildOfClass("Tool"):FindFirstChild("LeftClickRemote"):FireServer(game.Players.LocalPlayer.Character.HumanoidRootPart.Position, 1, true)
+        end
+
         netModule:WaitForChild("RE/RegisterHit"):FireServer(unpack(args))
     end
 end
@@ -234,7 +237,7 @@ function CheckNearestTeleporter(TargetCFrame)
     end
 
     local TeleportPositions = {
-        [placeIDS.Sea1] = {
+        ["Sea1"] = {
             Sky3 = Vector3.new(-7894, 5547, -380),
             Sky3Exit = Vector3.new(-4607, 874, -1667),
             UnderWater = Vector3.new(61163, 11, 1819),
@@ -243,14 +246,14 @@ function CheckNearestTeleporter(TargetCFrame)
             UnderwaterExit = Vector3.new(4050, -1, -1814),
         },
 
-        [placeIDS.Sea2] = {
+        ["Sea2"] = {
             ["Swan Mansion"] = Vector3.new(-390, 332, 673),
             ["Swan Room"] = Vector3.new(2285, 15, 905),
             ["Cursed Ship"] = Vector3.new(923, 126, 32852),
             ["Zombie Island"] = Vector3.new(-6509, 83, -133),
         },
 
-        [placeIDS.Sea3] = {
+        ["Sea3"] = {
             ["Floating Turtle"] = Vector3.new(-12462, 375, -7552),
             ["Hydra Island"] = Vector3.new(5660.03125, 1013.2661743164062, -337.931884765625),
             Mansion = Vector3.new(-12462, 375, -7552),
@@ -258,19 +261,13 @@ function CheckNearestTeleporter(TargetCFrame)
             ["Dimensional Shift"] = Vector3.new(-2097.3447265625, 4776.24462890625, -15013.4990234375),
             --["Beautiful Room"] = Vector3.new(5314.58203, 22.5364361, -125.942276),
             ["Temple of Time"] = Vector3.new(28286, 14897, 103),
-            ["Tiki Outpost"] = Vector3.new(-16811.107421875, 58.47794723510742, 294.60333251953125),
+            --["Tiki Outpost"] = Vector3.new(-16811.107421875, 58.47794723510742, 294.60333251953125),
         }
     }
-    local MyLevel = game:GetService("Players").LocalPlayer.Data.Level.Value
-    if MyLevel >= 1900 then
-        --TeleportPositions[placeIDS.Sea3]["Beautiful Pirate"] = Vector3.new(-11993.7744140625, 332.02947998046875, -8844.185546875)
-        --TeleportPositions[placeIDS.Sea3]["Beautiful Room"] = Vector3.new(5368.9970703125, 25.411880493164062, -502.53009033203125)
-        --TeleportPositions[placeIDS.Sea3]["Temple of Time"] = Vector3.new(28286, 14897, 103)
-    end
 
-    local Positions = TeleportPositions[game.PlaceId]
+    local Positions = TeleportPositions[WorldSea]
     if not Positions then
-        warn("[REDZ HUB] No teleport positions defined for this place ID: " .. tostring(game.PlaceId))
+        warn("[REDZ HUB] No teleport positions defined for this place ID: " .. tostring(WorldSea))
         return
     end
 
@@ -284,6 +281,11 @@ function CheckNearestTeleporter(TargetCFrame)
         if Distance < ClosestDistance then
             ClosestDistance = Distance
             ClosestTeleporter = Position
+            --if Position == Positions["Tiki Outpost"] then
+            --   game.ReplicatedStorage.Remotes.CommF_:InvokeServer('requestEntrance', Vector3.new(-5036, 315, -3179))
+            --    wait(.5)
+            --    game:GetService("ReplicatedStorage").Modules.Net["RF/BoatCastleTeleporters"]:InvokeServer("InitiateTeleport",workspace.Map["Boat Castle"].MapTeleportC)
+            --end
         end
     end
 
@@ -1126,7 +1128,7 @@ spawn(function()
             continue
         end
 
-        if _G.AutoFarmLevel or _G.AutoFarmNear or TweenON or _G.AutoBartilo then
+        if _G.AutoFarmLevel or _G.AutoFarmNear or TweenON or _G.AutoBartilo or _G.Dungeon then
             if not HRP:FindFirstChild("BodyClip") then
                 local BodyVelocity = Instance.new("BodyVelocity")
                 BodyVelocity.Name = "BodyClip"
@@ -1213,6 +1215,139 @@ workspace:GetDescendants(function(v)
         })
     end
 end)
+
+Number = math.random(1, 1000000)
+
+function UpdatePlayerChams()
+    local LevelCap = workspace:GetAttribute("LevelCap")
+    local Players = game:GetService("Players")
+    local LocalPlayer = Players.LocalPlayer
+    local Character = LocalPlayer.Character
+    local LocalHead = Character and Character:FindFirstChild("Head")
+
+    if not LocalHead then return end
+
+    for _, Player in ipairs(Players:GetPlayers()) do
+        pcall(function()
+            if Player == LocalPlayer then return end
+            local Level = Player.Data.Level -- .Value
+            local Character = Player.Character
+            local Head = Character and Character:FindFirstChild("Head")
+            local Humanoid = Character and Character:FindFirstChildOfClass("Humanoid")
+
+            if not Head or not Humanoid then return end
+
+            local ESPName = "NameEsp" .. tostring(Number)
+            local ESP = Head:FindFirstChild(ESPName)
+
+            if _G.PlayerESP then
+                local Distance = math.floor((LocalHead.Position - Head.Position).Magnitude / 3)
+                local Health = math.floor((Humanoid.Health / Humanoid.MaxHealth) * 100)
+
+                if not ESP then
+                    ESP = Instance.new("BillboardGui", Head)
+                    ESP.Name = ESPName
+                    ESP.Adornee = Head
+                    ESP.AlwaysOnTop = true
+                    ESP.ExtentsOffset = Vector3.new(0, 3, 0)
+                    ESP.Size = UDim2.new(1, 200, 1, 30)
+
+                    local TextLabel = Instance.new("TextLabel", ESP)
+                    TextLabel.Name = "TextLabel"
+                    TextLabel.Size = UDim2.new(1, 0, 1, 0)
+                    TextLabel.BackgroundTransparency = 1
+                    TextLabel.Font = Enum.Font.GothamSemibold
+                    TextLabel.TextSize = 14
+                    TextLabel.TextWrapped = true
+                    TextLabel.TextYAlignment = Enum.TextYAlignment.Top
+                    TextLabel.TextStrokeTransparency = 0.5
+                    TextLabel.RichText = true
+                end
+
+                local TextLabel = ESP:FindFirstChild("TextLabel")
+
+                if TextLabel then
+                    local Color = Player.TeamColor.Color
+                    local TeamColor = string.format(
+                        "#%02X%02X%02X",
+                        Color.R * 255,
+                        Color.G * 255,
+                        Color.B * 255
+                    )
+
+                    TextLabel.Text = string.format(
+                        '<font color="%s">%s</font>\n<font color="%s">[</font> <font color="#FFFFFF">%d Distance</font> <font color="%s">]</font>\n<font color="#FFFFFF">Health: %d%% | Lv. %d</font>',
+                        TeamColor,
+                        Player.Name,
+                        TeamColor,
+                        Distance,
+                        TeamColor,
+                        Health,
+                        Level.Value
+                    )
+                end
+            elseif ESP then
+                ESP:Destroy()
+            end
+        end)
+    end
+end
+
+function UpdateDevilChams()
+    local Player = game:GetService("Players").LocalPlayer
+    local Character = Player.Character
+    local LocalHead = Character and Character:FindFirstChild("Head")
+
+    if not LocalHead then return end
+
+    for _, Fruit in ipairs(workspace:GetChildren()) do
+        pcall(function()
+            if not string.find(Fruit.Name, "Fruit") then return end
+
+            local Handle = Fruit:FindFirstChild("Handle")
+            if not Handle then return end
+
+            local ESPName = "NameEsp" .. tostring(Number)
+            local ESP = Handle:FindFirstChild(ESPName)
+
+            if _G.DevilFruitESP then
+                local Distance = math.floor((LocalHead.Position - Handle.Position).Magnitude / 3)
+
+                if not ESP then
+                    ESP = Instance.new("BillboardGui", Handle)
+                    ESP.Name = ESPName
+                    ESP.Adornee = Handle
+                    ESP.AlwaysOnTop = true
+                    ESP.ExtentsOffset = Vector3.new(0, 1, 0)
+                    ESP.Size = UDim2.new(1, 200, 1, 30)
+
+                    local TextLabel = Instance.new("TextLabel", ESP)
+                    TextLabel.Name = "TextLabel"
+                    TextLabel.Size = UDim2.new(1, 0, 1, 0)
+                    TextLabel.BackgroundTransparency = 1
+                    TextLabel.Font = Enum.Font.GothamSemibold
+                    TextLabel.TextSize = 14
+                    TextLabel.TextWrapped = true
+                    TextLabel.TextYAlignment = Enum.TextYAlignment.Top
+                    TextLabel.TextStrokeTransparency = 0.5
+                    TextLabel.RichText = true
+                end
+
+                local TextLabel = ESP:FindFirstChild("TextLabel")
+
+                if TextLabel then
+                    TextLabel.Text = string.format(
+                        '<font color="#00b7ff">%s</font>\n<font color="#00b7ff">[</font> <font color="#FFFFFF">%d Distance</font> <font color="#00b7ff">]</font>',
+                        Fruit.Name,
+                        Distance
+                    )
+                end
+            elseif ESP then
+                ESP:Destroy()
+            end
+        end)
+    end
+end
 
 function storageFruit(v)
     if v:IsA("Tool") and string.find(v.Name, "Fruit") then
@@ -1305,11 +1440,11 @@ spawn(function()
 
                         -- ficou travado
                         if StuckTime >= 20 then
-                            print("NPC travado, pulando:", Enemy.Name)
+                            Humanoid.Health = 0
                             break
                         end
 
-                        topos(EnemyHRP.CFrame * CFrame.new(0, 30, 0))
+                        topos(EnemyHRP.CFrame * Pos)
                         AutoHaki()
                         EquipWeapon(_G.SelectTool)
                         BringPos = EnemyHRP.CFrame
@@ -1343,7 +1478,7 @@ local Minimizer = Window:NewMinimizer({
 local MobileButton = Minimizer:CreateMobileMinimizer({
   Image = "rbxassetid://80424431930361",
   BackgroundColor3 = Color3.fromRGB(0, 0, 0),
-  Corner = UDim.new(0, 8)
+  Corner = UDim.new(0, 6)
 })
 
 local Tab_Discord = Window:MakeTab({ "Discord", "info" })
@@ -1496,6 +1631,76 @@ Tab_Fruit:AddToggle({
   end
 })
 
+Tab_Visual:AddSection("Esp")
+
+Tab_Visual:AddToggle({
+  Name = "Esp Devil Fruits",
+  Default = false,
+  Callback = function(Value)
+    _G.DevilFruitESP = Value
+    if _G.DevilFruitESP then
+        task.spawn(function()
+            while _G.DevilFruitESP do
+                UpdateDevilChams()
+                task.wait(1)
+            end
+        end)
+    else
+        UpdateDevilChams()
+    end
+  end
+})
+
+Tab_Visual:AddToggle({
+  Name = "Esp Players",
+  Default = false,
+  Callback = function(Value)
+    _G.PlayerESP = Value
+    if _G.PlayerESP then
+        task.spawn(function()
+            while _G.PlayerESP do
+                UpdatePlayerChams()
+                task.wait(1)
+            end
+        end)
+    else
+        UpdatePlayerChams()
+    end
+  end
+})
+
+Tab_Visual:AddSection("Skins")
+Tab_Visual:AddDropdown({
+  Name = "Pain Skins",
+  MultiSelect = false,
+  Options = {"Default", "DeepBlue", "Red", "Orange", "Celestial", "SuperSpirit"},
+  Default = {"Default"},
+  Callback = function(Value)
+     _G.PainSkin = Value
+  end
+})
+Tab_Visual:AddDropdown({
+  Name = "Portal Skins",
+  MultiSelect = false,
+  Options = {"Default", "DeepBlue", "Red", "Orange", "Celestial", "SuperSpirit"},
+  Default = {"Default"},
+  Callback = function(Value)
+     _G.PortalSkin = Value
+  end
+})
+
+local SkinsModule = loadstring(game:HttpGet("https://raw.githubusercontent.com/tlredz/Library/refs/heads/main/redz-V5-remake/main.luau"))()
+
+spawn(function()
+    while task.wait(1) do
+        local player = game.Players.LocalPlayer
+        if player:FindFirstChild("PainFruitVFXColor") then
+
+        end
+    end
+end)
+
+
  function IsIslandRaid(cu)
     if game:GetService("Workspace")["_WorldOrigin"].Locations:FindFirstChild("Island " .. cu) then
         min = 4500
@@ -1518,21 +1723,142 @@ Tab_Fruit:AddToggle({
     end
 end
 
+island = 1
+
 function getNextIsland()
     TableIslandsRaid = {5, 4, 3, 2, 1}
     for r, v in pairs(TableIslandsRaid) do
         if IsIslandRaid(v) and (IsIslandRaid(v).Position - game.Players.LocalPlayer.Character.HumanoidRootPart.Position).Magnitude <= 4500 then
+            island = v
             return IsIslandRaid(v)
         end
     end
 end
 
+local RaidTargets = {}
+local CurrentIsland = nil
+local CleaningIsland = false
+
 spawn(function()
-    while wait() do
+    while task.wait() do
         if _G.Dungeon then
-            if getNextIsland() then
-                spawn(topos(getNextIsland().CFrame * CFrame.new(0, 60, 0)), 1)
-            end
+            pcall(function()
+                local Player = game.Players.LocalPlayer
+                local Character = Player.Character
+                local HRP = Character and Character:FindFirstChild("HumanoidRootPart")
+
+                if not HRP then
+                    return
+                end
+
+                local NextIsland = getNextIsland()
+
+                if not NextIsland then
+                    return
+                end
+
+                local IslandName = NextIsland.Name
+
+                -- Detectou uma nova ilha
+                if CurrentIsland ~= IslandName then
+                    CurrentIsland = IslandName
+                    RaidTargets[IslandName] = nil
+                    CleaningIsland = false
+                end
+
+                -- Procura o NPC escolhido
+                if not RaidTargets[IslandName] then
+                    for _, Enemy in ipairs(workspace.Enemies:GetChildren()) do
+                        local Humanoid = Enemy:FindFirstChild("Humanoid")
+                        local EnemyHRP = Enemy:FindFirstChild("HumanoidRootPart")
+
+                        if Humanoid
+                            and EnemyHRP
+                            and Humanoid.Health > 0
+                            and (EnemyHRP.Position - NextIsland.Position).Magnitude <= 300
+                        then
+                            RaidTargets[IslandName] = Enemy
+                            break
+                        end
+                    end
+                end
+
+                local TargetEnemy = RaidTargets[IslandName]
+
+                -- =====================================================
+                -- AINDA NÃO TEM NPC -> VAI ATÉ A ILHA
+                -- =====================================================
+
+                if not TargetEnemy then
+                    topos(NextIsland.CFrame * CFrame.new(0, 60, 0))
+                    return
+                end
+
+                local TargetHumanoid = TargetEnemy:FindFirstChild("Humanoid")
+                local TargetHRP = TargetEnemy:FindFirstChild("HumanoidRootPart")
+
+                if not TargetHumanoid or not TargetHRP then
+                    RaidTargets[IslandName] = nil
+                    return
+                end
+
+                -- =====================================================
+                -- NPC PRINCIPAL VIVO -> MATA NORMALMENTE
+                -- =====================================================
+
+                if TargetHumanoid.Health > 0 and not CleaningIsland then
+                    topos(TargetHRP.CFrame * CFrame.new(0, 30, 0))
+
+                    AutoHaki()
+                    EquipWeapon(_G.SelectTool)
+
+                    TargetHRP.Transparency = 1
+                    TargetHumanoid.WalkSpeed = 0
+                    TargetHumanoid.JumpPower = 0
+
+                    return
+                end
+
+                -- =====================================================
+                -- NPC PRINCIPAL MORREU
+                -- TELEPORTA NOS OUTROS E MATA
+                -- =====================================================
+
+                if TargetHumanoid.Health <= 0 and not CleaningIsland then
+                    CleaningIsland = true
+
+                    for _, Enemy in ipairs(workspace.Enemies:GetChildren()) do
+                        local Humanoid = Enemy:FindFirstChild("Humanoid")
+                        local EnemyHRP = Enemy:FindFirstChild("HumanoidRootPart")
+
+                        if Humanoid
+                            and EnemyHRP
+                            and Humanoid.Health > 0
+                            and Enemy ~= TargetEnemy
+                            and (EnemyHRP.Position - NextIsland.Position).Magnitude <= 300
+                        then
+                            -- Teleporta em cima do inimigo
+                            topos(EnemyHRP.CFrame * CFrame.new(0, 5, 0))
+
+                            task.wait(0.1)
+
+                            -- Mata o inimigo
+                            Humanoid.Health = 0
+
+                            task.wait(0.1)
+                        end
+                    end
+
+                    -- Terminou essa ilha
+                    RaidTargets[IslandName] = nil
+                    CurrentIsland = nil
+                    CleaningIsland = false
+                end
+            end)
+        else
+            table.clear(RaidTargets)
+            CurrentIsland = nil
+            CleaningIsland = false
         end
     end
 end)
@@ -2098,6 +2424,15 @@ spawn(function()
         end
     end)
 
+Tab_Fishing:AddSection("Fishing")
+
+Tab_Fishing:AddButton({
+  Name = "Save Position",
+  Callback = function()
+    _G.FishingPos = game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame
+  end
+})
+
 Tab_Misc:AddSection("Farm Config")
 
 Tab_Misc:AddDropdown({
@@ -2131,6 +2466,19 @@ Tab_Misc:AddSlider({
     _G.TweenSpeed = Value
   end
 })
+
+Tab_Misc:AddSlider({
+  Name = "Farm Distance",
+  Min = 5,
+  Max = 60,
+  Increment = 1,
+  Default = 30,
+  Flag = "farmDistance_flag",
+  Callback = function(Value)
+    PosY = Value
+  end
+})
+
 Tab_Misc:AddSlider({
   Name = "Bring Distance",
   Min = 50,
@@ -2174,6 +2522,14 @@ Tab_Misc:AddSlider({
     _G.Speed = Value
   end
 })
+
+spawn(function()
+    while wait() do
+        if game.Players.LocalPlayer.Character then
+            game.Players.LocalPlayer.Character:SetAttribute("SpeedMultiplier",_G.Speed)
+        end
+    end
+end)
 
 Tab_Misc:AddSection("Server")
 Tab_Misc:AddButton({

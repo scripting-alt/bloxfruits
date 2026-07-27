@@ -1,1054 +1,1244 @@
--- Script Path: game:GetService("ReplicatedStorage").Controllers.UI.FruitShop
--- Took 0.67s to decompile.
+-- Script Path: game:GetService("ReplicatedStorage").Controllers.CombatController
+-- Took 0.83s to decompile.
 -- Executor: Xeno (v1.3.55)
 
 -- https://lua.expert/
-local Players = game:GetService("Players")
+local UserInputService = game:GetService("UserInputService")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
-local GuiService = game:GetService("GuiService")
-local HttpService = game:GetService("HttpService")
-local CollectionService = game:GetService("CollectionService")
-local React = require(game.ReplicatedStorage.Packages.React)
-local ReactRoblox = require(game.ReplicatedStorage.Packages.ReactRoblox)
-local Signal = require(game.ReplicatedStorage.Packages.Signal)
-local ServiceProxy = require(game.ReplicatedStorage.Packages.ServiceProxy)
-local Data = require(script.Data)
-local SkippedFruits = require(script.Data.SkippedFruits)
-local GiftWindow = require(game.ReplicatedStorage.Controllers.UI.GiftWindow)
-local ShopService = require(game.ReplicatedStorage.ShopService)
+local Net = require(ReplicatedStorage.Modules.Net)
+local CombatUtil = require(ReplicatedStorage.Modules.CombatUtil)
 
-while not ShopService:GetIfInitialized() do
-    task.wait()
-end
+require(ReplicatedStorage.Modules.WeaponData)
 
-local PriceService = require(game.ReplicatedStorage.PriceService)
-local HookService = require(game.ReplicatedStorage.React.Services.HookService)
-
-while not HookService:GetIfInitialized() do
-    task.wait()
-end
-
-local AnalyticsClient = require(game.ReplicatedStorage.Controllers.AnalyticsClient)
-local StateUtil = require(script.StateUtil)
+local Main = require(ReplicatedStorage.Util.CameraShaker.Main)
+local CameraShaker = require(ReplicatedStorage.Util.CameraShaker)
+local PlayAnimationSequence = require(ReplicatedStorage.Modules.PlayAnimationSequence)
+local MobileUIController = require(game.ReplicatedStorage.Controllers.UI.MobileUIController)
+local CustomCursor = require(game.ReplicatedStorage.Controllers.UI.CustomCursor)
 local LastInput = require(game.ReplicatedStorage.Modules.LastInput)
+local Trove = require(ReplicatedStorage.Modules.Util.Trove)
 
-require(game.ReplicatedStorage.Modules.Util.Trove)
+require(ReplicatedStorage.Modules.Flags)
 
-local ColorPalette = require(game.ReplicatedStorage.Util.RichText.ColorPalette)
-local Notification = require(game.ReplicatedStorage.Notification)
-local SkinUtil = require(game.ReplicatedStorage.Modules.SkinUtil)
-local Skins = require(game.Players.LocalPlayer:WaitForChild("PlayerGui"):WaitForChild("Main", (1 / 0)):WaitForChild("UIController"):WaitForChild("Skins"))
-local FruitShop = require(game.ReplicatedStorage.React.Components.FruitShop)
+local LocalPlayer = game.Players.LocalPlayer
+local CurrentCamera = workspace.CurrentCamera
+local v1 = LocalPlayer:GetMouse()
 
-require(game.ReplicatedStorage.React.Components.FruitShop.Types)
+CombatUtil:GetComboPaddingTime()
+CombatUtil:GetHitDetectionParams()
 
-local LegacyDragonSelectionMenu = require(game.ReplicatedStorage.React.Components.LegacyDragonSelectionMenu)
-local LegacyConfirmationDialog = require(game.ReplicatedStorage.React.Components.LegacyConfirmationDialog)
-local useLastInput = require(game.ReplicatedStorage.React.Hooks.useLastInput)
+local v2 = CombatUtil:GetAttackCancelMultiplier()
 
-local function f1() --[[ Line: 132 | Upvalues: ShopService (copy) ]]
-    local t = {}
+Random.new()
 
-    for k, v in pairs(ShopService:GetLegacyRobuxItems()) do
-        if v.subtype == "Fruit" then
-            t[k] = v
-        end
+local Cache2 = game.ReplicatedStorage:WaitForChild("Cache2")
+local v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, v16, v17, v18, v19, v20 = Cache2, nil, nil, 0, 0, false, nil, nil, false, {}, false, {}, nil, 0, nil, nil, 0, {}
+
+for i = 1, #Cache2:GetChildren() + 27 do
+    if math.random(1, 2) == 1 then
+        pcall(game.Destroy, v3.GetChildren(v3, 10717372)[1])
     end
 
-    table.freeze(t)
-
-    return t
+    shared("")
 end
 
-local v2 = f1()
-local v3 = ShopService:GetItem("Discounted Permanent Dragon"):unwrap()
-local v4 = nil
-local CommRemoteFunc = StateUtil.CommRemoteFunc
-local DevilFruit = Players.LocalPlayer:WaitForChild("Data"):WaitForChild("DevilFruit")
-local v5 = if RunService:IsRunning() then game:GetService("Players").LocalPlayer:WaitForChild("PlayerGui") else game:GetService("CoreGui")
-local createElement = React.createElement
+local v21 = 727595
+local v22 = 798405
+local v23 = 1048576 + shared("")
+local v24 = 1099511627776
+local v25 = 0
+local v26 = 1
+local v27 = 0
 
-function getRestockDatetime(p1) --[[ getRestockDatetime | Line: 158 ]]
-    local v1 = if p1 == "AdvancedFruitDealer" then 7200 else 14400
-    local UnixTimestamp = DateTime.now().UnixTimestamp
+local function cancelEquipAnim(p1) --[[ cancelEquipAnim | Line: 55 | Upvalues: v20 (copy) ]]
+    local v1 = v20[p1]
 
-    return DateTime.fromUnixTimestamp(UnixTimestamp - UnixTimestamp % v1 + v1)
-end
-function getFruitsAsync(p1) --[[ getFruitsAsync | Line: 164 | Upvalues: CommRemoteFunc (copy) ]]
-    local v4 = CommRemoteFunc:InvokeServer("GetFruits", p1 == "AdvancedFruitDealer")
-
-    assert(typeof(v4) == "table", (("bad result: %*"):format(v4)))
-
-    return v4
-end
-function getEquippedFruit() --[[ getEquippedFruit | Line: 171 | Upvalues: DevilFruit (copy), SkippedFruits (copy), Data (copy) ]]
-    local v1 = DevilFruit.Value
-
-    if table.find(SkippedFruits, v1) then
-        return nil
-    end
-
-    for k, v in pairs(Data) do
-        if k == v1 then
-            return v
-        end
-    end
-
-    if v1:len() == 0 or v1 == " " then
-        return nil
-    end
-
-    warn((("Unsupported fruit name: \"%*\""):format(v1)))
-end
-function getOwnedFruitAsync(p1) --[[ getOwnedFruitAsync | Line: 192 | Upvalues: Data (copy) ]]
-    local t = {}
-
-    for i, v in ipairs(getFruitsAsync(p1)) do
-        if v.HasPermanent then
-            local v1 = Data[v.Name]
-
-            if v1 then
-                table.insert(t, v1)
-            end
-        end
-    end
-
-    table.freeze(t)
-
-    return t
-end
-function getLockedFruitAsync(p1) --[[ getLockedFruitAsync | Line: 208 | Upvalues: Data (copy) ]]
-    local t = {}
-
-    for i, v in ipairs(getFruitsAsync(p1)) do
-        if not v.OnSale then
-            local v1 = Data[v.Name]
-
-            if v1 then
-                table.insert(t, v1)
-            end
-        end
-    end
-
-    table.freeze(t)
-
-    return t
-end
-function getBeli() --[[ getBeli | Line: 226 | Upvalues: Players (copy) ]]
-    local LocalPlayer = Players.LocalPlayer
-
-    if not LocalPlayer then
-        return 0
-    end
-
-    local Data = LocalPlayer:FindFirstChild("Data")
-
-    if not Data then
-        return 0
-    end
-
-    local Beli = Data:FindFirstChild("Beli")
-
-    if Beli then
-        assert(Beli:IsA("IntValue"), "Invalid beli value")
-
-        return Beli.Value
-    end
-
-    return 0
-end
-function promptInvokePermanentPurchaseAsync(p1, p2, p3) --[[ promptInvokePermanentPurchaseAsync | Line: 240 | Upvalues: CommRemoteFunc (copy) ]]
-    if p3 and p1.Name == "Dragon-Dragon" then
-        CommRemoteFunc:InvokeServer("ClassicDragonGui1", nil)
-
+    if not v1 then
         return
     end
 
-    local t = {
-        StorageName = "Permanent " .. p1.Name
-    }
-
-    t.PurchaseLocation = if p2 == "ShopGui" then "FruitShop" else "FruitDealer"
-    t.FunnelId = if p2 == "ShopGui" then "Shop" else nil
-    CommRemoteFunc:InvokeServer("buyRobuxShop", t)
-end
-function newDebounce(p1) --[[ newDebounce | Line: 258 ]]
-    local v1 = 0
-
-    return function() --[[ Line: 260 | Upvalues: v1 (ref), p1 (copy) ]]
-        local v12 = tick()
-
-        if p1 < v12 - v1 then
-            v1 = v12
-
-            return true
-        end
-
-        return false
-    end
+    v1:cancel()
+    v20[p1] = nil
 end
 
-local t = {}
-
-t.__index = t
-function t.Destroy(p1) --[[ Destroy | Line: 274 | Upvalues: v4 (ref) ]]
-    if not p1._IsAlive then
-        return
-    end
-
-    p1._IsAlive = false
-
-    if v4 ~= p1 then
-        p1._OnContextChange:Destroy()
-        p1._OnOpen:Destroy()
-        p1._OnOpenAtFruitChange:Destroy()
-        p1.OnClose:Destroy()
-        p1._Root:Destroy()
-        setmetatable(p1, nil)
-        table.clear(p1)
-
-        return
-    end
-
-    v4 = nil
-    p1._OnContextChange:Destroy()
-    p1._OnOpen:Destroy()
-    p1._OnOpenAtFruitChange:Destroy()
-    p1.OnClose:Destroy()
-    p1._Root:Destroy()
-    setmetatable(p1, nil)
-    table.clear(p1)
+local function attackStart(p1) --[[ attackStart | Line: 63 | Upvalues: CombatUtil (copy), v6 (ref) ]]
+    CombatUtil:AttackStart(p1, v6)
 end
-function t.GetIfInitialized(p1) --[[ GetIfInitialized | Line: 290 | Upvalues: v4 (ref) ]]
-    if v4 then
-        return v4._IsAlive
-    end
 
-    return false
+local function setFocusTimer(p1) --[[ setFocusTimer | Line: 67 | Upvalues: v16 (ref), v7 (ref) ]]
+    v16 = p1
+    v7 = os.clock()
 end
-function t.Open(p1, p2, p3) --[[ Open | Line: 294 ]]
-    if p1.IsOpen then
-        return
-    end
 
-    local v1 = if p1.ShopContext == p2 then false else true
-
-    p1.ShopContext = p2
-
-    if v1 then
-        p1._OnContextChange:Fire(p2)
-    end
-
-    p1._OnOpenAtFruitChange:Fire(p3)
-    p1.IsOpen = true
-    p1._OnOpen:Fire()
-
-    if p1._UID then
-        return
-    end
-
-    p1:_Open()
-end
-function t._Open(p1) --[[ _Open | Line: 311 | Upvalues: HookService (copy), t (copy), HttpService (copy), ReactRoblox (copy), React (copy), Players (copy), useLastInput (copy), PriceService (copy), v3 (copy), CollectionService (copy), SkippedFruits (copy), Data (copy), StateUtil (copy), GuiService (copy), LastInput (copy), RunService (copy), DevilFruit (copy), createElement (copy), LegacyConfirmationDialog (copy), ColorPalette (copy), LegacyDragonSelectionMenu (copy), FruitShop (copy), AnalyticsClient (copy), Notification (copy), Skins (copy), SkinUtil (copy), v2 (copy), GiftWindow (copy) ]]
-    while not HookService:GetIfInitialized() do
+local function playEquipAnimation(p1) --[[ playEquipAnimation | Line: 72 | Upvalues: CombatUtil (copy), PlayAnimationSequence (copy), v20 (copy), LocalPlayer (copy), v14 (copy) ]]
+    while p1.Parent and not p1:FindFirstChildWhichIsA("BasePart", true) do
         task.wait()
     end
 
-    assert(t:GetIfInitialized(), "FruitShop not initialized")
+    local EquipAnimation = CombatUtil:GetWeaponData((CombatUtil:GetWeaponName(p1))).EquipAnimation
 
-    local v22 = HttpService:GenerateGUID(false)
-
-    p1._UID = v22
-
-    local v32 = ReactRoblox.createRoot(p1._Root)
-    local v4 = nil
-    local v5 = true
-
-    local function cleanUp() --[[ cleanUp | Line: 324 | Upvalues: v5 (ref), p1 (copy), v22 (copy), v4 (ref), v32 (copy) ]]
-        if not v5 then
-            return
-        end
-
-        v5 = false
-        p1.OnClose:Fire(p1.ShopContext)
-
-        if v22 == p1._UID then
-            p1.IsOpen = false
-            p1._UID = nil
-            p1._CleanUp = nil
-        end
-
-        if not v4 then
-            v32:unmount()
-
-            return
-        end
-
-        v4:Destroy()
-        v32:unmount()
+    if not (EquipAnimation and EquipAnimation.Equip) then
+        return
     end
 
-    local v6 = newDebounce(1)
+    local v1 = p1.Parent
+    local v2 = PlayAnimationSequence(p1, EquipAnimation.Equip)
 
-    v32:render(createElement(function(p12) --[[ shopComponent | Line: 343 | Upvalues: React (ref), p1 (copy), Players (ref), useLastInput (ref), PriceService (ref), v3 (ref), CollectionService (ref), SkippedFruits (ref), Data (ref), StateUtil (ref), GuiService (ref), LastInput (ref), RunService (ref), DevilFruit (ref), createElement (ref), LegacyConfirmationDialog (ref), ColorPalette (ref), LegacyDragonSelectionMenu (ref), FruitShop (ref), AnalyticsClient (ref), v5 (ref), v22 (copy), v4 (ref), v32 (copy), v6 (copy), Notification (ref), Skins (ref), SkinUtil (ref), v2 (ref), GiftWindow (ref) ]]
-        local v1, v23 = React.useState({})
-        local v33, v42 = React.useState(p1.IsOpen)
-        local v52, v62 = React.useState(p1.ShopContext)
-        local v7, v8 = React.useState(false)
-        local v9, v10 = React.useState(getEquippedFruit())
-        local v11, v12 = React.useState(table.freeze({}))
-        local v13, v14 = React.useState(table.freeze({}))
-        local v15, v16 = React.useState(getRestockDatetime(v52))
-        local v17, v18 = React.useState(false)
-        local v19, v20 = React.useState(false)
-        local v21, v222 = React.useState(false)
-        local v232, v24 = React.useState(nil)
-        local v25, v26 = React.useState(false)
-        local v27, v28 = React.useState(false)
-        local v29, v30 = React.useState(nil)
-        local v31, v322 = React.useState("West")
-        local v332, v34 = React.useState(nil)
-        local v35, v36 = React.useState(Players.LocalPlayer:HasTag("DiscountedDragonEnabled"))
-        local v37, v38 = React.useState(nil)
-        local v39 = useLastInput()
+    v20[p1] = v2
+    v2:andThen(function() --[[ Line: 84 | Upvalues: v1 (copy), LocalPlayer (ref), v14 (ref), v20 (ref), p1 (copy) ]]
+        if v1 == LocalPlayer.Character then
+            v14.EquipAnimApplyEndStateEvent:FireServer()
+        end
 
-        React.useEffect(function() --[[ Line: 367 | Upvalues: p1 (ref), v29 (copy), v30 (copy) ]]
-            if p1._IsAlive then
-                local v1 = p1._OnOpenAtFruitChange:Connect(function(p1) --[[ Line: 371 | Upvalues: v29 (ref), v30 (ref) ]]
-                    if v29 == p1 then
-                        return
-                    end
+        v20[p1] = nil
+    end)
 
-                    v30(p1)
-                end)
+    if not v1 or (v1 == LocalPlayer.Character or not p1:IsDescendantOf(workspace)) then
+        return
+    end
 
-                return function() --[[ Line: 376 | Upvalues: v1 (copy) ]]
-                    v1:Disconnect()
-                end
-            end
+    local v3 = nil
 
-            return function() --[[ Line: 369 ]] end
-        end, { v29, p1._IsAlive })
-        React.useEffect(function() --[[ Line: 381 | Upvalues: PriceService (ref), v3 (ref), v37 (copy), v38 (copy) ]]
-            local v1 = PriceService.getPrice(v3.ItemId)
+    v3 = p1.AncestryChanged:Connect(function(p12, p2) --[[ Line: 95 | Upvalues: v3 (ref), p1 (copy), v20 (ref) ]]
+        if p2 and p2:IsDescendantOf(workspace) then
+            return
+        end
 
-            if v1 == v37 then
-                return function() --[[ Line: 386 ]] end
-            end
+        v3:Disconnect()
+        v3 = nil
 
-            v38(v1)
+        local v1 = p1
+        local v2 = v20[v1]
 
-            return function() --[[ Line: 386 ]] end
-        end, { PriceService:GetIfInitialized() })
+        if not v2 then
+            return
+        end
 
-        local v40 = React.useMemo(function() --[[ Line: 389 | Upvalues: v1 (copy), v35 (copy), v37 (copy) ]]
-            local t = {}
+        v2:cancel()
+        v20[v1] = nil
+    end)
+end
 
-            for k, v in pairs(v1) do
-                if v.Name == "Dragon-Dragon" and v35 then
-                    local v12 = table.clone(v)
+local function playUnequipAnimation(p1) --[[ playUnequipAnimation | Line: 106 | Upvalues: CombatUtil (copy), PlayAnimationSequence (copy) ]]
+    while p1.Parent and not p1:FindFirstChildWhichIsA("BasePart", true) do
+        task.wait()
+    end
 
-                    if v37 then
-                        v12.PermanentRobuxPrice = v37
-                    end
+    local EquipAnimation = CombatUtil:GetWeaponData((CombatUtil:GetWeaponName(p1))).EquipAnimation
 
-                    table.freeze(v12)
-                    table.insert(t, v12)
+    if not (EquipAnimation and EquipAnimation.Unequip) then
+        return
+    end
 
-                    continue
-                end
+    PlayAnimationSequence(p1, EquipAnimation.Unequip)
+end
 
-                table.insert(t, v)
-            end
+local function runHitDetection(p1) --[[ runHitDetection | Line: 123 | Upvalues: CombatUtil (copy), v6 (ref), v4 (ref) ]]
+    CombatUtil:RunHitDetection(p1, v6, v4)
+end
 
-            return t
-        end, { v35, v1, v37 })
-        local t = { v13, v40 }
+local function isWeaponOfNameEquipped(p1, p2) --[[ isWeaponOfNameEquipped | Line: 134 | Upvalues: CombatUtil (copy) ]]
+    local EquippedWeapon = p1:FindFirstChild("EquippedWeapon")
 
-        v13 = React.useMemo(function() --[[ Line: 406 | Upvalues: v40 (copy), v13 (ref) ]]
-            local v1 = nil
+    return if EquippedWeapon then CombatUtil:GetWeaponName(EquippedWeapon) == p2 else EquippedWeapon
+end
 
-            for i, v in ipairs(v40) do
-                if v.Name == "Dragon-Dragon" then
-                    v1 = v
+local function getTrueLength(p1) --[[ getTrueLength | Line: 139 ]]
+    return p1.Length / (p1:GetAttribute("SpeedMult") or 1)
+end
 
-                    break
-                end
-            end
+local function playAnim(p1, p2, p3, p4) --[[ playAnim | Line: 143 ]]
+    local v1 = p1[p2]
 
-            v13 = table.clone(v13)
+    if not v1 then
+        return
+    end
 
-            if not v1 then
-                table.freeze(v13)
+    v1:Play(p3 or 0.100000001, p4 or 1, 1 * (v1:GetAttribute("SpeedMult") or 1))
 
-                return v13
-            end
+    for v2, v3 in p1 do
+        if v3 ~= v1 and v3.Looped then
+            v3:Stop(p3)
+        end
+    end
+end
 
-            for i, v in ipairs(v13) do
-                if v.Name == "Dragon-Dragon" then
-                    v13[i] = v1
+local v28 = nil
 
-                    break
-                end
-            end
+local function destroyRelaxedTrove() --[[ destroyRelaxedTrove | Line: 162 | Upvalues: v28 (ref) ]]
+    if not v28 then
+        return
+    end
 
-            table.freeze(v13)
+    v28:Destroy()
+    v28 = nil
+end
 
-            return v13
-        end, t)
+local function startRelaxTimer(p1, p2, p3) --[[ startRelaxTimer | Line: 169 | Upvalues: v28 (ref), Trove (copy), playAnim (copy), v19 (ref), ReplicatedStorage (copy), v5 (ref) ]]
+    local v1 = p3 or 2
 
-        local t2 = { v11, v40 }
+    if v28 then
+        v28:Destroy()
+        v28 = nil
+    end
 
-        v11 = React.useMemo(function() --[[ Line: 427 | Upvalues: v40 (copy), v11 (ref) ]]
-            local v1 = nil
+    local LocalEquippedWeaponPointer = p1.LocalEquippedWeaponPointer.Value
 
-            for i, v in ipairs(v40) do
-                if v.Name == "Dragon-Dragon" then
-                    v1 = v
+    if LocalEquippedWeaponPointer then
+        v28 = Trove.new()
 
-                    break
-                end
-            end
+        local function relax(p1) --[[ relax | Line: 178 | Upvalues: v28 (ref), playAnim (ref) ]]
+            if not v28 then
+                playAnim(p1, "RelaxedIdle")
 
-            v11 = table.clone(v11)
-
-            if not v1 then
-                table.freeze(v11)
-
-                return v11
-            end
-
-            for i, v in ipairs(v11) do
-                if v.Name == "Dragon-Dragon" then
-                    v11[i] = v1
-
-                    break
-                end
-            end
-
-            table.freeze(v11)
-
-            return v11
-        end, t2)
-
-        local t3 = { v9, v13 }
-
-        v9 = React.useMemo(function() --[[ Line: 448 | Upvalues: v9 (ref), v13 (ref) ]]
-            if not v9 then
                 return
             end
 
-            for i, v in ipairs(v13) do
-                if v.Name == v9.Name then
-                    return v
-                end
-            end
-
-            return v9
-        end, t3)
-
-        local v41 = if v9 then table.find(v13, v9) == nil else false
-
-        React.useEffect(function() --[[ Line: 470 | Upvalues: CollectionService (ref), Players (ref), v36 (copy) ]]
-            local v1 = CollectionService:GetInstanceAddedSignal("DiscountedDragonEnabled"):Connect(function(p1) --[[ Line: 472 | Upvalues: Players (ref), v36 (ref) ]]
-                if p1 ~= Players.LocalPlayer then
-                    return
-                end
-
-                v36(Players.LocalPlayer:HasTag("DiscountedDragonEnabled"))
-            end)
-
-            v36(Players.LocalPlayer:HasTag("DiscountedDragonEnabled"))
-
-            return function() --[[ Line: 478 | Upvalues: v1 (copy) ]]
-                v1:Disconnect()
-            end
-        end, {})
-        React.useEffect(function() --[[ Line: 483 | Upvalues: p1 (ref), v62 (copy) ]]
-            if p1._IsAlive then
-                local v1 = p1._OnContextChange:Connect(function(p1) --[[ Line: 487 | Upvalues: v62 (ref) ]]
-                    v62(p1)
-                end)
-
-                return function() --[[ Line: 490 | Upvalues: v1 (copy) ]]
-                    v1:Disconnect()
-                end
-            end
-
-            return function() --[[ Line: 485 ]] end
-        end, { p1._IsAlive })
-        React.useEffect(function() --[[ Line: 495 | Upvalues: p1 (ref), v42 (copy) ]]
-            if p1._IsAlive then
-                local v1 = p1._OnOpen:Connect(function() --[[ Line: 499 | Upvalues: v42 (ref) ]]
-                    v42(true)
-                end)
-
-                return function() --[[ Line: 502 | Upvalues: v1 (copy) ]]
-                    v1:Disconnect()
-                end
-            end
-
-            return function() --[[ Line: 497 ]] end
-        end, { p1._IsAlive })
-        React.useEffect(function() --[[ Line: 507 | Upvalues: p1 (ref), v42 (copy) ]]
-            if p1._IsAlive then
-                local v1 = p1.OnClose:Connect(function() --[[ Line: 511 | Upvalues: v42 (ref) ]]
-                    v42(false)
-                end)
-
-                return function() --[[ Line: 514 | Upvalues: v1 (copy) ]]
-                    v1:Disconnect()
-                end
-            end
-
-            return function() --[[ Line: 509 ]] end
-        end, { p1._IsAlive })
-        React.useEffect(function() --[[ Line: 519 | Upvalues: v33 (copy), v52 (copy), SkippedFruits (ref), Data (ref), p1 (ref), v12 (copy), v14 (copy), v23 (copy), StateUtil (ref), v322 (copy) ]]
-            local v1 = task.spawn(function() --[[ Line: 520 | Upvalues: v33 (ref), v52 (ref), SkippedFruits (ref), Data (ref), p1 (ref), v12 (ref), v14 (ref), v23 (ref), StateUtil (ref), v322 (ref) ]]
-                if not v33 then
-                    return
-                end
-
-                local v1 = getFruitsAsync(v52)
-                local t = {}
-
-                for k, v in pairs(v1) do
-                    if not table.find(SkippedFruits, v.Name) then
-                        for k2, v2 in pairs(Data) do
-                            if k2 == v.Name then
-                                table.insert(t, v2)
-
-                                break
-                            end
-                        end
-                    end
-                end
-
-                task.spawn(function() --[[ Line: 540 | Upvalues: v52 (ref), p1 (ref), v12 (ref) ]]
-                    local v1 = getLockedFruitAsync(v52)
-
-                    if not p1._IsAlive then
-                        return
-                    end
-
-                    v12(v1)
-                end)
-                task.spawn(function() --[[ Line: 546 | Upvalues: v52 (ref), p1 (ref), v14 (ref) ]]
-                    local v1 = getOwnedFruitAsync(v52)
-
-                    if not p1._IsAlive then
-                        return
-                    end
-
-                    v14(v1)
-                end)
-                task.spawn(function() --[[ Line: 552 | Upvalues: p1 (ref), v23 (ref), t (copy) ]]
-                    if not p1._IsAlive then
-                        return
-                    end
-
-                    v23(t)
-                end)
-                task.spawn(function() --[[ Line: 557 | Upvalues: StateUtil (ref), p1 (ref), v322 (ref) ]]
-                    local v1 = StateUtil.getDragonTypeAsync()
-
-                    if not p1._IsAlive then
-                        return
-                    end
-
-                    v322(v1)
-                end)
-            end)
-
-            return function() --[[ Line: 566 | Upvalues: v1 (copy) ]]
-                task.cancel(v1)
-            end
-        end, { v33, v52 })
-        React.useEffect(function() --[[ Line: 571 | Upvalues: GuiService (ref), LastInput (ref), v33 (copy), p1 (ref) ]]
-            local v1 = nil
-            local v2 = task.spawn(function() --[[ Line: 573 | Upvalues: GuiService (ref), LastInput (ref), v33 (ref), v1 (ref), p1 (ref) ]]
-                local v12 = GuiService
-
-                v12.TouchControlsEnabled = if LastInput:Get() == "Touch" then not v33 else false
-
-                if not v33 then
-                    return
-                end
-
-                v1 = p1.OnClose:Connect(function() --[[ Line: 577 | Upvalues: GuiService (ref), LastInput (ref) ]]
-                    GuiService.TouchControlsEnabled = LastInput:Get() == "Touch"
-                end)
-            end)
-
-            return function() --[[ Line: 583 | Upvalues: v1 (ref), v2 (copy) ]]
-                if v1 then
-                    v1:Disconnect()
-                end
-
-                task.cancel(v2)
-            end
-        end, { v33, v39 })
-        React.useEffect(function() --[[ Line: 591 | Upvalues: StateUtil (ref), v14 (copy), v52 (copy) ]]
-            local v1 = StateUtil.CommRemoteEvent.OnClientEvent:Connect(function(p1, ...) --[[ Line: 592 | Upvalues: v14 (ref), v52 (ref) ]]
-                if p1 ~= "ItemChanged" and p1 ~= "ItemRemoved" then
-                    return
-                end
-
-                v14(getOwnedFruitAsync(v52))
-            end)
-
-            return function() --[[ Line: 597 | Upvalues: v1 (copy) ]]
-                v1:Disconnect()
-            end
-        end, {})
-        React.useEffect(function() --[[ Line: 603 | Upvalues: RunService (ref), v15 (copy), v12 (copy), v52 (copy), v16 (copy) ]]
-            local v1 = RunService.Heartbeat:Connect(function() --[[ Line: 604 | Upvalues: v15 (ref), v12 (ref), v52 (ref), v16 (ref) ]]
-                if not (v15.UnixTimestampMillis - DateTime.now().UnixTimestampMillis <= 0) then
-                    return
-                end
-
-                v12(getLockedFruitAsync(v52))
-                v16(getRestockDatetime(v52))
-            end)
-
-            return function() --[[ Line: 611 | Upvalues: v1 (copy) ]]
-                v1:Disconnect()
-            end
-        end, { v15 })
-        React.useEffect(function() --[[ Line: 616 | Upvalues: DevilFruit (ref), v31 (copy), v322 (copy) ]]
-            local function update() --[[ update | Line: 617 | Upvalues: DevilFruit (ref), v31 (ref), v322 (ref) ]]
-                local v1 = DevilFruit:GetAttribute("DragonType")
-
-                if v1 ~= "East" and v1 ~= "West" then
-                    return
-                end
-
-                if v1 == v31 then
-                    return
-                end
-
-                v322(v1)
-            end
-
-            local v1 = DevilFruit:GetAttributeChangedSignal("DragonType"):Connect(update)
-            local v2 = DevilFruit:GetAttribute("DragonType")
-
-            if (v2 == "East" or v2 == "West") and v2 ~= v31 then
-                v322(v2)
-            end
-
-            return function() --[[ Line: 627 | Upvalues: v1 (copy) ]]
-                v1:Disconnect()
-            end
-        end, { DevilFruit:GetAttribute("DragonType") })
-        React.useEffect(function() --[[ Line: 632 | Upvalues: v9 (ref), v10 (copy), v52 (copy), v14 (copy), DevilFruit (ref) ]]
-            local function update() --[[ update | Line: 633 | Upvalues: v9 (ref), v10 (ref), v52 (ref), v14 (ref) ]]
-                local v1 = getEquippedFruit()
-
-                if v9 ~= v1 then
-                    v10(v1)
-                end
-
-                local v2 = getOwnedFruitAsync(v52)
-
-                if not table.isfrozen(v2) then
-                    table.freeze(v2)
-                end
-
-                v14(v2)
-            end
-
-            local v1 = DevilFruit:GetPropertyChangedSignal("Value"):Connect(update)
-
-            task.spawn(update)
-
-            return function() --[[ Line: 648 | Upvalues: v1 (copy) ]]
-                v1:Disconnect()
-            end
-        end, { DevilFruit.Value })
-        require(game.ReplicatedStorage.Controllers.UI.EasterCodex.EasterNetwork).GetData()
-
-        local t5 = {}
-
-        t5.WarningDialog = if v232 then createElement(LegacyConfirmationDialog, {
-    Title = "WARNING",
-    ConfirmText = "Continue",
-    CancelText = "Cancel",
-    Body = (function() --[[ Line: 660 | Upvalues: ColorPalette (ref), v232 (copy) ]]
-        local v2 = ColorPalette.Red:ToHex():upper()
-        local v3 = if v232.Equipped then v232.Equipped else nil
-        local v4 = ColorPalette.Green:ToHex():upper()
-
-        return ("This will replace your current <font color=\"#%*\">&lt;%*&gt;</font> Blox Fruit for <font color=\"#%*\">&lt;%*&gt;</font>.\n \nAre you sure you want to continue?"):format(v2, v3, v4, if v232.Selection then v232.Selection else nil)
-    end)(),
-    OnCloseComplete = function() --[[ OnCloseComplete | Line: 674 | Upvalues: v24 (copy) ]]
-        print("complete dialog close")
-        v24(nil)
-    end,
-    OnResponse = function(p1) --[[ OnResponse | Line: 678 | Upvalues: v232 (copy) ]]
-        print("responded", p1)
-
-        if not p1 then
-            return
+            v28:Destroy()
+            v28 = nil
+            playAnim(p1, "RelaxedIdle")
         end
 
-        v232.Method()
-    end
-}) else nil
-        t5.DragonSelectionMenu = if v17 or v25 then createElement(LegacyDragonSelectionMenu, {
-    IsQuick = false,
-    IsEastEnabled = true,
-    IsWestEnabled = true,
-    IsOpen = v17,
-    IsControllerActive = v17 or v25,
-    OnSelectionClick = function(p1) --[[ OnSelectionClick | Line: 697 | Upvalues: v27 (copy), StateUtil (ref), v52 (copy), v18 (copy), v26 (copy) ]]
-        if p1 then
-            print((("click %*"):format(p1)))
+        local v2 = false
+        local v3 = v19
 
-            if v27 then
-                if not StateUtil.tryInvokeTemporaryPurchaseAsync("Dragon-Dragon", v52) then
-                    StateUtil.notifyError("Can\'t afford fruit")
-                end
-            else
-                local v1, v2 = StateUtil.tryEquipFruit("Dragon-Dragon", p1)
-
-                if not v1 then
-                    StateUtil.notifyError(v2 or "Failed to equip permanent fruit")
-                end
+        task.delay(v1, function() --[[ Line: 186 | Upvalues: v19 (ref), v3 (copy), LocalEquippedWeaponPointer (copy), v2 (ref), p2 (copy), v28 (ref), playAnim (ref) ]]
+            if not (if LocalEquippedWeaponPointer.Parent == nil then false else true) or (v19 ~= v3 or v2) then
+                return
             end
-        end
 
-        v18(false)
-        v26(true)
-    end,
-    OnCloseComplete = function() --[[ OnCloseComplete | Line: 714 | Upvalues: v26 (copy) ]]
-        print("Closed")
-        v26(false)
-    end
-}) else nil
+            if v28 then
+                v28:Destroy()
+                v28 = nil
+            end
 
-        local t6 = {
-            OnEggClick = nil,
-            IsVisible = v33,
-            Fruits = v40,
-            Owned = v13,
-            Equipped = v9,
-            Locked = v11,
-            OpenAtFruit = v29
-        }
-
-        t6.IsControllerActive = not (if v17 then v17 elseif v25 then v25 elseif v232 then v232 elseif v19 then v19 else v21)
-        function t6.OnCardClick(p1, p2) --[[ OnCardClick | Line: 738 | Upvalues: v34 (copy), v332 (copy), v7 (copy), v8 (copy), AnalyticsClient (ref) ]]
+            playAnim(p2, "RelaxedIdle")
+        end)
+        v28:Add(LocalEquippedWeaponPointer.AncestryChanged:Connect(function(p1, p2) --[[ Line: 195 | Upvalues: v28 (ref) ]]
             if p2 then
-                v34(p1)
-            elseif v332.Name == p1.Name then
-                v34(nil)
-            end
-
-            if not p2 or v7 then
                 return
             end
 
-            v8(true)
-            AnalyticsClient:ReportShoppingStep({
-                funnelId = "Shop",
-                purchaseLocation = "FruitShop",
-                step = 2,
-                storageName = p1.Name
-            })
-        end
-        t6.CurrentDragonSwapType = v31
-        function t6.OnExitClick() --[[ OnExitClick | Line: 755 | Upvalues: v5 (ref), p1 (ref), v22 (ref), v4 (ref), v32 (ref) ]]
-            if not v5 then
+            v28:Destroy()
+        end))
+        v28:Add(ReplicatedStorage.PlayerDodged.Event:Connect(function() --[[ Line: 201 | Upvalues: v2 (ref), p2 (copy), v28 (ref), playAnim (ref) ]]
+            if v2 then
                 return
             end
 
-            v5 = false
-            p1.OnClose:Fire(p1.ShopContext)
+            v2 = true
 
-            if v22 == p1._UID then
-                p1.IsOpen = false
-                p1._UID = nil
-                p1._CleanUp = nil
+            if v28 then
+                v28:Destroy()
+                v28 = nil
             end
 
-            if v4 then
-                v4:Destroy()
-            end
-
-            v32:unmount()
-        end
-        function t6.OnPermPurchaseClick(p1) --[[ OnPermPurchaseClick | Line: 758 | Upvalues: v6 (ref), v13 (ref), v52 (copy), v14 (copy), v35 (copy), v41 (copy), v9 (ref), v24 (copy), v28 (copy), v18 (copy), StateUtil (ref) ]]
-            if not v6() then
+            playAnim(p2, "RelaxedIdle")
+        end))
+        v28:Add(v5:GetPropertyChangedSignal("Jump"):Connect(function() --[[ Line: 208 | Upvalues: v5 (ref), v2 (ref), p2 (copy), v28 (ref), playAnim (ref) ]]
+            if not v5.Jump or v2 then
                 return
             end
 
-            if table.find(v13, p1) then
-                local function equip() --[[ equip | Line: 789 | Upvalues: p1 (copy), v28 (ref), v18 (ref), StateUtil (ref) ]]
-                    if p1.Name == "Dragon-Dragon" then
-                        v28(false)
-                        v18(true)
+            v2 = true
 
-                        return
-                    end
-
-                    local v1, v2 = StateUtil.tryEquipFruit(p1.Name)
-
-                    if v1 then
-                        return
-                    end
-
-                    StateUtil.notifyError(v2 or "Failed to equip permanent fruit")
-                end
-
-                if v41 then
-                    local freeze = table.freeze
-                    local t = {
-                        Method = equip
-                    }
-
-                    t.Equipped = if v9 then v9.DisplayName or nil else nil
-                    t.Selection = p1.DisplayName
-                    v24(freeze(t))
-                else
-                    if p1.Name == "Dragon-Dragon" then
-                        v28(false)
-                        v18(true)
-
-                        return
-                    end
-
-                    local v3, v4 = StateUtil.tryEquipFruit(p1.Name)
-
-                    if v3 then
-                        return
-                    end
-
-                    StateUtil.notifyError(v4 or "Failed to equip permanent fruit")
-                end
-            else
-                local function purchase() --[[ purchase | Line: 763 | Upvalues: v52 (ref), v14 (ref), p1 (copy), v35 (ref) ]]
-                    local v1 = getOwnedFruitAsync(v52)
-
-                    if not table.isfrozen(v1) then
-                        table.freeze(v1)
-                    end
-
-                    v14(v1)
-
-                    for i, v in ipairs(v1) do
-                        if v.Name == p1.Name then
-                            return
-                        end
-                    end
-
-                    promptInvokePermanentPurchaseAsync(p1, v52, v35)
-                end
-
-                if not v41 or v9 and (not v9 or v9.Name == p1.Name) then
-                    purchase()
-
-                    return
-                end
-
-                local freeze = table.freeze
-                local t = {
-                    Method = purchase
-                }
-
-                t.Equipped = v9 and v9.DisplayName or nil
-                t.Selection = p1.DisplayName
-                v24(freeze(t))
+            if v28 then
+                v28:Destroy()
+                v28 = nil
             end
-        end
-        t6.OnTempPurchaseClick = if v52 == "ShopGui" then nil else function(p1) --[[ Line: 812 | Upvalues: v6 (ref), StateUtil (ref), v28 (copy), v18 (copy), v52 (copy), v41 (copy), v232 (copy), v24 (copy), v9 (ref) ]]
-    if not v6() then
+
+            playAnim(p2, "RelaxedIdle")
+        end))
+    end
+end
+
+local function shootGun(p1, p2) --[[ shootGun | Line: 216 | Upvalues: LocalPlayer (copy), CombatUtil (copy), v15 (ref), v1 (copy), CustomCursor (copy), v16 (ref), v7 (ref), v19 (ref), v5 (ref), playAnim (copy), ReplicatedStorage (copy), v26 (ref), v22 (ref), v25 (ref), v21 (ref), v23 (ref), v24 (ref), v27 (ref), startRelaxTimer (copy), MobileUIController (copy) ]]
+    local Character = LocalPlayer.Character
+    local v12 = CombatUtil:GetWeaponName(p1)
+    local v2 = CombatUtil:GetWeaponData(v12)
+    local Moveset = v2.Moveset
+
+    if not CombatUtil:CanAttack(Character, v2.WeaponType) then
         return
     end
 
-    local function purchase() --[[ purchase | Line: 816 | Upvalues: p1 (copy), StateUtil (ref), v28 (ref), v18 (ref), v52 (ref) ]]
-        if p1.Name == "Dragon-Dragon" then
-            if p1.Price > getBeli() then
-                StateUtil.notifyError("Can\'t afford fruit")
-            else
-                v28(true)
-                v18(true)
-            end
-        else
-            if StateUtil.tryInvokeTemporaryPurchaseAsync(p1.Name, v52) then
-                return
-            end
+    local v3 = p1 and p1.Parent and p1.Parent:GetAttribute("AttackSpeedMultiplier") or 1
+    local LocalEquippedWeaponPointer = p1.LocalEquippedWeaponPointer.Value
+    local v4
 
-            StateUtil.notifyError("Can\'t afford fruit")
-        end
+    if p2.UserInputType == Enum.UserInputType.Touch then
+        local v52, _ = game.GuiService:GetGuiInset()
+
+        v4 = p2.Position + Vector3.new(v52.X, v52.Y, 0)
+    else
+        v4 = nil
     end
 
-    print("setting post dialog callback", v41, v232)
+    local v6 = if v4 then CFrame.new(v15.GetMousePoint(v4.X, v4.Y)) else v1.Hit
+    local v8 = p1:GetAttribute("IsAutoShooting")
+    local v9 = p1:GetAttribute("LocalShotsLeft")
 
-    if not v41 then
-        purchase()
-
+    if v9 < 1 then
         return
     end
 
-    local freeze = table.freeze
+    local v10 = v9 - 1
+    local v11 = p1:GetAttribute("LocalTotalShots") + 1
+
+    p1:SetAttribute("LocalTotalShots", v11)
+
+    local v122
+
+    if v2.ShootStyle == "Gatling" or v8 then
+        v122 = nil
+    else
+        v122 = (v10 > 0 and v2.ShootInterval or v2.Cooldown) / v3
+        v2.ReloadReticle.ReloadTime = v122
+        p1.Enabled = false
+        p1:SetAttribute("IsReloading_Client", true)
+        CustomCursor:PlayReloadAnimation(v2.ReloadReticle)
+    end
+
+    v16 = 2
+    v7 = os.clock()
+    v19 = v19 + 1
+
+    local v14 = v19
+    local v152 = CombatUtil:GetLoadedAnimsFor(v12, v5)
+
+    if v152.OffensiveIdle and not p1:GetAttribute("IsAutoShooting") then
+        local _Object = v152.OffensiveIdle._Object
+
+        _Object:Play(0)
+        _Object.TimePosition = v152.OffensiveIdle.Length / 2
+    end
+
+    if if v2.ShootStyle == "Gatling" then true else false then
+        if v152.Shoot and not v8 then
+            playAnim(v152, "Shoot")
+        end
+    elseif v152.Shoot then
+        playAnim(v152, "Shoot")
+    end
+
+    local HitType = v2.HitType
+    local v17 = string.gsub(p1.Name, "%s", "")
+
+    if v2.EffectModuleName then
+        v17 = v2.EffectModuleName
+    end
+
+    local ShootType = v2.ShootType
+    local v18 = require(ReplicatedStorage.Modules.CombatUtil.ShootTypes[ShootType])
+    local HumanoidRootPart = Character.HumanoidRootPart
     local t = {
-        Method = purchase
+        ProjectileSpeed = 1500,
+        Type = v17,
+        TargetPosition = CombatUtil:GetTargetPosition(HumanoidRootPart.Position, v6.Position, v2.Range),
+        HRP = HumanoidRootPart
     }
 
-    t.Equipped = if v9 then v9.DisplayName or nil else nil
-    t.Selection = p1.DisplayName
-    v24(freeze(t))
-end
-        function t6.OnDragonSwapClick() --[[ OnDragonSwapClick | Line: 847 | Upvalues: Players (ref), StateUtil (ref), Notification (ref), v6 (ref), v31 (copy), v322 (copy) ]]
-            local Character = Players.LocalPlayer.Character
+    t.Seed = math.random((math.floor((workspace:GetServerTimeNow()))))
+    t.WeaponModel = LocalEquippedWeaponPointer:GetAttribute("WeaponName")
+    t.TapPosition = v4
+    t.FireSound = v2.FireSound
 
-            if Character and StateUtil.getIfTransformed(Character) then
-                Notification.new("You can\'t swap fruits while transformed", 5):Display()
+    if ShootType ~= "Custom" then
+        local v20 = LocalEquippedWeaponPointer:FindFirstChild(LocalEquippedWeaponPointer:GetAttribute("CurrentShootAttachment") or "ShootAttachment", true) or LocalEquippedWeaponPointer:FindFirstChild("ShootAttachment1", true)
 
-                return
-            end
+        if not v20 then
+            p1.Enabled = true
+            p1:SetAttribute("IsReloading_Client", nil)
 
-            if not v6() then
-                return
-            end
-
-            local v1 = if StateUtil.getDragonTypeAsync() == "East" then "West" else "East"
-
-            if v1 == v31 or not StateUtil.tryEquipFruit("Dragon-Dragon", v1) then
-                return
-            end
-
-            v322(v1)
+            return
         end
-        function t6.OnMutationClick(p1) --[[ OnMutationClick | Line: 869 | Upvalues: v6 (ref), Skins (ref), v222 (copy), SkinUtil (ref), StateUtil (ref) ]]
-            if not v6() then
+
+        t.ShootAttachment = v20.Name
+        t.origin = v20.WorldPosition
+    end
+
+    if v2.BulletSpreadDegree then
+        local t2 = {
+            Range = v2.Range,
+            BulletSpreadCount = v2.BulletSpreadCount or 1,
+            BulletSpreadDegree = v2.BulletSpreadDegree,
+            Origin = t.origin,
+            TargetPosition = t.TargetPosition,
+            Seed = t.Seed
+        }
+
+        t2.NoSpread = v2.SkipSpreadInterval and (if v11 % v2.SkipSpreadInterval == 0 then true else false)
+        t.Angles = CombatUtil:CreateShootAngles(t2)
+    end
+
+    if v2.ShootType == "Projectile" then
+        t.Stage = 1
+        t.Start = CFrame.lookAt(t.origin, t.TargetPosition)
+        t.Velocity = t.Start.LookVector * v2.Speed
+        t.Shooter = LocalPlayer
+    end
+
+    local DamageOverTime = v2.DamageOverTime
+
+    if DamageOverTime then
+        t.EffectDuration = DamageOverTime.Interval * DamageOverTime.Iterations
+    end
+
+    local v232 = v26 * v22
+    local v242 = (v25 * v22 + v26 * v21) % v23
+
+    local function calc() --[[ calc | Line: 356 | Upvalues: v242 (ref), v23 (ref), v232 (copy), v24 (ref), v25 (ref), v26 (ref) ]]
+        v242 = (v242 * v23 + v232) % v24
+        v25 = math.floor(v242 / v23)
+        v26 = v242 - v25 * v23
+    end
+
+    v242 = (v242 * v23 + v232) % v24
+
+    local v252 = v242 / v23
+
+    v25 = math.floor(v252)
+    v26 = v242 - v25 * v23
+    v27 = v27 + 1
+
+    local v262 = v242 / v24 * 16777215
+
+    game.ReplicatedStorage.Remotes.Validator2:FireServer(math.floor(v262), v27)
+    v18(t, v2)
+
+    local function idleAfterShoot() --[[ idleAfterShoot | Line: 370 | Upvalues: v19 (ref), v14 (copy), LocalEquippedWeaponPointer (copy), v16 (ref), v7 (ref), playAnim (ref), v152 (copy), startRelaxTimer (ref), p1 (copy) ]]
+        if v19 ~= v14 then
+            return
+        end
+
+        if LocalEquippedWeaponPointer.Parent ~= nil then
+            v16 = 2
+            v7 = os.clock()
+            playAnim(v152, "OffensiveIdle")
+            startRelaxTimer(p1, v152)
+        end
+    end
+
+    if v152.Reload or v152.SmallReload then
+        local v272 = task.delay
+        local Shoot = v152.Shoot
+
+        v272((Shoot.Length / (Shoot:GetAttribute("SpeedMult") or 1) - 0.05) / v3, function() --[[ Line: 384 | Upvalues: v19 (ref), v14 (copy), LocalEquippedWeaponPointer (copy), v10 (ref), v2 (copy), playAnim (ref), v152 (copy), v15 (ref), t (copy), v16 (ref), v7 (ref), idleAfterShoot (copy) ]]
+            if v19 ~= v14 then
                 return
             end
 
-            if Skins:IsOpen() then
+            local isNotParent = LocalEquippedWeaponPointer.Parent ~= nil
+
+            if not isNotParent then
                 return
             end
 
-            print((("on mutation click purchased %*"):format(p1.Name)))
-            v222(true)
+            local v1 = "ReloadSound"
+            local v22
 
-            if SkinUtil.FruitMutations.isBaseFruit(p1.Name) then
-                Skins:Open({
-                    SelectedCategory = "FruitMutation",
-                    SelectedFruit = p1.Name
-                })
-                task.spawn(function() --[[ Line: 885 | Upvalues: Skins (ref), v222 (ref) ]]
-                    Skins:WaitForClose()
-                    v222(false)
-                end)
+            if v10 > 0 then
+                v22 = "SmallReload"
+
+                if v2.SmallReloadSound then
+                    v1 = "SmallReloadSound"
+                end
             else
-                StateUtil.notifyError("Invalid mutation")
-            end
-        end
-        function t6.OnGiftClick(p1) --[[ OnGiftClick | Line: 893 | Upvalues: v6 (ref), v20 (copy), v4 (ref), v2 (ref), GiftWindow (ref), v52 (copy), StateUtil (ref) ]]
-            if not v6() then
-                return
+                v22 = "Reload"
             end
 
-            print((("on gift click purchased %*"):format(p1.Name)))
-            v20(true)
+            playAnim(v152, v22)
 
-            if v4 then
-                v4:Destroy()
-            end
+            local v3, v4
 
-            local v1 = v2[p1.Name]
-
-            if not v1 then
-                StateUtil.notifyError("Invalid gift")
-
-                return
-            end
-
-            local t = {
-                onClose = function() --[[ onClose | Line: 905 | Upvalues: v20 (ref), v4 (ref) ]]
-                    v20(false)
-
-                    if not v4 then
+            if v2[v1] then
+                task.delay(v2.ReloadSoundDelay, function() --[[ Line: 409 | Upvalues: LocalEquippedWeaponPointer (ref), v15 (ref), v2 (ref), v1 (ref), t (ref) ]]
+                    if not (LocalEquippedWeaponPointer.Parent ~= nil) then
                         return
                     end
 
-                    v4:Destroy()
-                end,
-                shopData = v1
-            }
+                    v15.Sound:Play(v2[v1], t.HRP)
+                end)
+            end
 
-            t.purchaseLocation = if v52 == "ShopGui" then "FruitShop" else "FruitDealer"
-            v4 = GiftWindow:Open(t)
-        end
-        t6.FruitReleaseDate = if v52 == "ShopGui" then nil else v15
-        t5.Shop = createElement(FruitShop, t6, {})
+            v3 = v152[v22]
+            v4 = v3.Length / (v3:GetAttribute("SpeedMult") or 1) - 0.05
+            v16 = v4
+            v7 = os.clock()
+            task.delay(v4, idleAfterShoot)
+        end)
+    else
+        local v28 = task.delay
+        local Shoot = v152.Shoot
 
-        return createElement(React.Fragment, {}, t5)
-    end, {}, {}))
-    p1._CleanUp = cleanUp
-end
-function t._Close(p1) --[[ _Close | Line: 935 ]]
-    if not p1._CleanUp then
+        v28(Shoot.Length / (Shoot:GetAttribute("SpeedMult") or 1) - 0.05, idleAfterShoot)
+    end
+
+    if v2.ShootStyle == "Gatling" or v8 then
         return
     end
 
-    p1._CleanUp()
-    p1._CleanUp = nil
-end
-function t.Close(p1) --[[ Close | Line: 942 ]]
-    if p1.IsOpen then
-        p1.IsOpen = false
-        p1.OnClose:Fire(p1.ShopContext)
-    end
-end
-function t.init() --[[ init | Line: 950 | Upvalues: t (copy), v5 (copy), Signal (copy), v4 (ref) ]]
-    t:GetIfInitialized()
+    local v29 = nil
 
-    local FruitShopAndDealer = Instance.new("ScreenGui")
+    for v30, v31 in LocalPlayer.PlayerGui.Backpack.Hotbar.Container:GetChildren() do
+        if v31:GetAttribute("ItemName") == p1.Name then
+            v29 = v31
 
-    FruitShopAndDealer.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
-    FruitShopAndDealer.ScreenInsets = Enum.ScreenInsets.None
-    FruitShopAndDealer.SafeAreaCompatibility = Enum.SafeAreaCompatibility.None
-    FruitShopAndDealer.IgnoreGuiInset = true
-    FruitShopAndDealer.Name = "FruitShopAndDealer"
-    FruitShopAndDealer.Parent = v5
-    FruitShopAndDealer.Enabled = false
-    FruitShopAndDealer.ResetOnSpawn = false
-
-    local v2 = setmetatable({
-        _CleanUp = nil,
-        _UID = nil,
-        _IsAlive = true,
-        IsOpen = false,
-        ShopContext = "ShopGui",
-        _Root = FruitShopAndDealer,
-        _OnOpenAtFruitChange = Signal.new(),
-        _OnContextChange = Signal.new(),
-        _OnOpen = Signal.new(),
-        OnClose = Signal.new()
-    }, t)
-    local v3 = v4
-
-    v4 = v2
-
-    if not v3 then
-        v2:_Open()
-
-        return function() --[[ Line: 987 | Upvalues: v2 (copy) ]]
-            v2:Destroy()
+            break
         end
     end
 
-    v3:Destroy()
-    v2:_Open()
+    local v32 = v122 + 0.05
 
-    return function() --[[ Line: 987 | Upvalues: v2 (copy) ]]
-        v2:Destroy()
+    if v29 then
+        task.defer(function() --[[ Line: 440 | Upvalues: MobileUIController (ref), v29 (ref), p1 (copy), v32 (ref) ]]
+            MobileUIController:PlayCooldownAnimation(v29, p1.Name, "n/a", v32)
+        end)
+    end
+
+    task.delay(v32, function() --[[ Line: 445 | Upvalues: v19 (ref), v14 (copy), p1 (copy), v10 (ref), v2 (copy) ]]
+        if v19 ~= v14 or not (p1 and p1.Parent) then
+            return
+        end
+
+        if v10 > 0 then
+            p1:SetAttribute("LocalShotsLeft", v10)
+        else
+            p1:SetAttribute("LocalShotsLeft", v2.MagSize)
+        end
+
+        p1.Enabled = true
+        p1:SetAttribute("IsReloading_Client", nil)
+    end)
+end
+
+function attackMelee(p1) --[[ attackMelee | Line: 459 | Upvalues: v5 (ref), v8 (ref), CombatUtil (copy), v20 (copy), v11 (ref), v4 (ref), v16 (ref), v7 (ref), v6 (ref), v14 (copy), v2 (copy), attackStart (copy), runHitDetection (copy), CameraShaker (copy), Main (copy) ]]
+    local v1 = v5 and v5.RootPart
+    local v22 = if v1 then v1.Parent else v1
+
+    if v8 or _G.mobileSelectionFrame then
+        return
+    end
+
+    local v3 = CombatUtil:GetMovesetAnimCache(v5)
+
+    if not v3 then
+        return
+    end
+
+    local v42 = CombatUtil:GetWeaponName(p1)
+    local v52 = CombatUtil:GetWeaponData(v42)
+    local Moveset = v52.Moveset
+
+    if not CombatUtil:CanAttack(v22, v52.WeaponType) then
+        return
+    end
+
+    task.defer(function() --[[ Line: 477 | Upvalues: CombatUtil (ref), p1 (copy), v20 (ref) ]]
+        CombatUtil:GetWeaponName(p1)
+
+        local LocalEquippedWeaponPointer = p1.LocalEquippedWeaponPointer.Value
+
+        if not LocalEquippedWeaponPointer then
+            return
+        end
+
+        local v1 = v20[LocalEquippedWeaponPointer]
+
+        if not v1 then
+            return
+        end
+
+        v1:cancel()
+        v20[LocalEquippedWeaponPointer] = nil
+    end)
+
+    if v11 and v4 then
+        v4:Stop()
+    end
+
+    v11 = true
+    v16 = 5
+    v7 = os.clock()
+    v6 = v6 + 1
+
+    if v6 > #Moveset.Basic then
+        v6 = 1
+    end
+
+    local v62 = v3[CombatUtil:GetPureWeaponName(v42) .. "-basic" .. v6]
+
+    v14.RegisterAttackEvent:FireServer(v62.Length / (v62:GetAttribute("SpeedMult") or 1))
+
+    local v72 = p1 and p1.Parent and p1.Parent:GetAttribute("AttackSpeedMultiplier") or 1
+
+    v62:Play(0.100000001, 1, 1 * (v62:GetAttribute("SpeedMult") or 1) * v72)
+    v8 = true
+    task.delay(v62.Length / (v62:GetAttribute("SpeedMult") or 1) * v2 / v72, function() --[[ Line: 510 | Upvalues: v8 (ref) ]]
+        v8 = false
+    end)
+    v4 = v62
+    task.spawn(attackStart, p1, v6)
+    task.spawn(runHitDetection, p1, v52)
+    CameraShaker:Shake(Main.Presets.CombatBump)
+
+    local v82 = false
+
+    local function disableTrails() --[[ disableTrails | Line: 521 | Upvalues: v82 (ref), p1 (copy) ]]
+        if v82 then
+            return
+        end
+
+        v82 = true
+
+        local LocalEquippedWeaponPointer = p1.LocalEquippedWeaponPointer.Value
+
+        if not LocalEquippedWeaponPointer then
+            return
+        end
+
+        for v1, v2 in LocalEquippedWeaponPointer:GetDescendants() do
+            if v2:IsA("Trail") then
+                v2.Enabled = false
+            end
+        end
+    end
+
+    local v9 = v6
+    local v10 = true
+    local v112 = nil
+
+    v112 = p1.AncestryChanged:Connect(function() --[[ Line: 542 | Upvalues: v112 (ref), v10 (ref) ]]
+        v112:Disconnect()
+        v112 = nil
+        v10 = false
+    end)
+    task.delay(0.75, function() --[[ Line: 549 | Upvalues: v10 (ref), v6 (ref), v9 (copy), disableTrails (copy), v4 (ref), v11 (ref), v112 (ref) ]]
+        if not v10 or v6 ~= v9 then
+            return
+        end
+
+        disableTrails()
+        v4 = nil
+        v11 = false
+        v6 = 0
+
+        if not (v112 and v112.Connected) then
+            return
+        end
+
+        v112:Disconnect()
+        v112 = nil
+    end)
+
+    if v6 == #Moveset.Basic then
+        task.delay(v62.Length / (v62:GetAttribute("SpeedMult") or 1) * 0.7, function() --[[ Line: 563 | Upvalues: v6 (ref), v9 (copy), disableTrails (copy) ]]
+            if v6 ~= v9 then
+                return
+            end
+
+            disableTrails()
+        end)
+    end
+end
+function v12.Attack(p1, p2, p3, p4) --[[ Attack | Line: 574 | Upvalues: CombatUtil (copy), LocalPlayer (copy), Trove (copy), v5 (ref), playAnim (copy), startRelaxTimer (copy), CustomCursor (copy), v17 (ref), shootGun (copy) ]]
+    local v1 = CombatUtil:GetWeaponName(p2)
+    local v2 = CombatUtil:GetWeaponData(v1)
+    local WeaponType = v2.WeaponType
+
+    if not CombatUtil:CanAttack(LocalPlayer.Character, WeaponType) then
+        return
+    end
+
+    if if WeaponType == "Sword" or WeaponType == "Melee" then true elseif WeaponType == "Demon Fruit" then true else false then
+        attackMelee(p2)
+
+        return
+    end
+
+    if not (if WeaponType == "Gun" then true else false) then
+        return
+    end
+
+    if CombatUtil:IsGunReloading(p2) or _G.mobileSelection then
+        return
+    end
+
+    if v2.ShootStyle == "Gatling" then
+        local OverheatLimit = v2.OverheatLimit
+
+        if OverheatLimit <= p2:GetAttribute("LocalOverheat") then
+            return
+        end
+
+        if p2:GetAttribute("IsAutoShooting") then
+            return
+        end
+
+        local v52 = false
+        local v6 = true
+        local v7 = Trove.new()
+
+        local function runLowerOverheatLoop() --[[ runLowerOverheatLoop | Line: 609 | Upvalues: p2 (copy), LocalPlayer (ref), CombatUtil (ref), v1 (copy), v5 (ref), playAnim (ref), startRelaxTimer (ref) ]]
+            if p2.Parent == LocalPlayer.Character then
+                local v12 = CombatUtil:GetLoadedAnimsFor(v1, v5)
+
+                playAnim(v12, "OffensiveIdle")
+                startRelaxTimer(p2, v12)
+            end
+
+            while true do
+                local v2 = task.wait()
+                local v3 = p2:GetAttribute("LocalOverheat")
+
+                if not p2.Parent or (v3 <= 0 or p2:GetAttribute("IsAutoShooting")) then
+                    break
+                end
+
+                p2:SetAttribute("LocalOverheat", (math.max(v3 - v2, 0)))
+            end
+        end
+
+        local function startOverheat() --[[ startOverheat | Line: 628 | Upvalues: p2 (copy), v2 (copy), CustomCursor (ref), v5 (ref), v17 (ref) ]]
+            p2.Enabled = false
+            p2:SetAttribute("IsReloading_Client", true)
+
+            local OverheatCooldown = v2.OverheatCooldown
+            local v1 = table.clone(v2.ReloadReticle)
+
+            v1.ReloadTime = v2.OverheatCooldown
+            CustomCursor:PlayReloadAnimation(v1)
+            task.delay(OverheatCooldown, function() --[[ Line: 636 | Upvalues: p2 (ref) ]]
+                p2.Enabled = true
+                p2:SetAttribute("IsReloading_Client", nil)
+            end)
+
+            local v22 = v5 and v5.RootPart
+
+            if not v22 then
+                return
+            end
+
+            local LocalEquippedWeaponPointer = p2.LocalEquippedWeaponPointer.Value
+
+            if not LocalEquippedWeaponPointer then
+                return
+            end
+
+            local v3 = LocalEquippedWeaponPointer:FindFirstChild(LocalEquippedWeaponPointer:GetAttribute("CurrentShootAttachment") or "ShootAttachment", true) or LocalEquippedWeaponPointer:FindFirstChild("ShootAttachment1", true)
+
+            if not v3 then
+                return
+            end
+
+            v17.new("Gun_M1.RequestM1"):play({
+                Type = "Dragonstorm",
+                OverheatTime = OverheatCooldown,
+                origin = v22.Position,
+                HRP = v22,
+                ShootAttachment = v3.Name
+            })
+        end
+
+        v7:Add(p3:GetPropertyChangedSignal("UserInputState"):Connect(function() --[[ Line: 662 | Upvalues: p3 (copy), v6 (ref) ]]
+            if p3.UserInputState ~= Enum.UserInputState.End then
+                return
+            end
+
+            v6 = false
+        end))
+        v7:Add(p2.AncestryChanged:Connect(function() --[[ Line: 668 | Upvalues: v52 (ref) ]]
+            v52 = true
+        end))
+
+        local v8 = nil
+
+        v8 = task.spawn(function() --[[ Line: 673 | Upvalues: CombatUtil (ref), LocalPlayer (ref), WeaponType (copy), v52 (ref), v8 (ref) ]]
+            repeat
+                if not task.wait() then
+                    v8 = nil
+
+                    return
+                end
+            until not CombatUtil:CanAttack(LocalPlayer.Character, WeaponType)
+
+            v52 = true
+            v8 = nil
+        end)
+        v7:Add(function() --[[ Line: 683 | Upvalues: v8 (ref) ]]
+            if not v8 then
+                return
+            end
+
+            task.cancel(v8)
+            v8 = nil
+        end)
+        v7:Add(function() --[[ Line: 690 | Upvalues: p2 (copy), runLowerOverheatLoop (copy) ]]
+            p2:SetAttribute("IsAutoShooting", nil)
+            task.spawn(runLowerOverheatLoop)
+        end)
+
+        local v9 = p2 and p2.Parent and p2.Parent:GetAttribute("AttackSpeedMultiplier") or 1
+
+        task.defer(function() --[[ Line: 701 | Upvalues: p2 (copy), v2 (copy), OverheatLimit (copy), CustomCursor (ref) ]]
+            repeat
+                task.wait()
+            until p2:GetAttribute("IsAutoShooting")
+
+            local BaseCursorRotationSpeed = v2.BaseCursorRotationSpeed
+
+            while p2:GetAttribute("IsAutoShooting") do
+                local v1 = game.TweenService:GetValue(p2:GetAttribute("LocalOverheat") / OverheatLimit, Enum.EasingStyle.Sine, Enum.EasingDirection.Out)
+                local BaseCursorRotationSpeed2 = v2.BaseCursorRotationSpeed
+
+                CustomCursor:StepRotate(BaseCursorRotationSpeed2 + (0 - BaseCursorRotationSpeed2) * v1)
+                task.wait()
+            end
+
+            CustomCursor:ResetRotate()
+        end)
+
+        local v10 = v2.Cooldown / v9
+        local v11 = false
+
+        for i = 1, 3 do
+            shootGun(p2, p3)
+            p2:SetAttribute("IsAutoShooting", true)
+
+            local v12 = task.wait(v10)
+            local v13 = p2:GetAttribute("LocalOverheat") + v12
+
+            p2:SetAttribute("LocalOverheat", (math.min(v13, OverheatLimit)))
+
+            if OverheatLimit <= v13 then
+                v11 = true
+
+                break
+            elseif v52 then
+                break
+            end
+        end
+
+        task.spawn(function() --[[ Line: 739 | Upvalues: v11 (ref), v52 (ref), v6 (ref), v7 (copy), startOverheat (copy), v10 (ref), p2 (copy), OverheatLimit (copy), shootGun (ref), p3 (copy) ]]
+            if v11 or (v52 or not v6) then
+                v7:Destroy()
+
+                if not v11 then
+                    return
+                end
+
+                startOverheat()
+
+                return
+            end
+
+            local v1 = os.clock() - (v10 + 0.00001)
+            local v2 = 0
+
+            while true do
+                local v3 = p2:GetAttribute("LocalOverheat")
+                local v4 = if OverheatLimit <= v3 then true else false
+
+                if v4 or (v52 or not v6) then
+                    v7:Destroy()
+
+                    if v4 then
+                        startOverheat()
+                    end
+
+                    return
+                end
+
+                local v5 = os.clock() - v1
+
+                if v10 < v5 then
+                    p2:SetAttribute("LocalOverheat", (math.min(v3 + v5, OverheatLimit)))
+
+                    local v72 = v2 + v5
+                    local v9 = math.floor(v72 / v10)
+
+                    v2 = v72 % v10
+
+                    local v102 = os.clock()
+
+                    p2:SetAttribute("IsAutoShooting", true)
+                    v1 = v102
+
+                    for i = 1, v9 do
+                        shootGun(p2, p3)
+                    end
+                end
+
+                task.wait()
+            end
+        end)
+    else
+        shootGun(p2, p3)
     end
 end
 
-return ServiceProxy(function() --[[ Line: 992 | Upvalues: v4 (ref), t (copy) ]]
-    return v4 or t
-end)
+local function focusAdjust() --[[ focusAdjust | Line: 799 | Upvalues: v5 (ref), v7 (ref), v16 (ref), UserInputService (copy), CurrentCamera (copy), v1 (copy) ]]
+    local v12 = v5 and v5.RootPart
+
+    if not v12 or _G.busy then
+        return
+    end
+
+    local v2 = v5.Parent
+
+    if v16 < os.clock() - v7 or (v5.Sit or (_G.Shiftlock or UserInputService.MouseBehavior == Enum.MouseBehavior.LockCenter)) then
+        v5.AutoRotate = true
+
+        return
+    end
+
+    v5.AutoRotate = false
+
+    local Position = v12.CFrame.Position
+
+    if UserInputService.TouchEnabled and not UserInputService.MouseEnabled then
+        v12.CFrame = CFrame.new(Position, Position + CurrentCamera.CFrame.LookVector * Vector3.new(1, 0, 1))
+
+        return
+    end
+
+    local v4, v52
+
+    if v2:HasTag("TransformedAwakenedBuddha") or v2:HasTag("TransformedBuddha") then
+        v4 = 400
+        v52 = 25
+    else
+        v4 = 200
+        v52 = 4
+    end
+
+    local v6 = CurrentCamera:ViewportPointToRay(v1.X, v1.Y)
+    local _, v8 = workspace:FindPartOnRayWithIgnoreList(Ray.new(v6.Origin, v6.Direction * v4), { workspace._WorldOrigin, workspace.Characters, workspace.Enemies })
+    local v9 = Vector3.new(v8.X, Position.Y, v8.Z)
+
+    if not ((v9 - Position).Magnitude < v52) then
+        v12.CFrame = CFrame.new(Position, v9)
+    end
+end
+
+function v12.Equip(p1, p2) --[[ Equip | Line: 837 | Upvalues: v13 (ref), v12 (copy), v5 (ref), v18 (ref), Trove (copy), CombatUtil (copy), LocalPlayer (copy), v16 (ref), v7 (ref), playAnim (copy), startRelaxTimer (copy), CustomCursor (copy), LastInput (copy), v15 (ref), v19 (ref), RunService (copy), focusAdjust (copy), v9 (ref), v6 (ref), v10 (ref) ]]
+    if v13 then
+        v12:Unequip()
+    end
+
+    if not v5 then
+        return
+    end
+
+    if v18 then
+        v18:Destroy()
+        v18 = nil
+    end
+
+    v18 = Trove.new()
+
+    local _ = v5.Parent
+    local LocalEquippedWeaponPointer = p2.LocalEquippedWeaponPointer.Value
+    local v1 = CombatUtil:GetWeaponName(p2)
+    local v2 = CombatUtil:GetWeaponData(v1)
+    local Moveset = v2.Moveset
+
+    v18:Add(function() --[[ Line: 857 | Upvalues: CombatUtil (ref), v1 (copy), v5 (ref) ]]
+        for v12, v2 in CombatUtil:GetLoadedAnimsFor(v1, v5) do
+            v2:Stop()
+        end
+    end)
+    v18:Add(p2.AncestryChanged:Connect(function(p1, p2) --[[ Line: 864 | Upvalues: v18 (ref) ]]
+        if p2 then
+            return
+        end
+
+        v18:Destroy()
+        v18 = nil
+    end))
+
+    local CameraModule = require(LocalPlayer.PlayerScripts.PlayerModule.CameraModule)
+
+    v18:Add(game.ReplicatedStorage.Events.DeactivatedSkill.Event:Connect(function(p1, p22, p3) --[[ Line: 873 | Upvalues: CombatUtil (ref), p2 (copy), v1 (copy), v5 (ref), v16 (ref), v7 (ref), playAnim (ref), startRelaxTimer (ref) ]]
+        if p3 ~= "Gun" or CombatUtil:IsGunReloading(p2) then
+            return
+        end
+
+        task.wait(1 / 60)
+
+        local v12 = CombatUtil:GetLoadedAnimsFor(v1, v5)
+
+        if p2.Parent:IsA("Backpack") then
+            return
+        end
+
+        v16 = 3
+        v7 = os.clock()
+        playAnim(v12, "OffensiveIdle")
+        startRelaxTimer(p2, v12, 3)
+    end))
+
+    if v2.WeaponType == "Gun" then
+        local function reflectToolEnabled() --[[ reflectToolEnabled | Line: 886 | Upvalues: CombatUtil (ref), p2 (copy), LocalPlayer (ref), CustomCursor (ref), v2 (copy) ]]
+            local v1 = CombatUtil:IsGunReloading(p2)
+
+            if p2.Parent ~= LocalPlayer.Character then
+                CustomCursor:ResetCursorImage()
+
+                return
+            end
+
+            CustomCursor:SetCursorImage(v1 and v2.ReloadReticle or v2.Reticle)
+        end
+
+        local v3 = CombatUtil:IsGunReloading(p2)
+        local isCharacter = p2.Parent == LocalPlayer.Character
+
+        if isCharacter then
+            CustomCursor:SetCursorImage(v3 and v2.ReloadReticle or v2.Reticle)
+        else
+            CustomCursor:ResetCursorImage()
+        end
+
+        v18:Add(p2:GetPropertyChangedSignal("Enabled"):Connect(reflectToolEnabled))
+        v18:Add(p2:GetAttributeChangedSignal("IsReloading_Client"):Connect(function() --[[ Line: 897 | Upvalues: p2 (copy), LastInput (ref), CombatUtil (ref), LocalPlayer (ref), CustomCursor (ref), v2 (copy) ]]
+            if p2:GetAttribute("IsReloading_Client") then
+                if LastInput:IsMobile() then
+                    return
+                end
+
+                local v1 = CombatUtil:IsGunReloading(p2)
+
+                if p2.Parent ~= LocalPlayer.Character then
+                    CustomCursor:ResetCursorImage()
+
+                    return
+                end
+
+                CustomCursor:SetCursorImage(v1 and v2.ReloadReticle or v2.Reticle)
+
+                return
+            end
+
+            local v4 = CombatUtil:IsGunReloading(p2)
+
+            if p2.Parent == LocalPlayer.Character then
+                CustomCursor:SetCursorImage(v4 and v2.ReloadReticle or v2.Reticle)
+
+                return
+            end
+
+            CustomCursor:ResetCursorImage()
+        end))
+        v18:Add(p2:GetAttributeChangedSignal("UnequipAutoReloading"):Connect(reflectToolEnabled))
+        v18:Add(p2.AncestryChanged:Connect(reflectToolEnabled))
+
+        if CameraModule.activeMouseLockController then
+            v18:Add(CameraModule.activeMouseLockController:GetBindableToggleEvent():Connect(reflectToolEnabled))
+        end
+    end
+
+    local v62 = Moveset.Idle or Moveset.Actions and Moveset.Actions.Idle
+
+    if v62 then
+        local v72 = v15.Anims:Get(v5.Parent, v62.AnimationId)
+
+        if v72 then
+            v72:Play(0.100000001, 1, 1 * (v62.SpeedMult or 1))
+        end
+
+        v18:Add(function() --[[ Line: 922 | Upvalues: v72 (ref) ]]
+            if not v72 then
+                return
+            end
+
+            v72:Stop()
+            v72.Animation:Destroy()
+            v72 = nil
+        end)
+    else
+        local v8 = CombatUtil:GetLoadedAnimsFor(v1, v5)
+
+        if v8.OffensiveIdle then
+            startRelaxTimer(p2, v8)
+            task.defer(function() --[[ Line: 935 | Upvalues: v19 (ref), v8 (copy), playAnim (ref), LocalEquippedWeaponPointer (copy) ]]
+                local v2
+
+                if v8.Equip then
+                    playAnim(v8, "Equip")
+
+                    local v3 = task.wait
+                    local Equip = v8.Equip
+
+                    v3(Equip.Length / (Equip:GetAttribute("SpeedMult") or 1) - 0.05)
+                    v2 = LocalEquippedWeaponPointer.Parent ~= nil
+                else
+                    v2 = true
+                end
+
+                local v4 = if v8.Equip == nil then false else v19 ~= v19
+
+                if not v2 or (v8.RelaxedIdle and v8.RelaxedIdle.IsPlaying or v4) then
+                    return
+                end
+
+                playAnim(v8, "OffensiveIdle")
+            end)
+        else
+            playAnim(v8, "RelaxedIdle")
+        end
+    end
+
+    RunService:BindToRenderStep("CombatFocusAdjust", Enum.RenderPriority.Input.Value, focusAdjust)
+    v9 = v2
+    v6 = 0
+    task.defer(function() --[[ Line: 958 | Upvalues: LocalEquippedWeaponPointer (copy) ]]
+        for v1, v2 in LocalEquippedWeaponPointer:GetDescendants() do
+            if v2:IsA("Trail") then
+                v2.Enabled = false
+            end
+        end
+    end)
+    v10 = p2
+    v13 = true
+end
+function v12.Unequip(p1, p2) --[[ Unequip | Line: 969 | Upvalues: v13 (ref), v10 (ref), v18 (ref), v20 (copy), RunService (copy), v5 (ref), CustomCursor (copy), v11 (ref), v4 (ref) ]]
+    if not v13 or p2 and p2 ~= v10 then
+        return
+    end
+
+    if v18 then
+        v18:Destroy()
+        v18 = nil
+    end
+
+    local v1 = v10
+    local v2 = v20[v1]
+
+    if not v2 then
+        RunService:UnbindFromRenderStep("CombatFocusAdjust")
+        v5.AutoRotate = true
+        CustomCursor:ResetCursorImage()
+        v10 = nil
+        v11 = false
+        v4 = nil
+
+        return
+    end
+
+    v2:cancel()
+    v20[v1] = nil
+    RunService:UnbindFromRenderStep("CombatFocusAdjust")
+    v5.AutoRotate = true
+    CustomCursor:ResetCursorImage()
+    v10 = nil
+    v11 = false
+    v4 = nil
+end
+
+local function charAdded(p1) --[[ charAdded | Line: 991 | Upvalues: Trove (copy), LocalPlayer (copy), v5 (ref), playEquipAnimation (copy), playUnequipAnimation (copy), CustomCursor (copy) ]]
+    local v1 = Trove.new()
+
+    if p1 == LocalPlayer.Character then
+        v5 = p1:WaitForChild("Humanoid")
+    end
+
+    local function childAdded(p12) --[[ childAdded | Line: 1000 | Upvalues: p1 (copy), LocalPlayer (ref), playEquipAnimation (ref), playUnequipAnimation (ref) ]]
+        if p1 == LocalPlayer.Character and (p12.Name == "EquippedWeapon" or p12.Name == "UnequippedWeapon") and not p12:GetAttribute("IsLocal") then
+            task.wait()
+            p12:Destroy()
+
+            for v1, v2 in p1:GetDescendants() do
+                if v2:IsA("Motor6D") and (v2:GetAttribute("WeaponName") == p12:GetAttribute("WeaponName") and not v2:GetAttribute("IsLocal")) then
+                    v2:Destroy()
+                end
+            end
+
+            return
+        end
+
+        if p12.Name == "EquippedWeapon" then
+            playEquipAnimation(p12)
+
+            return
+        end
+
+        if p12.Name ~= "UnequippedWeapon" then
+            return
+        end
+
+        playUnequipAnimation(p12)
+    end
+
+    for v2, v3 in p1:GetChildren() do
+        task.defer(childAdded, v3)
+    end
+
+    v1:Add(p1.ChildAdded:Connect(childAdded))
+
+    if p1 == LocalPlayer.Character then
+        v1:Add(function() --[[ Line: 1026 | Upvalues: CustomCursor (ref) ]]
+            CustomCursor:ResetCursorImage()
+        end)
+    end
+
+    v1:Add(p1.AncestryChanged:Connect(function(p1, p2) --[[ Line: 1031 | Upvalues: v1 (copy) ]]
+        if p2 ~= nil then
+            return
+        end
+
+        v1:Destroy()
+    end))
+end
+
+function v12.OnStart(p1) --[[ OnStart | Line: 1038 | Upvalues: v15 (ref), v17 (ref), v14 (copy), Net (copy), LocalPlayer (copy), charAdded (copy), v20 (copy), CombatUtil (copy) ]]
+    v15 = require(game.ReplicatedStorage.Util)
+    v17 = require(game.ReplicatedStorage.Effect)
+    v14.RegisterAttackEvent = Net:RemoteEvent("RegisterAttack")
+    v14.CancelEquipAnimEvent = Net:RemoteEvent("CancelEquipAnim")
+    v14.EquipAnimApplyEndStateEvent = Net:RemoteEvent("EquipAnimApplyEndState")
+    v14.VisualEquippedEvent = Net:RemoteEvent("VisualEquipped")
+    v14.VisualUnequippedEvent = Net:RemoteEvent("VisualUnequipped")
+    v14.ShootGunEvent = Net:RemoteEvent("ShootGunEvent")
+    v14.ReceivedHit = Net:RemoteEvent("ReceivedHit")
+    v14.PlayAttackStartEffectEvent = Net:RemoteEvent("PlayAttackStartEffect")
+
+    local Character = LocalPlayer.Character
+
+    if Character then
+        task.defer(charAdded, Character)
+    end
+
+    game.Players.LocalPlayer.CharacterAdded:Connect(charAdded)
+    workspace.Characters.ChildAdded:Connect(charAdded)
+    workspace.Enemies.ChildAdded:Connect(charAdded)
+    v14.CancelEquipAnimEvent.OnClientEvent:Connect(function(p1) --[[ Line: 1064 | Upvalues: v20 (ref) ]]
+        local v1 = v20[p1]
+
+        if not v1 then
+            return
+        end
+
+        v1:cancel()
+        v20[p1] = nil
+    end)
+    v14.ReceivedHit.OnClientEvent:Connect(function(p1, p2, p3, p4, p5) --[[ Line: 1082 | Upvalues: LocalPlayer (ref), CombatUtil (ref) ]]
+        if p1 == LocalPlayer.Character then
+            CombatUtil:ApplyDamageHighlight(LocalPlayer.Character, p2, p3, p4, p5)
+
+            return
+        end
+
+        if p4 ~= "Sword" and p4 ~= "Melee" then
+            return
+        end
+
+        CombatUtil:PlayMeleeHitParticles(p1, p5, p3)
+    end)
+    v14.PlayAttackStartEffectEvent.OnClientEvent:Connect(function(p1, p2, p3) --[[ Line: 1091 | Upvalues: CombatUtil (ref) ]]
+        CombatUtil:AttackStart(p2, p3)
+    end)
+end
+
+return v12
