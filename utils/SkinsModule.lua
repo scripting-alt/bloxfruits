@@ -11,6 +11,18 @@ local FruitSkins = {
         GrayscaleToColorSequence = ColorSequence.new(Color3.fromRGB(255, 255, 255)),
         GrayscaleToColorStrength = 0,
     },
+    DeepBlue = {
+        Default = {
+        Default_Color1 = Color3.fromRGB(255, 55, 58),
+        Default_Color2 = Color3.fromRGB(95, 14, 14),
+        Default_Color3 = Color3.fromRGB(255, 114, 112),
+
+        Shifted_Color1 = Color3.fromRGB(55, 58, 255),
+        Shifted_Color2 = Color3.fromRGB(14, 14, 95),
+        Shifted_Color3 = Color3.fromRGB(112, 138, 255),
+        GrayscaleToColorSequence = ColorSequence.new(Color3.fromRGB(255, 255, 255)),
+        GrayscaleToColorStrength = 0,
+    },
     Red = {
         Default_Color1 = Color3.fromRGB(255, 55, 58),
         Default_Color2 = Color3.fromRGB(95, 14, 14),
@@ -71,17 +83,23 @@ local FruitSkins = {
             GrayscaleToColorStrength = 0,
         },
 
-        DarkG = {
-            Default_Color1 = Color3.fromRGB(120, 0, 255),
-            Default_Color2 = Color3.fromRGB(40, 0, 100),
-            Default_Color3 = Color3.fromRGB(200, 100, 255),
-
-            Shifted_Color1 = Color3.fromRGB(20, 0, 40),
-            Shifted_Color2 = Color3.fromRGB(5, 0, 10),
-            Shifted_Color3 = Color3.fromRGB(50, 0, 80),
-
-            GrayscaleToColorSequence = ColorSequence.new(Color3.fromRGB(0, 0, 0)),
-            GrayscaleToColorStrength = 1,
+        Divine = {
+            GrayscaleToColorStrength = 0.2,
+            Default_Color1 = Color3.fromRGB(176, 255, 246),
+            Default_Color2 = Color3.fromRGB(84, 189, 255),
+            Default_Color3 = Color3.fromRGB(74, 131, 255),
+            Default_Color4 = Color3.fromRGB(0, 60, 255),
+            Default_Color5 = Color3.fromRGB(102, 118, 255),
+            Default_Color6 = Color3.fromRGB(0, 0, 255),
+            Default_Color7 = Color3.fromRGB(110, 63, 248),
+            Shifted_Color1 = Color3.fromRGB(255, 229, 97),
+            Shifted_Color2 = Color3.fromRGB(255, 225, 30),
+            Shifted_Color3 = Color3.fromRGB(255, 199, 16),
+            Shifted_Color4 = Color3.fromRGB(255, 158, 21),
+            Shifted_Color5 = Color3.fromRGB(141, 118, 0),
+            Shifted_Color6 = Color3.fromRGB(83, 69, 0),
+            Shifted_Color7 = Color3.fromRGB(248, 158, 41),
+            GrayscaleToColorSequence = ColorSequence.new(Color3.fromRGB(255, 255, 0), Color3.fromRGB(255, 255, 255))
         },
     },
 
