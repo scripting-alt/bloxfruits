@@ -28,7 +28,7 @@ getFruit.Fruits = {
     ["Smoke"] = 15116696973,
     ["Spike"] = 15107005807,
 
-    ["Flame"] = "BodyFlame", -- MeshId: 71296207199529
+    ["Flame"] = "Flame", -- MeshId: 71296207199529
 
     ["Ice"] = 15100433167,
     ["Sand"] = 15111517529,

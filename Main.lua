@@ -2,8 +2,8 @@
 local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/tlredz/Library/refs/heads/main/redz-V5-remake/main.luau"))()
 
 ScriptVersion = {
-    Version = "v1.5.2",
-    Date = "2026-07-24"
+    Version = "v1.7.3",
+    Date = "2026-07-28"
 }
 
 _G.SelectTool = "Melee"
@@ -1217,6 +1217,7 @@ workspace:GetDescendants(function(v)
 end)
 
 Number = math.random(1, 1000000)
+local FruitList = loadstring(game:HttpGet("https://raw.githubusercontent.com/scripting-alt/bloxfruits/refs/heads/main/utils/GetFruitNameModule.lua"))()
 
 function UpdatePlayerChams()
     local LevelCap = workspace:GetAttribute("LevelCap")
@@ -1306,7 +1307,7 @@ function UpdateDevilChams()
 
             local Handle = Fruit:FindFirstChild("Handle")
             if not Handle then return end
-
+            local GetFruitName = FruitList.GetFruitName(Fruit)
             local ESPName = "NameEsp" .. tostring(Number)
             local ESP = Handle:FindFirstChild(ESPName)
 
@@ -1338,7 +1339,7 @@ function UpdateDevilChams()
                 if TextLabel then
                     TextLabel.Text = string.format(
                         '<font color="#00b7ff">%s</font>\n<font color="#00b7ff">[</font> <font color="#FFFFFF">%d Distance</font> <font color="#00b7ff">]</font>',
-                        Fruit.Name,
+                        GetFruitName or "Unknown Fruit",
                         Distance
                     )
                 end
@@ -1670,36 +1671,66 @@ Tab_Visual:AddToggle({
 })
 
 Tab_Visual:AddSection("Skins")
-Tab_Visual:AddDropdown({
-  Name = "Pain Skins",
-  MultiSelect = false,
-  Options = {"Default", "DeepBlue", "Red", "Orange", "Celestial", "SuperSpirit"},
-  Default = {"Default"},
-  Callback = function(Value)
-     _G.PainSkin = Value
-  end
-})
-Tab_Visual:AddDropdown({
-  Name = "Portal Skins",
-  MultiSelect = false,
-  Options = {"Default", "DeepBlue", "Red", "Orange", "Celestial", "SuperSpirit"},
-  Default = {"Default"},
-  Callback = function(Value)
-     _G.PortalSkin = Value
-  end
-})
 
-local SkinsModule = loadstring(game:HttpGet("https://raw.githubusercontent.com/tlredz/Library/refs/heads/main/redz-V5-remake/main.luau"))()
+local SkinsModule = loadstring(game:HttpGet("https://raw.githubusercontent.com/scripting-alt/bloxfruits/refs/heads/main/utils/SkinsModule.lua"))()
 
-spawn(function()
-    while task.wait(1) do
-        local player = game.Players.LocalPlayer
-        if player:FindFirstChild("PainFruitVFXColor") then
+local PainSkin, PortalSkin = "Default", "Default"
 
+local function applySkin(Type, Name, FolderName)
+    if type(Name) == "table" then Name = Name[1] end
+
+    local VFXFolder = game.Players.LocalPlayer:FindFirstChild(FolderName)
+    local Skin = VFXFolder and SkinsModule.GetSkinData(Type, Name)
+
+    if not Skin then return end
+
+    for Name, Folder in pairs({
+        Default = VFXFolder:FindFirstChild("Default"),
+        Shifted = VFXFolder:FindFirstChild("Shifted")
+    }) do
+        if Folder then
+            for Attribute, Value in pairs(Skin) do
+                if string.find(Attribute, Name .. "_", 1, true) then
+                    Folder:SetAttribute(Attribute, Value)
+                end
+            end
         end
     end
-end)
 
+    local Shifted = VFXFolder:FindFirstChild("Shifted")
+
+    if Shifted then
+        Shifted:SetAttribute("GrayscaleToColorSequence", Skin.GrayscaleToColorSequence)
+        Shifted:SetAttribute("GrayscaleToColorStrength", Skin.GrayscaleToColorStrength)
+    end
+end
+
+Tab_Visual:AddDropdown({
+    Name = "Pain Skins",
+    MultiSelect = false,
+    Options = {"Default", "DeepBlue", "Red", "Orange", "Celestial", "SuperSpirit"},
+    Default = "Default",
+    Callback = function(Value)
+        PainSkin = type(Value) == "table" and Value[1] or Value
+    end
+})
+
+Tab_Visual:AddDropdown({
+    Name = "Portal Skins",
+    MultiSelect = false,
+    Options = {"Default", "Divine", "Redz"},
+    Default = "Default",
+    Callback = function(Value)
+        PortalSkin = type(Value) == "table" and Value[1] or Value
+    end
+})
+
+task.spawn(function()
+    while task.wait(1) do
+        applySkin("Pain", PainSkin, "PainFruitVFXColor")
+        applySkin("Portal", PortalSkin, "PortalFruitVFXColor")
+    end
+end)
 
  function IsIslandRaid(cu)
     if game:GetService("Workspace")["_WorldOrigin"].Locations:FindFirstChild("Island " .. cu) then

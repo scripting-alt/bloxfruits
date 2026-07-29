@@ -100,29 +100,41 @@ local FruitSkins = {
             Shifted_Color7 = Color3.fromRGB(248, 158, 41),
             GrayscaleToColorSequence = ColorSequence.new(Color3.fromRGB(255, 255, 0), Color3.fromRGB(255, 255, 255))
         },
+        Default = {
+            GrayscaleToColorStrength = 0,
+            Default_Color1 = Color3.fromRGB(176, 255, 246),
+            Default_Color2 = Color3.fromRGB(84, 189, 255),
+            Default_Color3 = Color3.fromRGB(74, 131, 255),
+            Default_Color4 = Color3.fromRGB(0, 60, 255),
+            Default_Color5 = Color3.fromRGB(102, 118, 255),
+            Default_Color6 = Color3.fromRGB(0, 0, 255),
+            Default_Color7 = Color3.fromRGB(110, 63, 248),
+            Shifted_Color1 = Color3.fromRGB(176, 255, 246),
+            Shifted_Color2 = Color3.fromRGB(84, 189, 255),
+            Shifted_Color3 = Color3.fromRGB(74, 131, 255),
+            Shifted_Color4 = Color3.fromRGB(0, 60, 255),
+            Shifted_Color5 = Color3.fromRGB(102, 118, 255),
+            Shifted_Color6 = Color3.fromRGB(0, 0, 255),
+            Shifted_Color7 = Color3.fromRGB(110, 63, 248),
+            GrayscaleToColorSequence = ColorSequence.new(Color3.fromRGB(255, 255, 255))
+        },
         Redz = {
-            GrayscaleToColorStrength = 0.2,
-
-            Default_Color1 = Color3.fromRGB(255, 255, 255), -- Branco
-            Default_Color2 = Color3.fromRGB(215, 215, 215), -- Cinza claro
-            Default_Color3 = Color3.fromRGB(255, 70, 70),   -- Vermelho claro
-            Default_Color4 = Color3.fromRGB(190, 0, 0),     -- Vermelho
-            Default_Color5 = Color3.fromRGB(120, 0, 0),     -- Vermelho escuro
-            Default_Color6 = Color3.fromRGB(35, 35, 35),    -- Cinza escuro
-            Default_Color7 = Color3.fromRGB(0, 0, 0),       -- Preto
-
-            Shifted_Color1 = Color3.fromRGB(255, 255, 255), -- Branco intenso
-            Shifted_Color2 = Color3.fromRGB(255, 90, 90),   -- Vermelho vivo
-            Shifted_Color3 = Color3.fromRGB(255, 40, 40),   -- Vermelho forte
-            Shifted_Color4 = Color3.fromRGB(180, 0, 0),     -- Vermelho escuro
-            Shifted_Color5 = Color3.fromRGB(90, 0, 0),      -- Bordô
-            Shifted_Color6 = Color3.fromRGB(20, 20, 20),    -- Preto suave
-            Shifted_Color7 = Color3.fromRGB(0, 0, 0),       -- Preto
-
-            GrayscaleToColorSequence = ColorSequence.new(
-                Color3.fromRGB(255, 0, 0),
-                Color3.fromRGB(255, 255, 255)
-            )
+            GrayscaleToColorStrength = 0.5,
+            Default_Color1 = Color3.fromRGB(176, 255, 246),
+            Default_Color2 = Color3.fromRGB(84, 189, 255),
+            Default_Color3 = Color3.fromRGB(74, 131, 255),
+            Default_Color4 = Color3.fromRGB(0, 60, 255),
+            Default_Color5 = Color3.fromRGB(102, 118, 255),
+            Default_Color6 = Color3.fromRGB(0, 0, 255),
+            Default_Color7 = Color3.fromRGB(110, 63, 248),
+            Shifted_Color1 = Color3.fromRGB(85, 8, 8),
+            Shifted_Color2 = Color3.fromRGB(83, 17, 40),
+            Shifted_Color3 = Color3.fromRGB(140, 11, 14),
+            Shifted_Color4 = Color3.fromRGB(89, 18, 18),
+            Shifted_Color5 = Color3.fromRGB(62, 24, 48),
+            Shifted_Color6 = Color3.fromRGB(143, 0, 0),
+            Shifted_Color7 = Color3.fromRGB(55, 3, 15),
+            GrayscaleToColorSequence = ColorSequence.new(Color3.fromRGB(147, 14, 14), Color3.fromRGB(53, 5, 5))
         },
     },
 
