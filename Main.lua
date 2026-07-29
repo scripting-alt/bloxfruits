@@ -3,7 +3,7 @@ local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/tlred
 
 ScriptVersion = {
     Version = "v1.7.5",
-    Date = "2026-07-29"
+    Date = "2026-07-28"
 }
 
 _G.SelectTool = "Melee"
@@ -303,7 +303,8 @@ function requestEntrance(entrance)
     task.wait(0.5)
 end
 
-function topos(TargetCFrame)
+function topos(TargetCFrame, speed)
+    speed = speed or _G.TweenSpeed
     if not TargetCFrame then
         return
     end
@@ -360,7 +361,7 @@ function topos(TargetCFrame)
 
     local Tween = game:GetService("TweenService"):Create(
         PartTele,
-        TweenInfo.new(Distance / _G.TweenSpeed, Enum.EasingStyle.Linear),
+        TweenInfo.new(Distance / speed, Enum.EasingStyle.Linear),
         {
             CFrame = TargetCFrame
         }
@@ -1400,92 +1401,6 @@ spawn(function()
     end
 end)
 
-function BringMobTopos(Enemy, pos)
-    local Humanoid = Enemy:FindFirstChild("Humanoid")
-    local HumanoidRootPart = Enemy:FindFirstChild("HumanoidRootPart")
-
-    if Enemy.Parent
-    and Humanoid
-    and HumanoidRootPart
-    and Humanoid.Health > 0
-    and (HumanoidRootPart.Position - game.Players.LocalPlayer.Character.HumanoidRootPart.Position).Magnitude <= _G.BringDistance then
-        HumanoidRootPart.CFrame = BringPos
-        Humanoid.JumpPower = 0
-        Humanoid.WalkSpeed = 0
-        HumanoidRootPart:SetNetworkOwner(game.Players.LocalPlayer)
-        HumanoidRootPart.Transparency = 1
-        --HumanoidRootPart.CanCollide = false
-
-        local Head = Enemy:FindFirstChild("Head")
-        if Head then
-            Head.CanCollide = false
-        end
-
-        local Animator = Humanoid:FindFirstChild("Animator")
-        if Animator then
-            Animator:Destroy()
-        end
-
-        if not HumanoidRootPart:FindFirstChild("Lock") then
-            local BodyVelocity = Instance.new("BodyVelocity")
-
-            BodyVelocity.Name = "Lock"
-            BodyVelocity.Parent = HumanoidRootPart
-            BodyVelocity.MaxForce = Vector3.new(math.huge, math.huge, math.huge)
-            BodyVelocity.Velocity = Vector3.zero
-        end
-
-        -- sethiddenproperty(plr, "SimulationRadius", math.huge)
-
-        Humanoid:ChangeState(11)
-    end
-end
-
-local function BringAllMobs(mobName)
-    local mobs = {}
-
-    for _, mob in ipairs(workspace.Enemies:GetChildren()) do
-        local Hum = mob:FindFirstChild("Humanoid")
-        local HRP = mob:FindFirstChild("HumanoidRootPart")
-
-        if mob.Name == mobName
-        and Hum
-        and HRP
-        and Hum.Health > 0 then
-            table.insert(mobs, mob)
-        end
-    end
-
-    if #mobs == 0 then
-        return nil
-    end
-
-    -- Primeiro NPC será o centro
-    local First = mobs[1]
-    local FirstHRP = First.HumanoidRootPart
-
-    BringPos = FirstHRP.CFrame
-
-    -- Os outros vão sendo puxados para o primeiro
-    for i = 2, #mobs do
-        local mob = mobs[i]
-        local HRP = mob.HumanoidRootPart
-
-        topos(HRP.CFrame * CFrame.new(0,5,0))
-
-        BringMobTopos(mob)
-
-        task.wait(0.02)
-    end
-
-    task.wait(0.1)
-
-    -- Agora vai para o grupo
-    topos(BringPos * Pos)
-
-    return FirstHRP
-end
-
 spawn(function()
     while task.wait() do
         if not _G.AutoFarmNear or not checkStopFarm() then
@@ -1505,16 +1420,9 @@ spawn(function()
                 local Humanoid = Enemy:FindFirstChild("Humanoid")
                 local EnemyHRP = Enemy:FindFirstChild("HumanoidRootPart")
 
-                if Humanoid
-                and EnemyHRP
-                and Humanoid.Health > 0
+                if Humanoid and EnemyHRP 
+                and Humanoid.Health > 0 
                 and (HRP.Position - EnemyHRP.Position).Magnitude <= 1000 then
-
-                    local Center = BringAllMobs(Enemy.Name)
-
-                    if not Center then
-                        break
-                    end
 
                     LastHealth = Humanoid.Health
                     StuckTime = 0
@@ -1525,7 +1433,6 @@ spawn(function()
                         if not Enemy.Parent then
                             break
                         end
-
                         if Humanoid.Health == LastHealth then
                             StuckTime += 1
                         else
@@ -1533,40 +1440,25 @@ spawn(function()
                             StuckTime = 0
                         end
 
+                        -- ficou travado
                         if StuckTime >= 20 then
-                            --Humanoid.Health = 0
+                            Humanoid.Health = 0
                             break
                         end
 
-                        BringPos = Center.CFrame
-                        topos(BringPos * Pos)
-
+                        topos(EnemyHRP.CFrame * Pos, 500)
                         AutoHaki()
                         EquipWeapon(_G.SelectTool)
+                        BringPos = EnemyHRP.CFrame
                         BringMob(Enemy.Name)
 
-                        for _, mob in ipairs(workspace.Enemies:GetChildren()) do
-                            if mob.Name == Enemy.Name then
-                                local MobHum = mob:FindFirstChild("Humanoid")
-                                local MobHRP = mob:FindFirstChild("HumanoidRootPart")
+                        EnemyHRP.Transparency = 1
+                        --EnemyHRP.CanCollide = false
 
-                                if MobHum
-                                and MobHRP
-                                and MobHum.Health > 0
-                                and (MobHRP.Position - Center.Position).Magnitude <= 150 then
+                        Humanoid.WalkSpeed = 0
+                        Humanoid.JumpPower = 0
 
-                                    MobHRP.Transparency = 1
-                                    --MobHRP.CanCollide = false
-
-                                    MobHum.WalkSpeed = 0
-                                    MobHum.JumpPower = 0
-                                end
-                            end
-                        end
-
-                    until not _G.AutoFarmNear
-                        or Humanoid.Health <= 0
-                        or not Enemy.Parent
+                    until not _G.AutoFarmNear or Humanoid.Health <= 0
 
                     break
                 end
