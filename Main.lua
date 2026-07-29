@@ -2,8 +2,8 @@
 local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/tlredz/Library/refs/heads/main/redz-V5-remake/main.luau"))()
 
 ScriptVersion = {
-    Version = "v1.7.3",
-    Date = "2026-07-28"
+    Version = "v1.7.5",
+    Date = "2026-07-29"
 }
 
 _G.SelectTool = "Melee"
@@ -1534,7 +1534,7 @@ spawn(function()
                         end
 
                         if StuckTime >= 20 then
-                            Humanoid.Health = 0
+                            --Humanoid.Health = 0
                             break
                         end
 
