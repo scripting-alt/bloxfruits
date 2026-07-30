@@ -2930,11 +2930,12 @@ task.spawn(function()
         if _G.Buuut then
             local Remote = Tool:FindFirstChild("RemoteEvent")
 
-            if Remote and not Tool:FindFirstChild("FakeRemoteEvent") then
+            if Remote and not Tool:FindFirstChild("OR_RemoteEvent") then
                 Remote.Name = "OR_RemoteEvent"
 
                 local Fake = Remote:Clone()
-                Fake.Name = "FakeRemoteEvent"
+                Fake.Name = "RemoteEvent"
+                Fake:SetAttribute("FA_RemoteEvent", true)
                 Fake.Parent = Tool
             end
 
@@ -2946,9 +2947,9 @@ task.spawn(function()
             end
         else
             local Original = Tool:FindFirstChild("OR_RemoteEvent")
-            local Fake = Tool:FindFirstChild("FakeRemoteEvent")
+            local Fake = Tool:FindFirstChild("RemoteEvent")
 
-            if Fake then
+            if Fake and Fake:GetAttribute("FA_RemoteEvent") then
                 Fake:Destroy()
             end
 
