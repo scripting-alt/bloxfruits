@@ -2857,6 +2857,108 @@ Tab_Dev:AddButton({
   end
 })
 
+Tab_Pvp:AddSection("Aimbot")
+Tab_Pvp:AddToggle({Name = "Aimbot",Default = false,
+Callback = function(Value)
+    _G.Buuut = Value
+end})
+
+Tab_Pvp:AddSlider({
+  Name = "Distance Aimbot",
+  Min = 50,
+  Max = 1000,
+  Increment = 1,
+  Default = 500,
+  Callback = function(Value)
+    _G.DistanceBuuut = Value
+  end
+})
+
+local Players = game:GetService("Players")
+local CollectionService = game:GetService("CollectionService")
+
+local LocalPlayer = Players.LocalPlayer
+
+local function IsFriendly(player)
+    if player == LocalPlayer then
+        return true
+    end
+
+    return CollectionService:HasTag(player, "Ally" .. LocalPlayer.Name)
+        or CollectionService:HasTag(LocalPlayer, "Ally" .. player.Name)
+        or (LocalPlayer.Team == game.Teams.Marines and player.Team == game.Teams.Marines)
+end
+
+local function GetNearestEnemy()
+    local Character = LocalPlayer.Character
+    local Root = Character and Character:FindFirstChild("HumanoidRootPart")
+    if not Root then
+        return
+    end
+
+    local Closest, Distance = nil, _G.DistanceBuuut or math.huge
+
+    for _, Player in ipairs(Players:GetPlayers()) do
+        if not IsFriendly(Player) then
+            local Char = Player.Character
+            local Hum = Char and Char:FindFirstChild("Humanoid")
+            local HRP = Char and Char:FindFirstChild("HumanoidRootPart")
+
+            if Hum and Hum.Health > 0 and HRP then
+                local Magnitude = (HRP.Position - Root.Position).Magnitude
+
+                if Magnitude <= Distance then
+                    Distance = Magnitude
+                    Closest = HRP
+                end
+            end
+        end
+    end
+
+    return Closest
+end
+
+task.spawn(function()
+    while task.wait() do
+        local Character = LocalPlayer.Character
+        local Tool = Character and Character:FindFirstChildOfClass("Tool")
+
+        if not Tool then
+            continue
+        end
+
+        if _G.Buuut then
+            local Remote = Tool:FindFirstChild("RemoteEvent")
+
+            if Remote and not Tool:FindFirstChild("FakeRemoteEvent") then
+                Remote.Name = "OR_RemoteEvent"
+
+                local Fake = Remote:Clone()
+                Fake.Name = "FakeRemoteEvent"
+                Fake.Parent = Tool
+            end
+
+            local Original = Tool:FindFirstChild("OR_RemoteEvent")
+            local Target = GetNearestEnemy()
+
+            if Original and Target then
+                Original:FireServer(Target.Position)
+            end
+        else
+            local Original = Tool:FindFirstChild("OR_RemoteEvent")
+            local Fake = Tool:FindFirstChild("FakeRemoteEvent")
+
+            if Fake then
+                Fake:Destroy()
+            end
+
+            if Original then
+                Original.Name = "RemoteEvent"
+            end
+        end
+    end
+end)
+
 local Queue = queue_on_teleport or syn and syn.queue_on_teleport
 
 if Queue then
