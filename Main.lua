@@ -1176,6 +1176,62 @@ spawn(function()
     end
 end)
 
+task.spawn(function()
+    local Players = game:GetService("Players")
+    local CollectionService = game:GetService("CollectionService")
+    local VirtualInputManager = game:GetService("VirtualInputManager")
+
+    while task.wait() do
+        if not _G.CollectBerry then
+            continue
+        end
+
+        local Character = Players.LocalPlayer.Character or Players.LocalPlayer.CharacterAdded:Wait()
+        local Position = Character:GetPivot().Position
+
+        local ClosestBerry
+        local ClosestPart
+        local ClosestDistance = math.huge
+
+        for _, Berry in ipairs(CollectionService:GetTagged("BerryBush")) do
+            local Model = Berry.Parent
+
+            if Model then
+                local Distance = (Model:GetPivot().Position - Position).Magnitude
+
+                if Distance < ClosestDistance then
+                    for PartName, Enabled in pairs(Berry:GetAttributes()) do
+                        if Enabled then
+                            local Part = Model:FindFirstChild(PartName)
+
+                            if Part and Part:IsA("BasePart") then
+                                ClosestBerry = Model
+                                ClosestPart = Part
+                                ClosestDistance = Distance
+                                break
+                            end
+                        end
+                    end
+                end
+            end
+        end
+
+        if ClosestBerry and ClosestPart then
+            topos(CFrame.new(ClosestBerry:GetPivot().Position + Vector3.new(0, 2, 0)))
+            task.wait(0.5)
+
+            topos(ClosestPart.CFrame + Vector3.new(0, 1, 0))
+            task.wait(0.3)
+
+            VirtualInputManager:SendKeyEvent(true, Enum.KeyCode.E, false, game)
+            task.wait(0.1)
+            VirtualInputManager:SendKeyEvent(false, Enum.KeyCode.E, false, game)
+        elseif _G.CollectBerryHop then
+            --Hop()
+        end
+    end
+end)
+
 spawn(function()
     while wait() do
         if _G.FarmType == "Orbit" then
@@ -1286,6 +1342,78 @@ function UpdatePlayerChams()
                         TeamColor,
                         Health,
                         Level.Value
+                    )
+                end
+            elseif ESP then
+                ESP:Destroy()
+            end
+        end)
+    end
+end
+
+function UpdateBerriesESP()
+    local Player = game:GetService("Players").LocalPlayer
+    local Character = Player.Character
+    local LocalHead = Character and Character:FindFirstChild("Head")
+
+    if not LocalHead then
+        return
+    end
+
+    for _, Berry in ipairs(game:GetService("CollectionService"):GetTagged("BerryBush")) do
+        pcall(function()
+            local Model = Berry.Parent
+            if not Model then
+                return
+            end
+
+            local BerryName
+            for _, Value in pairs(Berry:GetAttributes()) do
+                if Value then
+                    BerryName = tostring(Value)
+                    break
+                end
+            end
+
+            if not BerryName then
+                return
+            end
+
+            local ESPName = "BerryESP" .. tostring(Number)
+            local ESP = Model:FindFirstChild(ESPName)
+
+            if _G.BerryESP then
+                local Distance = math.floor((LocalHead.Position - Model:GetPivot().Position).Magnitude)
+
+                if not ESP then
+                    ESP = Instance.new("BillboardGui")
+                    ESP.Name = ESPName
+                    ESP.Parent = Model
+                    ESP.Adornee = Model
+                    ESP.AlwaysOnTop = true
+                    ESP.ExtentsOffset = Vector3.new(0, 2, 0)
+                    ESP.Size = UDim2.new(1, 200, 1, 30)
+
+                    local TextLabel = Instance.new("TextLabel")
+                    TextLabel.Name = "TextLabel"
+                    TextLabel.Parent = ESP
+                    TextLabel.Size = UDim2.new(1, 0, 1, 0)
+                    TextLabel.BackgroundTransparency = 1
+                    TextLabel.Font = Enum.Font.GothamSemibold
+                    TextLabel.TextSize = 14
+                    TextLabel.TextWrapped = true
+                    TextLabel.TextYAlignment = Enum.TextYAlignment.Top
+                    TextLabel.TextStrokeTransparency = 0.5
+                    TextLabel.RichText = true
+                end
+
+                local TextLabel = ESP:FindFirstChild("TextLabel")
+
+                if TextLabel then
+                    TextLabel.Text = string.format(
+                        '<font color="#FFFF00">%s</font>\n<font color="#FFFF00">[</font> <font color="#FFFFFF">%dm</font> <font color="#FFFF00">]</font>',
+                        BerryName,
+                        Distance
                     )
                 end
             elseif ESP then
@@ -1588,6 +1716,18 @@ Tab_Farm:AddSlider({
   end
 })
 
+Tab_Farm:AddSection("Berries")
+
+Tab_Farm:AddToggle({
+  Name = "Auto Collect Berry",
+  Default = false,
+  Description = "Automatically collects the nearest berry bush",
+  Callback = function(Value)
+    _G.CollectBerry = Value
+  end
+})
+
+
 function debug(msg)
     Window:Notify({
       Title = "Debug",
@@ -1671,6 +1811,24 @@ Tab_Visual:AddToggle({
   end
 })
 
+Tab_Visual:AddToggle({
+  Name = "Esp Berries",
+  Default = false,
+  Callback = function(Value)
+    _G.BerryESP = Value
+    if _G.BerryESP then
+        task.spawn(function()
+            while _G.BerryESP do
+                UpdateBerriesESP()
+                task.wait(1)
+            end
+        end)
+    else
+        UpdateBerriesESP()
+    end
+  end
+})
+
 Tab_Visual:AddSection("Skins")
 
 local SkinsModule = loadstring(game:HttpGet("https://raw.githubusercontent.com/scripting-alt/bloxfruits/refs/heads/main/utils/SkinsModule.lua"))()
@@ -1710,7 +1868,7 @@ Tab_Visual:AddDropdown({
     Name = "Pain Skins",
     MultiSelect = false,
     Options = {"Default", "DeepBlue", "Red", "Orange", "Celestial", "SuperSpirit"},
-    Default = "Default",
+    Default = {"Default"},
     Callback = function(Value)
         PainSkin = type(Value) == "table" and Value[1] or Value
     end
@@ -1720,7 +1878,7 @@ Tab_Visual:AddDropdown({
     Name = "Portal Skins",
     MultiSelect = false,
     Options = {"Default", "Divine", "Redz"},
-    Default = "Default",
+    Default = {"Default"},
     Callback = function(Value)
         PortalSkin = type(Value) == "table" and Value[1] or Value
     end
@@ -2873,6 +3031,150 @@ Tab_Pvp:AddSlider({
     _G.DistanceBuuut = Value
   end
 })
+Tab_Sea:AddSection("Boat")
+
+local boatsFolder = workspace:WaitForChild("Boats")
+local player = game:GetService("Players").LocalPlayer
+local OWN_BOAT = "Own Boat"
+local displayToBoat, conns = {}, {} -- agora guarda o Instance, não o Name
+
+local function ownerName(boat)
+    local ov = boat:FindFirstChild("Owner")
+    local v = ov and ov.Value
+    return typeof(v) == "Instance" and v.Name or (v ~= nil and v ~= "" and tostring(v)) or "No Owner"
+end
+
+local function findOwnBoat()
+    for _, boat in ipairs(boatsFolder:GetChildren()) do
+        local ov = boat:FindFirstChild("Owner")
+        if ov and ov:IsA("ObjectValue") and ov.Value == player then return boat end
+    end
+end
+
+local boats = Tab_Sea:AddDropdown({
+    Name = "Boat",
+    Options = { OWN_BOAT },
+    Default = { OWN_BOAT },
+    Callback = function(v)
+        _G.SelectBoat = v == OWN_BOAT and findOwnBoat() or displayToBoat[v]
+    end
+})
+
+local function remove(boat)
+    local d = boat:GetAttribute("_D")
+    if d then boats:Remove(d); displayToBoat[d] = nil end
+    if conns[boat] then conns[boat]:Disconnect(); conns[boat] = nil end
+end
+
+local function add(boat)
+    local d = ("%s (%s)"):format(boat.Name, ownerName(boat))
+    boat:SetAttribute("_D", d)
+    displayToBoat[d] = boat
+    boats:Add(d)
+
+    local ov = boat:FindFirstChild("Owner")
+    if ov then
+        conns[boat] = ov:GetPropertyChangedSignal("Value"):Connect(function()
+            remove(boat); add(boat)
+        end)
+    end
+end
+
+for _, boat in ipairs(boatsFolder:GetChildren()) do add(boat) end
+boatsFolder.ChildAdded:Connect(function(b) task.wait(); add(b) end)
+boatsFolder.ChildRemoved:Connect(remove)
+
+Tab_Sea:AddSlider({Name = "Walk Speed",Min = 150,Max = 600,Increment = 5,Default = 150,
+Callback = function(Value)
+_G.SpeedBoat = Value
+end
+})
+Tab_Sea:AddToggle({Name = "Toggle Speed",Default = false,
+Callback = function(Value)
+    _G.SpeedBoatToggle = Value
+end})
+
+Tab_Sea:AddButton({
+  Name = "Sit Boat",
+  Callback = function()
+    local boat = _G.SelectBoat
+    if boat then
+        local seat = boat:FindFirstChild("VehicleSeat")
+        if seat then
+            local char = player.Character
+            if char and char:FindFirstChild("Humanoid") then
+                seat:Sit(char.Humanoid)
+            end
+        end
+    end
+  end
+})
+
+Tab_Sea:AddSection("Sail")
+
+local DEFAULT_BOAT = player.Team and player.Team.Name == "Pirates" and "PirateGrandBrigade" or "MarineGrandBrigade"
+local getBoats = game.ReplicatedStorage.Remotes.CommF_:InvokeServer("GetUnlockables", "BoatDealer")
+local BoatUnlockList = {"PirateGrandBrigade", "MarineGrandBrigade"}
+local Ignore = {
+    FlamingoAccess = 1,
+    UsoapHat = 1,
+    MarineCap = 1,
+    DefeatedIndraTrueForm = 1
+}
+for Name, Unlocked in pairs(getBoats) do
+    if Unlocked and not Ignore[Name] then
+        BoatUnlockList[#BoatUnlockList + 1] = Name
+    end
+end
+table.sort(BoatUnlockList)
+Tab_Sea:AddDropdown({
+    Name = "Auto Buy Boat",
+    Options = BoatUnlockList,
+    Default = { DEFAULT_BOAT },
+    Callback = function(v)
+        _G.SelectBoatBuy = v
+    end
+})
+
+Tab_Sea:AddDropdown({
+    Name = "Sea",
+    Options = { "Lv 1", "Lv 2", "Lv 3", "Lv 4", "Lv 5", "Lv 6" , "Lv Infinite"},
+    Default = { "Lv Infinite" },
+    Callback = function(v)
+        _G.LevelSea = v
+    end
+})
+
+
+Tab_Sea:AddSection("Islands")
+Tab_Sea:AddToggle({Name = "Auto Prehistoric Island",Default = false,
+Callback = function(Value)
+    _G.FindPH = Value
+end})
+
+Tab_Sea:AddToggle({Name = "Auto Kitsune Island",Default = false,
+Callback = function(Value)
+    _G.FindFrozen = Value
+end})
+
+Tab_Sea:AddToggle({Name = "Auto Kitsune Island",Default = false,
+Callback = function(Value)
+    _G.FindKitsune = Value
+end})
+
+-- SPAWN BOAT
+
+spawn(function()
+    while task.wait() do
+        if _G.SpeedBoatToggle then
+            local char = player.Character
+            local seat = char and char:FindFirstChild("Humanoid") and char.Humanoid.SeatPart
+            if seat and seat:IsA("VehicleSeat") then
+                seat.MaxSpeed = _G.SpeedBoat
+            end
+        end
+    end
+end)
 
 local Players = game:GetService("Players")
 local CollectionService = game:GetService("CollectionService")
