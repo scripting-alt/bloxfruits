@@ -2,7 +2,7 @@
 local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/tlredz/Library/refs/heads/main/redz-V5-remake/main.luau"))()
 
 ScriptVersion = {
-    Version = "v1.8.5",
+    Version = "v1.8.7",
     Date = "2026-08-04"
 }
 
@@ -2720,6 +2720,22 @@ spawn(function()
         end
     end
 end)
+
+Tab_Misc:AddSection("Teams")
+Tab_Misc:AddButton({
+  Name = "Join Pirates Team",
+  Debounce = 0.5,
+  Callback = function()
+    game:GetService('ReplicatedStorage').Remotes.CommF_:InvokeServer('SetTeam2', 'Pirates')
+  end
+})
+Tab_Misc:AddButton({
+  Name = "Join Marines Team",
+  Debounce = 0.5,
+  Callback = function()
+    game:GetService('ReplicatedStorage').Remotes.CommF_:InvokeServer('SetTeam2', 'Marines')
+  end
+})
 
 Tab_Misc:AddSection("Server")
 Tab_Misc:AddButton({
