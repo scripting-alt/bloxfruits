@@ -1549,7 +1549,7 @@ spawn(function()
             game:GetService("ReplicatedStorage").Remotes.CommF_:InvokeServer("Cousin","Buy")
         end
 
-        if _G.getFruits then
+        if _G.getFruits and not CheckStopFarm("FruitSpawn") then
             _G.ConfigStopFarm.FruitSpawn = false
 
             for _,v in ipairs(workspace:GetChildren()) do
