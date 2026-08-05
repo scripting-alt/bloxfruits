@@ -2,8 +2,8 @@
 local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/tlredz/Library/refs/heads/main/redz-V5-remake/main.luau"))()
 
 ScriptVersion = {
-    Version = "v1.7.5",
-    Date = "2026-07-28"
+    Version = "v1.8.5",
+    Date = "2026-08-04"
 }
 
 _G.SelectTool = "Melee"
@@ -1696,9 +1696,9 @@ Tab_Farm:AddToggle({
 
 Tab_Farm:AddToggle({
   Name = "Fast Attack",
-  Default = _G.FastAttack,
+  Default = true,
   Description = "Teste",
-  Flag = "fastAttack_flag",
+  Flag = "fastAttackToggle_flag",
   Callback = function(Value)
     _G.FastAttack = Value
   end
@@ -1710,7 +1710,7 @@ Tab_Farm:AddSlider({
   Max = 1,
   Increment = 0.1,
   Default = _G.FastAttackSpeed,
-  Flag = "fastAttack_flag",
+  Flag = "fastAttackSlider_flag",
   Callback = function(Value)
     _G.FastAttackSpeed = Value
   end
