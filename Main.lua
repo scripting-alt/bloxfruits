@@ -11,12 +11,7 @@ _G.FastAttack = true
 _G.FastAttackSpeed = 0.1
 _G.AutoFarmNear = false
 _G.AutoFarmLevel = false
-_G.ConfigStopFarm = {
-    FruitSpawn = false,
-    PirateRaid = false,
-    Saw = false,
-    Factory = false,
-}
+
 _G.FarmType = "Up"
 
 Mon = "Bandit"
@@ -52,6 +47,9 @@ elseif WorldSea == "Sea2" then
 elseif WorldSea == "Sea3" then
     World3 = true
     warn("[REDZ HUB] SEA 3")
+elseif WorldSea == "Dungeon" then
+    World3 = true
+    warn("[REDZ HUB] Dungeon")
 end
 
 local Window
@@ -63,21 +61,45 @@ local RegisterHit = Net["RE/RegisterHit"]
 local LastHealth = nil
 local StuckTime = 0
 
+_G.ConfigStopFarm = {
+    FruitSpawn = false,
+    PirateRaid = false,
+    Saw = false,
+    Factory = false,
+}
+
+local piority = {
+    FruitSpawn = 1,
+    PirateRaid = 2,
+    Factory = 2,
+    EliteSpawn = 3,
+}
+
+function checkStopFarm(farmAtual)
+    local farmPriority = farmAtual and piority[farmAtual] or nil
+    for k, v in pairs(_G.ConfigStopFarm) do
+        if v == true and k ~= farmAtual then
+            if farmAtual == nil then
+                return false
+            end
+            local p = piority[k]
+            if p == nil then
+                return false
+            end
+            if farmPriority == nil or p <= farmPriority then
+                return false
+            end
+        end
+    end
+
+    return true
+end
+
 function checkEnemySpawns(EnemyName)
     if ReplicatedStorage:FindFirstChild("FortBuilderReplicatedSpawnPositionsFolder"):FindFirstChild(EnemyName) then
         return true, ReplicatedStorage:FindFirstChild("FortBuilderReplicatedSpawnPositionsFolder"):FindFirstChild(EnemyName).CFrame
     end
     return false
-end
-
-function checkStopFarm()
-    for _, v in pairs(_G.ConfigStopFarm) do
-        if v == true then
-            return false
-        end
-    end
-
-    return true
 end
 
 local function GetBladeHits()
@@ -2137,6 +2159,11 @@ end
 spawn(function()
     while task.wait() do
         if _G.AutoEliteHunter and World3 then
+
+            if checkStopFarm("EliteSpawn") then
+                return
+            end
+
             pcall(function()
                 local Player = game.Players.LocalPlayer
                 local Quest = Player.PlayerGui.Main.Quest
@@ -2187,7 +2214,7 @@ spawn(function()
 
                                 Humanoid.WalkSpeed = 0
                                 topos(Enemy.HumanoidRootPart.CFrame * Pos)
-                            until not _G.AutoEliteHunter or Humanoid.Health <= 0 or not Enemy.Parent
+                            until not _G.AutoEliteHunter or Humanoid.Health <= 0 or not Enemy.Parent or checkStopFarm("EliteSpawn")
                         end
                     else
                         local Spawn = ReplicatedStorage:FindFirstChild(Elite)
@@ -2613,6 +2640,37 @@ spawn(function()
             end
         end
     end)
+
+
+Tab_Race:AddSection("Auto Race")
+Tab_Race:AddToggle({
+  Name = "Auto Active V4",
+  Default = true,
+  Flag = "autoV4_flag",
+  Callback = function(Value)
+    _G.ActiveV4 = Value
+  end
+})
+Tab_Race:AddToggle({
+  Name = "Auto Active V3",
+  Default = false,
+  Flag = "autoV3_flag",
+  Callback = function(Value)
+    _G.ActiveV3 = Value
+  end
+})
+
+spawn(function()
+    while wait(3) do
+        if _G.ActiveV4 then
+            game:GetService("ReplicatedStorage").Events.ActivateRaceV4:Fire()
+        end
+        if _G.ActiveV3 then
+            game.ReplicatedStorage.Remotes.CommE:FireServer("ActivateAbility")
+        end
+    end
+end)
+
 
 Tab_Fishing:AddSection("Fishing")
 
