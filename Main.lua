@@ -242,6 +242,7 @@ function Useskills(tool, input, position)
     EquipWeapon(tool)
     if game.Players.LocalPlayer.Character:FindFirstChildOfClass("Tool") then
         local VirtualInputManager = game:GetService('VirtualInputManager')
+        task.wait(0.08)
         VirtualInputManager:SendKeyEvent(true, Enum.KeyCode[input], false, game)
         task.wait(0.05)
         VirtualInputManager:SendKeyEvent(false, Enum.KeyCode[input], false, game)
@@ -2086,6 +2087,41 @@ spawn(function()
     end
 end)
 
+Attack = {}
+
+function Attack.Alive(enemy)
+    if not enemy then
+        return false
+    end
+
+    local hum = enemy:FindFirstChild("Humanoid")
+    local root = enemy:FindFirstChild("HumanoidRootPart")
+
+    return hum and hum.Health > 0 and root
+end
+
+function Attack.Kill(enemy)
+    if not Attack.Alive(enemy) then
+        return
+    end
+
+    local root = enemy.HumanoidRootPart
+
+    while _G.FarmBlazeEM
+        and Attack.Alive(enemy)
+        and enemy.Parent do
+
+        topos(root.CFrame * Pos) -- fica 8 studs acima
+        task.wait()
+
+        -- Atualiza caso o NPC se mova
+        root = enemy:FindFirstChild("HumanoidRootPart")
+        if not root then
+            break
+        end
+    end
+end
+
 if World1 then
     Tab_Quests:AddSection("Quest Sword")
     Tab_Quests:AddToggle({
@@ -2141,6 +2177,11 @@ elseif World2 then
                     end
                 })
 elseif World3 then
+    local DragonHunter = game.ReplicatedStorage.Modules.Net["RF/DragonHunter"]
+    local Mobs = {
+    "Hydra Enforcer",
+    "Venomous Assailant"
+    }
     Tab_Quests:AddSection("Elite Hunter")
     EliteHunterKill = Tab_Quests:AddParagraph("Progress", "Algo")
     Tab_Quests:AddToggle({
@@ -2153,19 +2194,155 @@ elseif World3 then
                 stopTeleport()
               end
             })
+    Tab_Quests:AddSection("Dragon Dojo")
+    Tab_Quests:AddToggle({
+              Name = "Auto Dragon Hunter",
+              Default = false,
+              Flag = "DragonHunter_Flags",
+              Callback = function(Value)
+                _G.FarmBlazeEM = Value
+                stopTeleport()
+              end
+            })
 
     spawn(function()
         while wait(1) do
            pcall(function()
-               --if game:GetService("ReplicatedStorage"):FindFirstChild("Diablo") or game:GetService("ReplicatedStorage"):FindFirstChild("Deandre") or game:GetService("ReplicatedStorage"):FindFirstChild("Urban") or game:GetService("Workspace").Enemies:FindFirstChild("Diablo") or game:GetService("Workspace").Enemies:FindFirstChild("Deandre") or game:GetService("Workspace").Enemies:FindFirstChild("Urban") then
-                --   EliteHunterKill:Set({Title = "Progress", Content = "Number of kills  : "..game:GetService("ReplicatedStorage").Remotes.CommF_:InvokeServer("EliteHunter","Progress")})	
-                --else
-                    EliteHunterKill:SetDescription("Number of kills  : "..game:GetService("ReplicatedStorage").Remotes.CommF_:InvokeServer("EliteHunter","Progress"))	
-               -- end
+                EliteHunterKill:SetDescription("Number of kills  : "..game:GetService("ReplicatedStorage").Remotes.CommF_:InvokeServer("EliteHunter","Progress"))	
            end)
        end
     end)
+
+    function checkQuesta()
+    pcall(function()
+        DragonHunter:InvokeServer({Context = "RequestQuest"})
+    end)
+
+    local ok, quest = pcall(function()
+        return DragonHunter:InvokeServer({Context = "Check"})
+    end)
+
+    if not ok or not quest or not quest.Text then
+        return false
+    end
+
+    local text = quest.Text
+
+    if text:find("Defeat") then
+        local amount = tonumber(text:match("Defeat%s+(%d+)"))
+
+        for _, mob in ipairs(Mobs) do
+            if text:find(mob) then
+                return true, mob, amount, 1
+            end
+        end
+
+    elseif text:find("Destroy") then
+        return true, nil, 10, 2
+    end
+
+    return true
+    end
+
+    function BackTODoJo()
+    for _,v in ipairs(game.Players.LocalPlayer.PlayerGui.Notifications:GetChildren()) do
+        if v.Name == "NotificationTemplate"
+        and v.Text:find("Head back to the Dojo") then
+            return true
+        end
+    end
+
+    return false
+    end
+
+    function DragonMobClear(kill, mobName, pos)
+    if kill and mobName then
+        for _,enemy in ipairs(workspace.Enemies:GetChildren()) do
+            if enemy.Name == mobName and Attack.Alive(enemy) then
+                Attack.Kill(enemy, true)
+            end
+        end
+    elseif pos then
+        topos(pos)
+    end
+    end
+
+    task.spawn(function()
+    while task.wait() do
+        if not _G.FarmBlazeEM then
+            continue
+        end
+
+        pcall(function()
+
+            local hasQuest, mobName, _, stage = checkQuesta()
+
+            if not hasQuest or BackTODoJo() then
+                topos(CFrame.new(5813,1208,884))
+                DragonMobClear(false)
+                return
+            end
+
+            if stage == 1 then
+
+                repeat
+                    task.wait()
+                    DragonMobClear(true, mobName, CFrame.new(4620.61,1002.29,399.08))
+                until not _G.FarmBlazeEM
+                    or BackTODoJo()
+                    or not checkQuesta()
+
+            elseif stage == 2 then
+
+                local bamboo = workspace.Map.Waterfall.IslandModel:FindFirstChild("Meshes/bambootree",true)
+
+                if not bamboo then
+                    return
+                end
+
+                repeat
+                    task.wait()
+
+                    topos(bamboo.CFrame * CFrame.new(4,0,0))
+
+                    if (Root.Position - bamboo.Position).Magnitude <= 200 then
+
+                        MousePos = bamboo.Position
+
+                        for _,weapon in ipairs({"Melee","Sword","Blox Fruit","Gun"}) do
+                            for _,skill in ipairs({"Z","X","C"}) do
+                                pcall(function()
+                                    Useskills(weapon,skill)
+                                end)
+                            end
+                            task.wait(0.5)
+                        end
+                    end
+
+                until not _G.FarmBlazeEM
+                    or BackTODoJo()
+                    or not bamboo.Parent
+            end
+        end)
+    end
+    end)
+
+    task.spawn(function()
+    while task.wait(.1) do
+        if _G.FarmBlazeEM then
+            local ember = workspace:FindFirstChild("EmberTemplate")
+            local part = ember and ember:FindFirstChild("Part")
+
+            if part then
+                Root.CFrame = part.CFrame
+            end
+        end
+    end
+    end)
+
 end
+
+
 
 spawn(function()
     while task.wait() do
