@@ -15,6 +15,7 @@ _G.AutoFarmLevel = false
 _G.FarmType = "Up"
 
 Mon = "Bandit"
+SkillPos = Vector3.new(0, 0, 0)
 LevelQuest = 1
 NameQuest = "BanditQuest1"
 NameMon = "Bandit"
@@ -47,9 +48,9 @@ elseif WorldSea == "Sea2" then
 elseif WorldSea == "Sea3" then
     World3 = true
     warn("[REDZ HUB] SEA 3")
-elseif WorldSea == "Dungeon" then
+elseif WorldSea == "Dungeons" then
     World3 = true
-    warn("[REDZ HUB] Dungeon")
+    warn("[REDZ HUB] Dungeons")
 end
 
 local Window
@@ -234,6 +235,16 @@ function BringMob(MobName)
 
             Humanoid:ChangeState(11)
         end
+    end
+end
+
+function Useskills(tool, input, position)
+    EquipWeapon(tool)
+    if game.Players.LocalPlayer.Character:FindFirstChildOfClass("Tool") then
+        local VirtualInputManager = game:GetService('VirtualInputManager')
+        VirtualInputManager:SendKeyEvent(true, Enum.KeyCode[input], false, game)
+        task.wait(0.05)
+        VirtualInputManager:SendKeyEvent(false, Enum.KeyCode[input], false, game)
     end
 end
 
@@ -3086,6 +3097,22 @@ Tab_Dev:AddButton({
   Debounce = 0.5,
   Callback = function()
     setclipboard(tostring(game.Players.LocalPlayer.Character.HumanoidRootPart.Position))
+  end
+})
+
+Tab_Dev:AddButton({
+  Name = "Use Z Skill Melee",
+  Debounce = 0.5,
+  Callback = function()
+    Useskills("Melee", "Z")
+  end
+})
+
+Tab_Dev:AddButton({
+  Name = "Use X Skill Melee",
+  Debounce = 0.5,
+  Callback = function()
+    Useskills("Melee", "X")
   end
 })
 
