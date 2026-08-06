@@ -177,11 +177,20 @@ local function AttackAll()
     local character = player.Character
     if not character then return end
 
-    local equippedWeapon = character:FindFirstChild("EquippedWeapon")
+    local equippedWeapon = character:FindFirstChildOfClass("Tool")
     if not equippedWeapon then return end
 
 
     local enemies = GetBladeHits()
+
+    if equippedWeapon and equippedWeapon:FindFirstChild("LeftClickRemote") and enemies[1] then
+        if _G.FastAttackFruit then
+            local direction = (enemies[1].HumanoidRootPart.Position - character:GetPivot().Position).Unit
+            equippedWeapon:FindFirstChild("LeftClickRemote"):FireServer(direction, 1)
+            return
+        end
+    end
+
     if #enemies > 0 then
         local netModule = game:GetService("ReplicatedStorage"):WaitForChild("Modules"):WaitForChild("Net")
         netModule:WaitForChild("RE/RegisterAttack"):FireServer(-math.huge)
@@ -1742,6 +1751,16 @@ Tab_Farm:AddToggle({
   Flag = "fastAttackToggle_flag",
   Callback = function(Value)
     _G.FastAttack = Value
+  end
+})
+
+Tab_Farm:AddToggle({
+  Name = "Fast Attack Fruit",
+  Default = true,
+  Description = "Teste",
+  Flag = "fastAttackFruitToggle_flag",
+  Callback = function(Value)
+    _G.FastAttackFruit = Value
   end
 })
 
