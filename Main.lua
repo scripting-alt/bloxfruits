@@ -3144,6 +3144,16 @@ Tab_Dev:AddButton({
 })
 
 Tab_Dev:AddButton({
+  Name = "No Cooldown",
+  Debounce = 0.5,
+  Callback = function()
+    game.Players.LocalPlayer.Character:SetAttribute("AllCooldown", 100)
+    game.Players.LocalPlayer.Character:SetAttribute("AttackSpeedMultiplier", 100)
+    game.Players.LocalPlayer.Character:SetAttribute("FruitTAPCooldown", 100)
+  end
+})
+
+Tab_Dev:AddButton({
   Name = "Use Z Skill Melee",
   Debounce = 0.5,
   Callback = function()
