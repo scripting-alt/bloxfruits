@@ -2,8 +2,8 @@
 local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/tlredz/Library/refs/heads/main/redz-V5-remake/main.luau"))()
 
 ScriptVersion = {
-    Version = "v1.8.8",
-    Date = "2026-08-05"
+    Version = "v1.9.3",
+    Date = "2026-08-06"
 }
 
 _G.SelectTool = "Melee"
@@ -2818,7 +2818,7 @@ Tab_Misc:AddSlider({
   Min = 1,
   Max = 10,
   Increment = 1,
-  Default = 1,
+  Default = 3,
   Callback = function(Value)
     game.Players.LocalPlayer.Character:SetAttribute("SpeedMultiplier",_G.Speed)
     _G.Speed = Value
