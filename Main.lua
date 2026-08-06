@@ -26,6 +26,13 @@ World2 = false
 World3 = false
 LevelFarmToggle = {}
 
+PostionsFarms = {
+    DragonHunter = CFrame.new(5863.74951171875, 1209.453125, 809.4564208984375),
+    Venomous = CFrame.new(4912.16552734375, 1186.46875, 1011.0550537109375),
+    HydraEnforcer = CFrame.new(4535.7626953125, 1127.2462158203125, 419.3918762207031),
+    TreeBreaks = CFrame.new(5863.74951171875, 1209.453125, 809.4564208984375),
+}
+
 StatsAdd = {Melee = false, Defense = false, Sword = false, Gun = false, Fruit = false}
 
 Pos = CFrame.new(0,0,0)
@@ -2165,6 +2172,8 @@ elseif World3 then
               end
             })
 
+
+
     spawn(function()
         while wait() do
             if _G.AutoDragonHunter and World3 then
@@ -3150,55 +3159,126 @@ Tab_Pvp:AddSlider({
 Tab_Sea:AddSection("Boat")
 
 local boatsFolder = workspace:WaitForChild("Boats")
-local player = game:GetService("Players").LocalPlayer
+local Players = game:GetService("Players")
+local player = Players.LocalPlayer
+
 local OWN_BOAT = "Own Boat"
-local displayToBoat, conns = {}, {} -- agora guarda o Instance, não o Name
+
+local displayToBoat = {}
+local conns = {}
 
 local function ownerName(boat)
-    local ov = boat:FindFirstChild("Owner")
-    local v = ov and ov.Value
-    return typeof(v) == "Instance" and v.Name or (v ~= nil and v ~= "" and tostring(v)) or "No Owner"
+	local ov = boat:FindFirstChild("Owner")
+	local v = ov and ov.Value
+
+	if typeof(v) == "Instance" then
+		return v.Name
+	end
+
+	if v ~= nil and v ~= "" then
+		return tostring(v)
+	end
+
+	return "No Owner"
 end
 
 local function findOwnBoat()
-    for _, boat in ipairs(boatsFolder:GetChildren()) do
-        local ov = boat:FindFirstChild("Owner")
-        if ov and ov:IsA("ObjectValue") and ov.Value == player then return boat end
-    end
+	for _, boat in ipairs(boatsFolder:GetChildren()) do
+		local ov = boat:FindFirstChild("Owner")
+
+		if ov and ov:IsA("ObjectValue") and ov.Value == player then
+			return boat
+		end
+	end
 end
 
 local boats = Tab_Sea:AddDropdown({
-    Name = "Boat",
-    Options = { OWN_BOAT },
-    Default = { OWN_BOAT },
-    Callback = function(v)
-        _G.SelectBoat = v == OWN_BOAT and findOwnBoat() or displayToBoat[v]
-    end
+	Name = "Boat",
+	Options = {OWN_BOAT},
+	Default = {OWN_BOAT},
+	Callback = function(value)
+		if value == OWN_BOAT then
+			_G.SelectBoat = findOwnBoat()
+		else
+			local boat = displayToBoat[value]
+
+			if boat and boat.Parent then
+				_G.SelectBoat = boat
+			else
+				_G.SelectBoat = nil
+				boats:Set({OWN_BOAT})
+			end
+		end
+	end
 })
 
-local function remove(boat)
-    local d = boat:GetAttribute("_D")
-    if d then boats:Remove(d); displayToBoat[d] = nil end
-    if conns[boat] then conns[boat]:Disconnect(); conns[boat] = nil end
+local function removeBoat(boat)
+	local display = boat:GetAttribute("_D")
+	if not display then
+		return
+	end
+
+	if _G.SelectBoat == boat then
+		_G.SelectBoat = findOwnBoat()
+		boats:Set({OWN_BOAT})
+	end
+
+	boats:Remove(display)
+
+	displayToBoat[display] = nil
+	boat:SetAttribute("_D", nil)
+
+	if conns[boat] then
+		conns[boat]:Disconnect()
+		conns[boat] = nil
+	end
 end
 
-local function add(boat)
-    local d = ("%s (%s)"):format(boat.Name, ownerName(boat))
-    boat:SetAttribute("_D", d)
-    displayToBoat[d] = boat
-    boats:Add(d)
+local function addBoat(boat)
+	if boat:GetAttribute("_D") then
+		removeBoat(boat)
+	end
 
-    local ov = boat:FindFirstChild("Owner")
-    if ov then
-        conns[boat] = ov:GetPropertyChangedSignal("Value"):Connect(function()
-            remove(boat); add(boat)
-        end)
-    end
+	local display = string.format("%s (%s)", boat.Name, ownerName(boat))
+
+	boat:SetAttribute("_D", display)
+	displayToBoat[display] = boat
+
+	boats:Add(display)
+
+	local ov = boat:FindFirstChild("Owner")
+
+	if ov then
+		conns[boat] = ov:GetPropertyChangedSignal("Value"):Connect(function()
+			local wasSelected = (_G.SelectBoat == boat)
+
+			removeBoat(boat)
+			addBoat(boat)
+
+			if wasSelected then
+				local newDisplay = boat:GetAttribute("_D")
+
+				if newDisplay then
+					_G.SelectBoat = boat
+					boats:Set({newDisplay})
+				end
+			end
+		end)
+	end
 end
 
-for _, boat in ipairs(boatsFolder:GetChildren()) do add(boat) end
-boatsFolder.ChildAdded:Connect(function(b) task.wait(); add(b) end)
-boatsFolder.ChildRemoved:Connect(remove)
+for _, boat in ipairs(boatsFolder:GetChildren()) do
+	addBoat(boat)
+end
+
+boatsFolder.ChildAdded:Connect(function(boat)
+	task.wait()
+	addBoat(boat)
+end)
+
+boatsFolder.ChildRemoved:Connect(function(boat)
+	removeBoat(boat)
+end)
 
 Tab_Sea:AddSlider({Name = "Walk Speed",Min = 150,Max = 600,Increment = 5,Default = 150,
 Callback = function(Value)
@@ -3261,6 +3341,11 @@ Tab_Sea:AddDropdown({
     end
 })
 
+Tab_Sea:AddToggle({Name = "Auto Sail",Default = false,
+Callback = function(Value)
+    _G.AutoSail = Value
+end})
+
 
 Tab_Sea:AddSection("Islands")
 Tab_Sea:AddToggle({Name = "Auto Prehistoric Island",Default = false,
@@ -3268,7 +3353,7 @@ Callback = function(Value)
     _G.FindPH = Value
 end})
 
-Tab_Sea:AddToggle({Name = "Auto Kitsune Island",Default = false,
+Tab_Sea:AddToggle({Name = "Auto Frozen Dimension",Default = false,
 Callback = function(Value)
     _G.FindFrozen = Value
 end})
@@ -3282,8 +3367,17 @@ end})
 
 spawn(function()
     while task.wait() do
+        local char = player.Character
+        if _G.AutoSail then
+            if char:FindFirstChild("Humanoid").Sit == false then
+
+
+
+            end
+        end
+
         if _G.SpeedBoatToggle then
-            local char = player.Character
+
             local seat = char and char:FindFirstChild("Humanoid") and char.Humanoid.SeatPart
             if seat and seat:IsA("VehicleSeat") then
                 seat.MaxSpeed = _G.SpeedBoat
