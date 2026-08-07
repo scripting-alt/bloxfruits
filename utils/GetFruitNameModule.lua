@@ -60,7 +60,7 @@ getFruit.Fruits = {
 
     ["Blizzard"] = 15100384816,
 
-    --["Gravity"] = 0,
+    ["Gravity"] = "BSurfaceMesh.001",
     --["Mammoth"] = 0,
     --["T-Rex"] = 0,
     --["Dough"] = 0,
