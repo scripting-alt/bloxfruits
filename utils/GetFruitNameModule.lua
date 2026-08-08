@@ -44,38 +44,39 @@ getFruit.Fruits = {
     ["Quake"] = 15057718441,
     ["Buddha"] = 15100313696,
 
-    --["Love"] = 0,
+    ["Love"] = 15116730102,
 
     ["Creation"] = "Steam",
 
     ["Spider"] = 15116967784,
 
-    --["Sound"] = 0,
+    ["Sound"] = 14661873358,
 
     ["Phoenix"] = 15100246632,
     ["Portal"] = 15112215862,
 
-    --["Lightning"] = 0,
-    --["Pain"] = 0,
+    ["Lightning"] = 15116747420,
+    ["Pain"] = 15116721173,
 
     ["Blizzard"] = 15100384816,
 
     ["Gravity"] = "BSurfaceMesh.001",
-    --["Mammoth"] = 0,
-    --["T-Rex"] = 0,
-    --["Dough"] = 0,
+    ["Mammoth"] = 14661837634,
+    ["T-Rex"] = "dino.001",
+    ["Dough"] = 15100273645,
 
     ["Shadow"] = 15112263502,
     ["Venom"] = 10395893751,
 
     ["Gas"] = "Gas",
 
-    --["Spirit"] = 0,
+    ["Spirit"] = "Retopo_Cube.001",
     --["Tiger"] = 0,
     --["Yeti"] = 0,
     --["Kitsune"] = 0,
-    --["Control"] = 0,
-    --["Dragon"] = 0,
+    ["Control"] = "ControlModel",
+    --["Dragon (West)"] = 0,
+    --["Dragon (East)"] = 0,
 }
 
 function getFruit.GetFruitName(Fruit)
