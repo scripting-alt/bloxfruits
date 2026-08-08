@@ -2,8 +2,8 @@
 local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/tlredz/Library/refs/heads/main/redz-V5-remake/main.luau"))()
 
 ScriptVersion = {
-    Version = "v1.9.3",
-    Date = "2026-08-06"
+    Version = "v1.9.5",
+    Date = "2026-08-08"
 }
 
 _G.SelectTool = "Melee"
