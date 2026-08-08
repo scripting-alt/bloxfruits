@@ -35,7 +35,7 @@ local Config = {
 }
 
 Config.START_POSITION = UDim2.new(0.5, -300, if isDungeonMap then 0.1 else 0, 4)
-Config.LABEL_TEMPLATE = script:WaitForChild("NotificationTemplate")
+Config.LABEL_TEMPLATE = game:GetService("ReplicatedStorage"):WaitForChild("Notification",999):WaitForChild("NotificationTemplate",999)
 Config.PARENT_GUI = ScreenGui
 
 Config.RICH_TEXT_PROPERTIES = {
