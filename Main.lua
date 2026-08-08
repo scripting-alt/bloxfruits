@@ -1549,6 +1549,7 @@ function reload()
     end)
     workspace._WorldOrigin["Foam;"].CanCollide = _G.WaterWalk
     game.Players.LocalPlayer.Character:SetAttribute("SpeedMultiplier",_G.Speed)
+    game.Players.LocalPlayer.Character:SetAttribute("DashLength",_G.DashDistance)
     game.Players.LocalPlayer.Character.ChildAdded:Connect(function(v)
         if _G.AutoStorageFruits then
             storageFruit(v)
@@ -2825,10 +2826,23 @@ Tab_Misc:AddSlider({
   end
 })
 
+Tab_Misc:AddSlider({
+  Name = "Dash Distance",
+  Min = 1,
+  Max = 300,
+  Increment = 10,
+  Default = game.Players.LocalPlayer.Character:GetAttribute("DashLength") or 10,
+  Callback = function(Value)
+    game.Players.LocalPlayer.Character:SetAttribute("DashLength",Value)
+    _G.DashDistance = Value
+  end
+})
+
 spawn(function()
     while wait() do
         if game.Players.LocalPlayer.Character then
             game.Players.LocalPlayer.Character:SetAttribute("SpeedMultiplier",_G.Speed)
+            game.Players.LocalPlayer.Character:SetAttribute("DashLength",_G.DashDistance)
         end
     end
 end)
@@ -3309,7 +3323,7 @@ boatsFolder.ChildRemoved:Connect(function(boat)
 	removeBoat(boat)
 end)
 
-Tab_Sea:AddSlider({Name = "Walk Speed",Min = 150,Max = 600,Increment = 5,Default = 150,
+Tab_Sea:AddSlider({Name = "Boat Speed",Min = 150,Max = 600,Increment = 5,Default = 150,
 Callback = function(Value)
 _G.SpeedBoat = Value
 end
