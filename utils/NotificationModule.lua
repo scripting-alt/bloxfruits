@@ -32,11 +32,17 @@ local Config = {
 	DEFAULT_MESSAGE = "<EMPTY MESSAGE>",
 	DEFAULT_DURATION = 6,
 	Y_PADDING = 33,
+	STACK_WIDTH = 600,
+	STACK_GAP = 5,
 }
 
 Config.START_POSITION = UDim2.new(0.5, -300, if isDungeonMap then 0.1 else 0, 4)
-Config.LABEL_TEMPLATE = game:GetService("ReplicatedStorage"):WaitForChild("Notification",999):WaitForChild("NotificationTemplate",999)
-Config.PARENT_GUI = ScreenGui
+Config.LABEL_TEMPLATE = game:GetService("ReplicatedStorage"):WaitForChild("Notification", 999):WaitForChild("NotificationTemplate", 999)
+
+Config.SLOT_HEIGHT = Config.LABEL_TEMPLATE.Size.Y.Offset
+if Config.SLOT_HEIGHT <= 0 then
+	Config.SLOT_HEIGHT = Config.Y_PADDING
+end
 
 Config.RICH_TEXT_PROPERTIES = {
 	Font = "SourceSansSemibold",
@@ -59,6 +65,30 @@ Config.NEW_PROPERTIES = {
 	TextColor3 = Color3.new(1, 1, 1),
 	TextStrokeColor3 = Color3.new(),
 }
+
+local Stack = ScreenGui:FindFirstChild("Stack")
+
+if not Stack then
+	Stack = Instance.new("Frame")
+	Stack.Name = "Stack"
+	Stack.BackgroundTransparency = 1
+	Stack.ClipsDescendants = false
+	Stack.AnchorPoint = Vector2.new(0, 0)
+	Stack.Position = Config.START_POSITION
+	Stack.Size = UDim2.new(0, Config.STACK_WIDTH, 0, 0)
+	Stack.AutomaticSize = Enum.AutomaticSize.Y
+	Stack.Parent = ScreenGui
+
+	local listLayout = Instance.new("UIListLayout")
+	listLayout.Name = "ListLayout"
+	listLayout.FillDirection = Enum.FillDirection.Vertical
+	listLayout.SortOrder = Enum.SortOrder.LayoutOrder
+	listLayout.HorizontalAlignment = Enum.HorizontalAlignment.Left
+	listLayout.Padding = UDim.new(0, Config.STACK_GAP)
+	listLayout.Parent = Stack
+end
+
+Config.PARENT_GUI = Stack
 
 local extraPaddingOffset = 0
 local topHudListLayout: UIListLayout? = nil
@@ -126,54 +156,52 @@ end)
 
 local NotificationStack = {
 	Side = 0,
+	OrderCounter = 0,
 	Messages = {},
 }
 
 function NotificationStack:Add(notification)
-	local enterFrom = Config.START_POSITION
-		- UDim2.new(0, 0, 0, Config.START_POSITION.Y.Offset + Config.Y_PADDING * 1.5)
-	local restingPosition = Config.START_POSITION + UDim2.new(0, 0, 0, #self.Messages * Config.Y_PADDING)
+	self.OrderCounter = self.OrderCounter + 1
+	notification.Slot.LayoutOrder = self.OrderCounter
+	notification.Slot.Parent = Config.PARENT_GUI
 
-	if not notification.FirstTime then
-		notification.FirstTime = true
-		notification.Label.Position = enterFrom
-	end
+	notification.Label.Position = UDim2.new(0, 0, 0, -Config.SLOT_HEIGHT)
+	notification.Label.Visible = true
 
 	TweenService:Create(notification.Label, TweenInfo.new(0.3), {
-		Position = restingPosition,
+		Position = UDim2.new(0, 0, 0, 0),
 	}):Play()
 
 	table.insert(self.Messages, notification)
 end
 
+function NotificationStack:Remove(notification)
+	self.Side = if self.Side == 1 then -1 else 1
+
+	local exitTween = TweenService:Create(notification.Label, TweenInfo.new(0.3), {
+		Position = UDim2.new(0, 300 * self.Side, 0, 0),
+	})
+
+	exitTween.Completed:Once(function()
+		local collapseTween = TweenService:Create(notification.Slot, TweenInfo.new(0.2), {
+			Size = UDim2.new(1, 0, 0, 0),
+		})
+
+		collapseTween.Completed:Once(function()
+			notification.Slot:Destroy()
+		end)
+		collapseTween:Play()
+	end)
+	exitTween:Play()
+end
+
 function NotificationStack:Update()
-	for index, notification in next, self.Messages do
+	for index = #self.Messages, 1, -1 do
+		local notification = self.Messages[index]
+
 		if notification:Dead() then
 			table.remove(self.Messages, index)
-			self.Side = if self.Side == 1 then -1 else 1
-
-			local exitPosition = notification.Label.Position + UDim2.new(0.5 * self.Side, 300 * self.Side, 0, 0)
-			local exitTween = TweenService:Create(notification.Label, TweenInfo.new(0.5), {
-				Position = exitPosition,
-			})
-
-			exitTween.Completed:Once(function()
-				notification.Label:Destroy()
-			end)
-			exitTween:Play()
-
-			local remaining = {}
-			for _, message in next, self.Messages do
-				table.insert(remaining, message)
-			end
-
-			self.Messages = {}
-			for _, message in next, remaining do
-				self:Add(message)
-			end
-
-			self:Update()
-			return
+			self:Remove(notification)
 		end
 	end
 end
@@ -299,16 +327,26 @@ function Notification.new(message: string?, duration: number?)
 	local text = if message then message else Config.DEFAULT_MESSAGE
 	local displayDuration = if duration then duration else Config.DEFAULT_DURATION
 
+	local slot = Instance.new("Frame")
+	slot.Name = "NotificationSlot"
+	slot.BackgroundTransparency = 1
+	slot.ClipsDescendants = false
+	slot.Size = UDim2.new(1, 0, 0, Config.SLOT_HEIGHT)
+
 	local label = Config.LABEL_TEMPLATE:Clone()
 	label.AutoLocalize = false
 	label.RichText = true
+	label.AnchorPoint = Vector2.new(0, 0)
+	label.Size = UDim2.new(1, 0, 1, 0)
+	label.Position = UDim2.new(0, 0, 0, 0)
+	label.Visible = false
 
 	for property, value in pairs(Config.NEW_PROPERTIES) do
 		label[property] = value
 	end
 
 	label.Text = ""
-	label.Parent = Config.PARENT_GUI
+	label.Parent = slot
 
 	local richText = TranslateText(label, "" .. text):gsub("<Color=/>", "\14/font\15")
 
@@ -329,6 +367,7 @@ function Notification.new(message: string?, duration: number?)
 	return setmetatable({
 		CreationTime = 0,
 		Displayed = false,
+		Slot = slot,
 		Label = label,
 		Duration = displayDuration,
 	}, Notification)
@@ -345,7 +384,6 @@ function Notification:Display(): boolean
 
 	self.Displayed = true
 	self.CreationTime = tick()
-	self.Label.Visible = true
 	NotificationStack:Add(self)
 
 	return true
