@@ -2814,6 +2814,15 @@ Tab_Misc:AddToggle({
   end
 })
 
+Tab_Misc:AddToggle({
+  Name = "Infinite Geppo",
+  Default = false,
+  Flag = "infiniteGeppo_flag",
+  Callback = function(Value)
+    _G.InfiniteGeppo = Value
+  end
+})
+
 Tab_Misc:AddSlider({
   Name = "Walk Speed",
   Min = 1,
@@ -2838,11 +2847,30 @@ Tab_Misc:AddSlider({
   end
 })
 
+Tab_Misc:AddSlider({
+  Name = "Jump Power",
+  Min = 50,
+  Max = 400,
+  Increment = 10,
+  Default = 70,
+  Callback = function(Value)
+    _G.JumpPower = Value
+  end
+})
+
 spawn(function()
     while wait() do
         if game.Players.LocalPlayer.Character then
             game.Players.LocalPlayer.Character:SetAttribute("SpeedMultiplier",_G.Speed)
             game.Players.LocalPlayer.Character:SetAttribute("DashLength",_G.DashDistance)
+            if _G.InfiniteGeppo then
+                game.Players.LocalPlayer.Character:SetAttribute("SkyjumpBoost",9999)
+            else
+                game.Players.LocalPlayer.Character:SetAttribute("SkyjumpBoost",0)
+            end
+            if game.Players.LocalPlayer.Character and game.Players.LocalPlayer.Character:FindFirstChild("Humanoid") then
+                game.Players.LocalPlayer.Character.Humanoid.JumpPower = _G.JumpPower
+            end
         end
     end
 end)
