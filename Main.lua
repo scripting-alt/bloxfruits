@@ -1563,7 +1563,7 @@ reload()
 spawn(function()
     while task.wait(1) do
         if _G.randomFruits then
-            game:GetService("ReplicatedStorage").Remotes.CommF_:InvokeServer("Cousin","Buy")
+            game:GetService("ReplicatedStorage").Remotes.CommF_:InvokeServer("Cousin","DLCBoxData")
         end
 
         if _G.getFruits and not CheckStopFarm("FruitSpawn") then
