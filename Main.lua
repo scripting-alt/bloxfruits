@@ -2,7 +2,7 @@
 local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/tlredz/Library/refs/heads/main/redz-V5-remake/main.luau"))()
 
 ScriptVersion = {
-    Version = "v1.9.9",
+    Version = "v1.2.0",
     Date = "2026-08-11"
 }
 
@@ -3547,8 +3547,10 @@ task.spawn(function()
     end
 end)
 
-local Queue = queue_on_teleport or syn and syn.queue_on_teleport
+local Queue = queue_on_teleport or (syn and syn.queue_on_teleport)
 
 if Queue then
-    Queue('loadstring(game:HttpGet("https://raw.githubusercontent.com/scripting-alt/bloxfruits/refs/heads/main/Main.lua"))()')
+    Queue([[
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/scripting-alt/bloxfruits/refs/heads/main/Main.lua"))()
+    ]])
 end
