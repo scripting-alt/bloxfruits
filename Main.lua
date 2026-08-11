@@ -184,8 +184,14 @@ local function AttackAll()
     local enemies = GetBladeHits()
 
     if equippedWeapon and equippedWeapon:FindFirstChild("LeftClickRemote") and enemies[1] then
+        local cd = 1        
         local direction = (enemies[1].HumanoidRootPart.Position - character:GetPivot().Position).Unit
-        equippedWeapon:FindFirstChild("LeftClickRemote"):FireServer(direction, 1)
+        equippedWeapon:FindFirstChild("LeftClickRemote"):FireServer(direction, cd)
+        warn(cd, "Fired LeftClickRemote with direction: ", direction)
+        cd = cd + 1
+        if cd > 3 then
+            cd = 1
+        end
     end
 
     if #enemies > 0 then
