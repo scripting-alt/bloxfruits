@@ -110,6 +110,18 @@ function checkEnemySpawns(EnemyName)
     return false
 end
 
+local LocalPlayer = game.Players.LocalPlayer
+
+local function IsFriendly(player)
+    if player == LocalPlayer then
+        return true
+    end
+
+    return CollectionService:HasTag(player, "Ally" .. LocalPlayer.Name)
+        or CollectionService:HasTag(LocalPlayer, "Ally" .. player.Name)
+        or (LocalPlayer.Team == game.Teams.Marines and player.Team == game.Teams.Marines)
+end
+
 local function GetBladeHits()
     local targets = {}
     local function GetDistance(v)
@@ -119,6 +131,10 @@ local function GetBladeHits()
     for _, part in pairs({game.Workspace.Enemies, game.Workspace.Characters}) do
         for _, v in pairs(part:GetChildren()) do
             if v:FindFirstChild("HumanoidRootPart") and v:FindFirstChild("Head") and v:FindFirstChild("Humanoid") then
+                if game.Players:GetPlayerFromCharacter(v) and IsFriendly(game.Players:GetPlayerFromCharacter(v)) then
+                    continue
+                end
+                
                 if GetDistance(v.HumanoidRootPart) < 60 then
                     table.insert(targets, v)
                 end
@@ -3465,16 +3481,6 @@ local Players = game:GetService("Players")
 local CollectionService = game:GetService("CollectionService")
 
 local LocalPlayer = Players.LocalPlayer
-
-local function IsFriendly(player)
-    if player == LocalPlayer then
-        return true
-    end
-
-    return CollectionService:HasTag(player, "Ally" .. LocalPlayer.Name)
-        or CollectionService:HasTag(LocalPlayer, "Ally" .. player.Name)
-        or (LocalPlayer.Team == game.Teams.Marines and player.Team == game.Teams.Marines)
-end
 
 local function GetNearestEnemy()
     local Character = LocalPlayer.Character
