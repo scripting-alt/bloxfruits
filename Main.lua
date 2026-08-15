@@ -2,8 +2,8 @@
 local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/tlredz/Library/refs/heads/main/redz-V5-remake/main.luau"))()
 
 ScriptVersion = {
-    Version = "v1.2.0",
-    Date = "2026-08-11"
+    Version = "v1.2.3",
+    Date = "2026-08-15"
 }
 
 _G.SelectTool = "Melee"
@@ -111,6 +111,8 @@ function checkEnemySpawns(EnemyName)
 end
 
 local LocalPlayer = game.Players.LocalPlayer
+local Players = game:GetService("Players")
+local CollectionService = game:GetService("CollectionService")
 
 local function IsFriendly(player)
     if player == LocalPlayer then
@@ -3476,9 +3478,6 @@ spawn(function()
         end
     end
 end)
-
-local Players = game:GetService("Players")
-local CollectionService = game:GetService("CollectionService")
 
 local LocalPlayer = Players.LocalPlayer
 
