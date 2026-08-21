@@ -3537,8 +3537,6 @@ if string.lower(identifyexecutor()) == "delta" then
         local args = {...}
         
         if method == "FireServer" and self.Name == "RemoteEvent" and _G.Buuut == true then
-            local lplayer = game:GetService("Players").LocalPlayer
-            if lplayer.Character and self:IsDescendantOf(lplayer.Character) then
                 if typeof(args[1]) == "Vector3" then
                     args[1] = targetPos
                     
@@ -3552,7 +3550,6 @@ if string.lower(identifyexecutor()) == "delta" then
                 end
                 
                 return oldNamecall(self, unpack(args))
-            end
         end
 
         return oldNamecall(game, ...)
