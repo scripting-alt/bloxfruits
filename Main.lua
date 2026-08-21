@@ -1714,6 +1714,7 @@ Tab_Discord:AddDiscordInvite({
 })
 Tab_Discord:AddParagraph("Version:", ScriptVersion.Version)
 Tab_Discord:AddParagraph("Date:", ScriptVersion.Date)
+Tab_Discord:AddParagraph("Executor:", identifyexecutor() or "Unknown")
 
 Tab_Farm:AddDropdown({
   Name = "Select Tool",
@@ -2191,8 +2192,8 @@ elseif World2 then
                     end
                 })
 elseif World3 then
-    Tab_Quests:AddSection("Elite Hunter")
-    EliteHunterKill = Tab_Quests:AddParagraph("Progress", "Algo")
+    Tab_Quests:AddSection("Elite Hunter & Cake Prince")
+    EliteHunterKill = Tab_Quests:AddParagraph("Progress", "Loading")
     Tab_Quests:AddToggle({
               Name = "Auto Elite Hunter",
               Default = false,
@@ -2203,6 +2204,18 @@ elseif World3 then
                 stopTeleport()
               end
             })
+
+    CakePrinceProgress = Tab_Quests:AddParagraph("Defeat Enimies", "Loading")
+    Tab_Quests:AddToggle({
+              Name = "Auto Cake Prince",
+              Default = false,
+              Flag = "CakePrince_Flags",
+              Callback = function(Value)
+                _G.AutoCakePrince = Value
+                stopTeleport()
+              end
+            })
+
     Tab_Quests:AddSection("Dragon Dojo")
     Tab_Quests:AddToggle({
               Name = "Auto Dragon Hunter",
