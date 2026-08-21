@@ -2,8 +2,8 @@
 local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/tlredz/Library/refs/heads/main/redz-V5-remake/main.luau"))()
 
 ScriptVersion = {
-    Version = "v1.2.3",
-    Date = "2026-08-15"
+    Version = "v1.3.6",
+    Date = "2026-08-21"
 }
 
 _G.SelectTool = "Melee"
@@ -3533,27 +3533,29 @@ local targetPos = Vector3.new(0, 0, 0)
 if string.lower(identifyexecutor()) == "delta" then
     local oldNamecall
     oldNamecall = hookmetamethod(game, "__namecall", function(self, ...)
-    local method = getnamecallmethod()
-    local args = {...}
-    if method == "FireServer" and self.Name == "RemoteEvent" then
-        local lplayer = game:GetService("Players").LocalPlayer
-        if lplayer.Character and self:IsDescendantOf(lplayer.Character) then
-            if typeof(args[1]) == "Vector3" then
-                local novoVector3 = targetPos
-                args[1] = novoVector3
-                
-                if _G.DebugLog then
-                    debug("Novo Vector3:", tostring(args[1]))
+        local method = getnamecallmethod()
+        local args = {...}
+        
+        if method == "FireServer" and self.Name == "RemoteEvent" and _G.Buuut == true then
+            local lplayer = game:GetService("Players").LocalPlayer
+            if lplayer.Character and self:IsDescendantOf(lplayer.Character) then
+                if typeof(args[1]) == "Vector3" then
+                    args[1] = targetPos
+                    
+                    if _G.DebugLog then
+                        print("Novo Vector3 enviado:", tostring(args[1]))
+                    end
+                else
+                    if _G.DebugLog then
+                        print("O evento enviou outra coisa (como bool), ignorando modificação.")
+                    end
                 end
-            else
-                debug("O evento enviou outra coisa (como bool), ignorando modificação.")
+                
+                return oldNamecall(self, unpack(args))
             end
-            
-            return oldNamecall(self, unpack(args))
         end
-    end
 
-    return oldNamecall(game, ...)
+        return oldNamecall(game, ...)
     end)
 end
 
@@ -3561,10 +3563,11 @@ task.spawn(function()
     while task.wait() do
         local Target = GetNearestEnemy()
         if Target then
-           targetPos = Target.Position
+            targetPos = Target.Position 
         end
     end
 end)
+
 
 task.spawn(function()
     while task.wait() do
