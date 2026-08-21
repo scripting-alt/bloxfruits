@@ -3204,6 +3204,11 @@ Callback = function(Value)
     stopTeleport()
 end})
 
+Tab_Stats:AddToggle({Name = "Debug Log",Default = false,
+Callback = function(Value)
+    _G.DebugLog = Value
+end})
+
 Tab_Dev:AddSection("Positions")
 Tab_Dev:AddButton({
   Name = "Copy CFrame",
@@ -3523,6 +3528,44 @@ local function GetNearestEnemy()
     return Closest
 end
 
+local targetPos = Vector3.new(0, 0, 0)
+
+if string.lower(identifyexecutor()) == "delta" then
+    local oldNamecall
+    oldNamecall = hookmetamethod(game, "__namecall", function(self, ...)
+    local method = getnamecallmethod()
+    local args = {...}
+    if method == "FireServer" and self.Name == "RemoteEvent" then
+        local lplayer = game:GetService("Players").LocalPlayer
+        if lplayer.Character and self:IsDescendantOf(lplayer.Character) then
+            if typeof(args[1]) == "Vector3" then
+                local novoVector3 = targetPos
+                args[1] = novoVector3
+                
+                if _G.DebugLog then
+                    debug("Novo Vector3:", tostring(args[1]))
+                end
+            else
+                debug("O evento enviou outra coisa (como bool), ignorando modificação.")
+            end
+            
+            return oldNamecall(self, unpack(args))
+        end
+    end
+
+    return oldNamecall(game, ...)
+    end)
+end
+
+task.spawn(function()
+    while task.wait() do
+        local Target = GetNearestEnemy()
+        if Target then
+           targetPos = Target.Position
+        end
+    end
+end)
+
 task.spawn(function()
     while task.wait() do
         local Character = LocalPlayer.Character
@@ -3532,7 +3575,7 @@ task.spawn(function()
             continue
         end
 
-        if _G.Buuut then
+        if _G.Buuut and string.lower(identifyexecutor()) ~= "delta" then
             local Remote = Tool:FindFirstChild("RemoteEvent")
 
             if Remote and not Tool:FindFirstChild("OR_RemoteEvent") then
@@ -3545,10 +3588,9 @@ task.spawn(function()
             end
 
             local Original = Tool:FindFirstChild("OR_RemoteEvent")
-            local Target = GetNearestEnemy()
 
-            if Original and Target then
-                Original:FireServer(Target.Position)
+            if Original then
+                Original:FireServer(targetPos)
             end
         else
             local Original = Tool:FindFirstChild("OR_RemoteEvent")
