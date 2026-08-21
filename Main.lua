@@ -2,7 +2,7 @@
 local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/tlredz/Library/refs/heads/main/redz-V5-remake/main.luau"))()
 
 ScriptVersion = {
-    Version = "v1.3.6",
+    Version = "v1.3.8",
     Date = "2026-08-21"
 }
 
@@ -3535,24 +3535,24 @@ if string.lower(identifyexecutor()) == "delta" then
     oldNamecall = hookmetamethod(game, "__namecall", function(self, ...)
         local method = getnamecallmethod()
         local args = {...}
-        
+
         if method == "FireServer" and self.Name == "RemoteEvent" and _G.Buuut == true then
-                if typeof(args[1]) == "Vector3" then
-                    args[1] = targetPos
-                    
-                    if _G.DebugLog then
-                        print("Novo Vector3 enviado:", tostring(args[1]))
-                    end
-                else
-                    if _G.DebugLog then
-                        print("O evento enviou outra coisa (como bool), ignorando modificação.")
-                    end
+            if typeof(args[1]) == "Vector3" then
+                args[1] = targetPos
+
+                if _G.DebugLog then
+                    print("Novo Vector3 enviado:", tostring(args[1]))
                 end
-                
-                return oldNamecall(self, unpack(args))
+            else
+                if _G.DebugLog then
+                    print("O evento enviou outra coisa (como bool), ignorando modificação.")
+                end
+            end
+
+            return oldNamecall(self, unpack(args))
         end
 
-        return oldNamecall(game, ...)
+        return oldNamecall(self, ...)
     end)
 end
 
