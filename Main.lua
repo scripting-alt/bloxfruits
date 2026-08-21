@@ -2,7 +2,7 @@
 local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/tlredz/Library/refs/heads/main/redz-V5-remake/main.luau"))()
 
 ScriptVersion = {
-    Version = "v1.4.9",
+    Version = "v1.5.1",
     Date = "2026-08-21"
 }
 
@@ -3532,6 +3532,7 @@ local targetPos = Vector3.new(0, 0, 0)
 
 if string.lower(identifyexecutor()) == "delta" then
     local oldNamecall
+
     oldNamecall = hookmetamethod(game, "__namecall", function(self, ...)
         local method = getnamecallmethod()
         local args = {...}
@@ -3557,7 +3558,6 @@ if string.lower(identifyexecutor()) == "delta" then
         return oldNamecall(self, ...)
     end)
 end
-
 
 task.spawn(function()
     while task.wait() do
