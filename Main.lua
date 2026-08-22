@@ -2,7 +2,7 @@
 local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/tlredz/Library/refs/heads/main/redz-V5-remake/main.luau"))()
 
 ScriptVersion = {
-    Version = "v1.6.6",
+    Version = "v1.6.8",
     Date = "2026-08-21"
 }
 
@@ -2783,7 +2783,7 @@ RacesPosition = {
     Shark = CFrame.new(28226.072265625, 14890.697265625, -211.45651245117188),
     Cyborg = CFrame.new(28493.044921875, 14895.697265625, -422.6650695800781),
     Mink = CFrame.new(29020.697265625, 14890.6962890625, -379.93170166015625),
-    Angel = CFrame.new(28967.095703125, 14919.345703125, 234.77899169921875),
+    Skypiea = CFrame.new(28967.095703125, 14919.345703125, 234.77899169921875),
     Ghoul = CFrame.new(28673.291015625, 14890.3984375, 454.6794738769531),
     Human = CFrame.new(29237.494140625, 14890.697265625, -206.47254943847656),
     EnterPos = CFrame.new(3032.92626953125, 2281.52880859375, -7326.8896484375),
@@ -2799,12 +2799,12 @@ task.spawn(function()
         if _G.QuestV4 then
             if race.Value == "Mink" then
                 local StartPoint = Workspace:FindFirstChild("StartPoint", true)
-                if StartPoint then
+                if StartPoint and (hrp.Position - Target.Position).Magnitude < 500 then
                     topos(StartPoint.CFrame * CFrame.new(0, 3, 0))
                 end
-            elseif race.Value == "Angel" then
-                local Target = game:GetService("Workspace").Map:FindFirstChild("snowisland_Cylinder.081", true)
-                if Target then
+            elseif race.Value == "Skypiea" then
+                local Target = game:GetService("Workspace"):FindFirstChild("FinishPart", true)
+                if Target and (hrp.Position - Target.Position).Magnitude < 500 then
                     topos(Target.CFrame)
                 end
             elseif race.Value == "Ghoul" or race.Value == "Human" then 
