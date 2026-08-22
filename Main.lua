@@ -3680,6 +3680,7 @@ local function GetNearestEnemy()
 end
 
 local targetPos = Vector3.new(0, 0, 0)
+local targetSelect = nil
 
 if string.lower(identifyexecutor()) == "delta" then
     local oldNamecall
@@ -3704,6 +3705,7 @@ if string.lower(identifyexecutor()) == "delta" then
                     if typeof(args[1]) == "Vector3" then
                         args[1] = targetPos
                     end
+                    args[2] = {targetSelect}
 
                     return oldNamecall(self, unpack(args))
                 end
@@ -3726,6 +3728,7 @@ task.spawn(function()
     while task.wait() do
         local Target = GetNearestEnemy()
         if Target then
+            targetSelect = Target
             targetPos = Target.Position 
         end
     end
