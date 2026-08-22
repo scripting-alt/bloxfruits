@@ -2,7 +2,7 @@
 local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/tlredz/Library/refs/heads/main/redz-V5-remake/main.luau"))()
 
 ScriptVersion = {
-    Version = "v1.5.1",
+    Version = "v1.5.4",
     Date = "2026-08-21"
 }
 
@@ -2761,6 +2761,58 @@ spawn(function()
     end
 end)
 
+Tab_Race:AddSection("Auto Race V4")
+
+Tab_Race:AddToggle({
+  Name = "Auto Quest V4",
+  Default = false,
+  Callback = function(Value)
+    _G.QuestV4 = Value
+  end
+})
+
+Tab_Race:AddToggle({
+  Name = "Auto Doors Race",
+  Default = false,
+  Callback = function(Value)
+    _G.DoorsRace = Value
+  end
+})
+
+RacesPosition = {
+    Shark = CFrame.new(28226.072265625, 14890.697265625, -211.45651245117188),
+    Cyborg = CFrame.new(28493.044921875, 14895.697265625, -422.6650695800781),
+    Mink = CFrame.new(29020.697265625, 14890.6962890625, -379.93170166015625),
+    Angel = CFrame.new(28967.095703125, 14919.345703125, 234.77899169921875),
+    Ghoul = CFrame.new(28673.291015625, 14890.3984375, 454.6794738769531),
+    Human = CFrame.new(29237.494140625, 14890.697265625, -206.47254943847656),
+    EnterPos = CFrame.new(3032.92626953125, 2281.52880859375, -7326.8896484375),
+}
+
+task.spawn(function()
+    while wait() do
+        local player = game.Players.LocalPlayer
+        local char = player.Character
+        local hrp = char and char:FindFirstChild("HumanoidRootPart")
+        local race = player:WaitForChild("Data"):WaitForChild("Race")
+
+        if _G.QuestV4 then
+            
+        end
+
+        if _G.DoorsRace and race.Value ~= "" then
+            if workspace.Map:FindFirstChild("Temple of Time") then
+                local center = workspace.Map:FindFirstChild("Temple of Time"):FindFirstChild("Center")
+                if center and (hrp.Position - center.Position).Magnitude < 1000 then
+                    topos(RacesPosition[race.Value])
+                else
+                    topos(RacesPosition["EnterPos"])
+                    game.ReplicatedStorage.Remotes.CommF_:InvokeServer("RaceV4Progress", "Teleport")
+                end
+            end
+        end
+    end
+end)
 
 Tab_Fishing:AddSection("Fishing")
 
@@ -2768,6 +2820,45 @@ Tab_Fishing:AddButton({
   Name = "Save Position",
   Callback = function()
     _G.FishingPos = game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame
+  end
+})
+
+Tab_Shop:AddSection("Reset Stats , Random Race")
+Tab_Shop:AddButton({
+  Name = "Buy Random Race 3,000F",
+  Debounce = 0.5,
+  Callback = function()
+    game:GetService('ReplicatedStorage').Remotes.CommF_:InvokeServer('BlackbeardReward', 'Reroll', '1')
+    game:GetService('ReplicatedStorage').Remotes.CommF_:InvokeServer('BlackbeardReward', 'Reroll', '2')
+  end
+})
+Tab_Shop:AddButton({
+  Name = "Buy Cyborg Race 2,500F",
+  Debounce = 0.5,
+  Callback = function()
+    game:GetService('ReplicatedStorage').Remotes.CommF_:InvokeServer(unpack({
+            'CyborgTrainer',
+            'Buy',
+        }))
+  end
+})
+Tab_Shop:AddButton({
+  Name = "Buy Ghoul Race",
+  Debounce = 0.5,
+  Callback = function()
+    game:GetService('ReplicatedStorage').Remotes.CommF_:InvokeServer(unpack({
+            'Ectoplasm',
+            'Change',
+            4,
+        }))
+  end
+})
+Tab_Shop:AddButton({
+  Name = "Buy Reset Stats 2,500F",
+  Debounce = 0.5,
+  Callback = function()
+    game:GetService('ReplicatedStorage').Remotes.CommF_:InvokeServer('BlackbeardReward', 'Refund', '1')
+    game:GetService('ReplicatedStorage').Remotes.CommF_:InvokeServer('BlackbeardReward', 'Refund', '2')
   end
 })
 
@@ -2941,6 +3032,39 @@ Tab_Misc:AddToggle({
   Default = true,
   Callback = function(Value)
     _G.AntiAFK = Value
+  end
+})
+
+Tab_Misc:AddButton({
+  Name = "FPS Boost",
+  Debounce = 0.5,
+  Callback = function()
+    _G.Settings = {
+        Players = {
+            ["Ignore Me"] = true, -- Ignore your Character
+            ["Ignore Others"] = true -- Ignore other Characters
+        },
+        Meshes = {
+            Destroy = false, -- Destroy Meshes
+            LowDetail = true -- Low detail meshes (NOT SURE IT DOES ANYTHING)
+        },
+        Images = {
+            Invisible = true, -- Invisible Images
+            LowDetail = false, -- Low detail images (NOT SURE IT DOES ANYTHING)
+            Destroy = false, -- Destroy Images
+        },
+        Other = {
+            ["No Particles"] = true, -- Disables all ParticleEmitter, Trail, Smoke, Fire and Sparkles
+            ["No Camera Effects"] = true, -- Disables all PostEffect's (Camera/Lighting Effects)
+            ["No Explosions"] = true, -- Makes Explosion's invisible
+            ["No Clothes"] = true, -- Removes Clothing from the game
+            ["Low Water Graphics"] = true, -- Removes Water Quality
+            ["No Shadows"] = true, -- Remove Shadows
+            ["Low Rendering"] = true, -- Lower Rendering
+            ["Low Quality Parts"] = true -- Lower quality parts
+        }
+    }
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/CasperFlyModz/discord.gg-rips/main/FPSBooster.lua"))()
   end
 })
 
