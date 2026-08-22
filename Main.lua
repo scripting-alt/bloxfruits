@@ -2,7 +2,7 @@
 local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/tlredz/Library/refs/heads/main/redz-V5-remake/main.luau"))()
 
 ScriptVersion = {
-    Version = "v1.5.4",
+    Version = "v1.6.4",
     Date = "2026-08-21"
 }
 
@@ -2764,18 +2764,18 @@ end)
 Tab_Race:AddSection("Auto Race V4")
 
 Tab_Race:AddToggle({
-  Name = "Auto Quest V4",
-  Default = false,
-  Callback = function(Value)
-    _G.QuestV4 = Value
-  end
-})
-
-Tab_Race:AddToggle({
   Name = "Auto Doors Race",
   Default = false,
   Callback = function(Value)
     _G.DoorsRace = Value
+  end
+})
+
+Tab_Race:AddToggle({
+  Name = "Auto Quest V4",
+  Default = false,
+  Callback = function(Value)
+    _G.QuestV4 = Value
   end
 })
 
@@ -2797,7 +2797,31 @@ task.spawn(function()
         local race = player:WaitForChild("Data"):WaitForChild("Race")
 
         if _G.QuestV4 then
-            
+            if race.Value == "Mink" then
+                local StartPoint = Workspace:FindFirstChild("StartPoint", true)
+                if StartPoint then
+                    topos(StartPoint.CFrame * CFrame.new(0, 3, 0))
+                end
+            elseif race.Value == "Angel" then
+                local Target = game:GetService("Workspace").Map:FindFirstChild("snowisland_Cylinder.081", true)
+                if Target then
+                    topos(Target.CFrame)
+                end
+            elseif race.Value == "Ghoul" or race.Value == "Human" then 
+                for _, enemy in pairs(game.Workspace.Enemies:GetChildren()) do
+                    local humanoid = enemy:FindFirstChild("Humanoid")
+                    local rootPart = enemy:FindFirstChild("HumanoidRootPart")
+                    if humanoid and rootPart and humanoid.Health > 0 then
+                        pcall(function()
+                            repeat
+                                task.wait(0.1)
+                                humanoid.Health = 0
+                                rootPart.CanCollide = false
+                            until not _G.QuestV4 or not enemy.Parent or humanoid.Health <= 0
+                        end)
+                    end
+                end
+            end
         end
 
         if _G.DoorsRace and race.Value ~= "" then
@@ -2809,6 +2833,9 @@ task.spawn(function()
                     topos(RacesPosition["EnterPos"])
                     game.ReplicatedStorage.Remotes.CommF_:InvokeServer("RaceV4Progress", "Teleport")
                 end
+            else
+                topos(RacesPosition["EnterPos"])
+                game.ReplicatedStorage.Remotes.CommF_:InvokeServer("RaceV4Progress", "Teleport")
             end
         end
     end
@@ -3662,12 +3689,24 @@ if string.lower(identifyexecutor()) == "delta" then
         local args = {...}
 
         if _G.Buuut == true then
-            if method == "FireServer" and self.Name == "RemoteEvent" then
-                if typeof(args[1]) == "Vector3" then
-                    args[1] = targetPos
+            if method == "FireServer" then
+                if self.Name == "RemoteEvent" then
+                    if typeof(args[1]) == "Vector3" then
+                        args[1] = targetPos
+                    elseif args[1] == "TAP" and typeof(args[2]) == "Vector3" then
+                        args[2] = targetPos
+                    end
+
+                    return oldNamecall(self, unpack(args))
                 end
 
-                return oldNamecall(self, unpack(args))
+                if self.Name == "RE/ShootGunEvent" then
+                    if typeof(args[1]) == "Vector3" then
+                        args[1] = targetPos
+                    end
+
+                    return oldNamecall(self, unpack(args))
+                end
             end
 
             if method == "InvokeServer" and self.Name == "" then
