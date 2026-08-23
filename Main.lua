@@ -2799,7 +2799,7 @@ task.spawn(function()
         if _G.QuestV4 then
             if race.Value == "Mink" then
                 local StartPoint = Workspace:FindFirstChild("StartPoint", true)
-                if StartPoint and (hrp.Position - Target.Position).Magnitude < 500 then
+                if StartPoint and (hrp.Position - StartPoint.Position).Magnitude < 500 then
                     topos(StartPoint.CFrame * CFrame.new(0, 3, 0))
                 end
             elseif race.Value == "Skypiea" then
