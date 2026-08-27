@@ -6,7 +6,7 @@ Library:AddTranslations("en", {})
 Library:UpdateTranslate("pt")
 
 ScriptVersion = {
-    Version = "v1.7.5",
+    Version = "v1.7.9",
     Date = "2026-08-21"
 }
 
@@ -3879,59 +3879,57 @@ if string.lower(identifyexecutor()) == "delta" then
 end
 
 local P, RS, LP, Cam = game:GetService("Players"), game:GetService("RunService"), game:GetService("Players").LocalPlayer, workspace.CurrentCamera
-local L = Drawing.new("Line"); L.Thickness, L.Color, L.Visible = 1.5, Color3.new(1,0,0), false
-
-local P, RS, LP, Cam = game:GetService("Players"), game:GetService("RunService"), game:GetService("Players").LocalPlayer, workspace.CurrentCamera
-local L = Drawing.new("Line"); L.Thickness, L.Color, L.Visible = 1.5, Color3.new(1,0,0), false
+local L = Drawing.new("Line")
+L.Thickness = 1.5
+L.Color = Color3.new(1, 0, 0)
+L.Visible = false
 
 task.spawn(function()
     while task.wait() do
+        local drawLine = false
+
         if _G.Buuut then
             local Target, CharClosest = GetNearestEnemy()
-            if Target then
+            if Target and CharClosest then
                 targetSelect = CharClosest
                 targetPos = Target.Position
             else
                 targetSelect = nil
-                targetPos = Vector3.new(0, 0, 0)
+                targetPos = Vector3.zero
             end
 
             if _G.BuuutTracer and targetSelect then
                 local myChar = LP.Character
                 local myHead = myChar and myChar:FindFirstChild("Head")
-                local enemyHead = targetSelect and targetSelect:FindFirstChild("Head")
-                
-                if myHead then
+                local enemyHead = targetSelect:FindFirstChild("Head")
+
+                if myHead and enemyHead then
                     local viewportSize = Cam.ViewportSize
-                    local myScreenPos, myVisible = Cam:WorldToViewportPoint(myHead.Position)
-                    local enemyScreenPos, enemyVisible = Cam:WorldToViewportPoint(enemyHead)
+                    local myScreenPos = Cam:WorldToViewportPoint(myHead.Position)
+                    local enemyScreenPos, enemyVisible = Cam:WorldToViewportPoint(enemyHead.Position)
+
                     L.From = Vector2.new(myScreenPos.X, myScreenPos.Y)
-                    
+
                     if enemyVisible then
                         L.To = Vector2.new(enemyScreenPos.X, enemyScreenPos.Y)
                     else
-                        local dir = (Vector2.new(enemyScreenPos.X, enemyScreenPos.Y) - L.From).Unit
                         local clampedX = math.clamp(enemyScreenPos.X, 0, viewportSize.X)
                         local clampedY = math.clamp(enemyScreenPos.Y, 0, viewportSize.Y)
-    
+
                         if enemyScreenPos.Z < 0 then
                             clampedX = viewportSize.X - clampedX
                             clampedY = viewportSize.Y - clampedY
                         end
-                        
+
                         L.To = Vector2.new(clampedX, clampedY)
                     end
-                    
-                    L.Visible = true
-                else
-                    L.Visible = false
+
+                    drawLine = true
                 end
-            else
-                L.Visible = false
             end
-        else
-            L.Visible = false
         end
+
+        L.Visible = drawLine
     end
 end)
 
