@@ -3395,6 +3395,67 @@ Tab_Dev:AddButton({
   end
 })
 
+local ButtonManager = loadstring(game:HttpGet("https://raw.githubusercontent.com/scripting-alt/bloxfruits/refs/heads/main/utils/ButtonsModule.lua"))()
+
+local TeleportPositions = {
+    Sea1 = {
+        Vector3.new(-7894, 5547, -380),
+        Vector3.new(-4607, 874, -1667),
+        Vector3.new(61163, 11, 1819),
+        Vector3.new(61165.19, 0.18, 1897.37),
+        Vector3.new(-1242.46, 4.78, 3901.28),
+        Vector3.new(4050, -1, -1814)
+    },
+    Sea2 = {
+        Vector3.new(-390, 332, 673),
+        Vector3.new(2285, 15, 905),
+        Vector3.new(923, 126, 32852),
+        Vector3.new(-6509, 83, -133)
+    },
+    Sea3 = {
+        Vector3.new(-12462, 375, -7552),
+        Vector3.new(5660.03, 1013.26, -337.93),
+        Vector3.new(-5036, 315, -3179),
+        Vector3.new(-2097.34, 4776.24, -15013.49),
+        Vector3.new(28286, 14897, 103)
+    }
+}
+
+Tab_Pvp:AddToggle({
+    Name = "Random Teleport",
+    Default = false,
+    Callback = function(Value)
+        local btn = ButtonManager.GetButton("RTPBtn")
+        if Value then
+            if btn and btn.Exist then
+                btn:Show()
+            else
+                ButtonManager.new({
+                    Name = "RTPBtn",
+                    Text = "Random TP",
+                    Size = UDim2.new(0, 100, 0, 45),
+                    Position = UDim2.new(0.1, 0, 0.3, 0),
+                    BackgroundColor = Color3.fromRGB(79, 70, 229),
+                    Drag = true,
+                    OnClick = function()
+                        local currentSea = type(WorldSea) == "string" and WorldSea or "Sea1"
+                        local positions = TeleportPositions[currentSea]
+                        
+                        if positions and #positions > 0 then
+                            local randomPos = positions[math.random(1, #positions)]
+                            game:GetService("ReplicatedStorage").Remotes.CommF_:InvokeServer("requestEntrance",randomPos)
+                        end
+                    end
+                })
+            end
+        else
+            if btn and btn.Exist then
+                btn:Hide()
+            end
+        end
+    end
+})
+
 Tab_Pvp:AddSection("Aimbot")
 Tab_Pvp:AddToggle({Name = "Aimbot",Default = false,
 Callback = function(Value)
