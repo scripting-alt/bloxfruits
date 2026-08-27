@@ -8,7 +8,7 @@ return {
     ["Distance Aimbot"] = "Distância do Aimbot",
     ["Aimbot Target Players"] = "Aimbot Mira em Jogadores"
     ["Aimbot Target Mobs"] = "Aimbot Mira em Inimigos"
-    ["Aimbot Tracer"] = "Aimbot Linha"
+    ["Aimbot Tracer"] = "Aimbot Linha",
     ["Fast Attack"] = "Ataque Rápido",
     ["Fast Attack Speed"] = "Velocidade do Ataque Rápido",
 
