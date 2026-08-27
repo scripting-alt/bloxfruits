@@ -25,11 +25,19 @@ return {
     ["Misc"] = "Diversos",
 
     ["Berries"] = "Bagas",
+    ["Auto Collect Berry"] = "Coleta Automática de Bagas",
     ["Automatically collects the nearest berry bush"] = "Coleta automaticamente o arbusto de bagas mais próximo",
 
     ["Fruits"] = "Frutas",
     ["Auto Storage Fruits"] = "Armazenamento Automático de Frutas",
     ["Get Fruits"] = "Pegar Frutas",
     ["Auto Random Fruit"] = "Fruta Aleatória Automática",
-    
+
+    ["Teams"] = "Times",
+    ["Join Pirates Team"] = "Entrar no Time dos Piratas",
+    ["Join Marines Team"] = "Entrar no Time da Marinha",
+
+    ["Server"] = "Servidor",
+    ["Rejoin Server"] = "Reentrar no Servidor",
+
 }

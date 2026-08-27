@@ -2969,6 +2969,15 @@ Tab_Misc:AddToggle({
   end
 })
 
+Tab_Misc:AddToggle({
+  Name = "Infinite Flashstep",
+  Default = false,
+  Flag = "infiniteFlashstep_flag",
+  Callback = function(Value)
+    _G.InfiniteFlashstep = Value
+  end
+})
+
 Tab_Misc:AddSlider({
   Name = "Walk Speed",
   Min = 1,
@@ -3013,6 +3022,11 @@ spawn(function()
                 game.Players.LocalPlayer.Character:SetAttribute("SkyjumpBoost",9999)
             else
                 game.Players.LocalPlayer.Character:SetAttribute("SkyjumpBoost",0)
+            end
+            if _G.InfiniteFlashstep then
+                game.Players.LocalPlayer.Character:SetAttribute("FlashstepCooldown",9999)
+            else
+                game.Players.LocalPlayer.Character:SetAttribute("FlashstepCooldown",0)
             end
             if game.Players.LocalPlayer.Character and game.Players.LocalPlayer.Character:FindFirstChild("Humanoid") then
                 game.Players.LocalPlayer.Character.Humanoid.JumpPower = _G.JumpPower
@@ -3515,6 +3529,14 @@ Tab_Pvp:AddToggle({Name = "Aimbot",Default = false,
 Callback = function(Value)
     _G.Buuut = Value
 end})
+Tab_Pvp:AddToggle({Name = "Aimbot Target Players",Default = true,Flag = "targetPlayer_flag",
+Callback = function(Value)
+    _G.BuuutPlayers = Value
+end})
+Tab_Pvp:AddToggle({Name = "Aimbot Target Mobs",Default = true,Flag = "targetMob_flag",
+Callback = function(Value)
+    _G.BuuutMobs = Value
+end})
 
 Tab_Pvp:AddSlider({
   Name = "Distance Aimbot",
@@ -3761,22 +3783,36 @@ local LocalPlayer = Players.LocalPlayer
 local function GetNearestEnemy()
     local Character = LocalPlayer.Character
     local Root = Character and Character:FindFirstChild("HumanoidRootPart")
-    if not Root then
-        return
-    end
+    if not Root then return nil end
 
     local Closest, Distance = nil, _G.DistanceBuuut or math.huge
+    local Targets = {}
 
-    for _, Player in ipairs(Players:GetPlayers()) do
-        if not IsFriendly(Player) then
-            local Char = Player.Character
-            local Hum = Char and Char:FindFirstChild("Humanoid")
-            local HRP = Char and Char:FindFirstChild("HumanoidRootPart")
+    if _G.BuuutPlayers then
+        for _, v in ipairs(Players:GetPlayers()) do
+            if v ~= LocalPlayer then
+                table.insert(Targets, v)
+            end
+        end
+    end
+
+    if _G.BuuutMobs and workspace:FindFirstChild("Enemies") then
+        for _, v in ipairs(workspace.Enemies:GetChildren()) do
+            table.insert(Targets, v)
+        end
+    end
+
+    for _, Entity in ipairs(Targets) do
+        local Char = Entity:IsA("Player") and Entity.Character or Entity
+        
+        if Char and not IsFriendly(Entity) then
+            local Hum = Char:FindFirstChildOfClass("Humanoid")
+            local HRP = Char:FindFirstChild("HumanoidRootPart") or Char:FindFirstChild("PrimaryPart")
 
             if Hum and Hum.Health > 0 and HRP then
                 local Magnitude = (HRP.Position - Root.Position).Magnitude
 
-                if Magnitude <= Distance then
+                if Magnitude < Distance then
                     Distance = Magnitude
                     Closest = HRP
                 end
@@ -3797,7 +3833,7 @@ if string.lower(identifyexecutor()) == "delta" then
         local method = getnamecallmethod()
         local args = {...}
 
-        if _G.Buuut == true then
+        if _G.Buuut == true and targetSelect then
             if method == "FireServer" then
                 if self.Name == "RemoteEvent" then
                     if typeof(args[1]) == "Vector3" then
@@ -3837,7 +3873,10 @@ task.spawn(function()
         local Target = GetNearestEnemy()
         if Target then
             targetSelect = Target
-            targetPos = Target.Position 
+            targetPos = Target.Position
+        else
+            targetSelect = nil
+            targetPos = Vector3.new(0, 0, 0)
         end
     end
 end)
@@ -3852,7 +3891,7 @@ task.spawn(function()
             continue
         end
 
-        if _G.Buuut and string.lower(identifyexecutor()) ~= "delta" then
+        if _G.Buuut and targetSelect and string.lower(identifyexecutor()) ~= "delta" then
             local Remote = Tool:FindFirstChild("RemoteEvent")
 
             if Remote and not Tool:FindFirstChild("OR_RemoteEvent") then
