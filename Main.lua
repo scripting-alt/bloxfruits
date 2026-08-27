@@ -3881,7 +3881,7 @@ task.spawn(function()
     end
 end)
 
-
+--
 task.spawn(function()
     while task.wait() do
         local Character = LocalPlayer.Character

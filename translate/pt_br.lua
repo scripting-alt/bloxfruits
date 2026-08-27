@@ -41,3 +41,5 @@ return {
     ["Rejoin Server"] = "Reentrar no Servidor",
 
 }
+
+--
