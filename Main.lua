@@ -1,8 +1,12 @@
 
-local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/tlredz/Library/refs/heads/main/redz-V5-remake/main.luau"))()
+local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/scripting-alt/bloxfruits/refs/heads/main/library.luau"))()
+Library:AddTranslations("pt", {
+    ["Auto Farm Level"] = "Farm Nível Automático",
+})
+Library.Translations["pt"]
 
 ScriptVersion = {
-    Version = "v1.6.8",
+    Version = "v1.6.9",
     Date = "2026-08-21"
 }
 
@@ -1647,7 +1651,7 @@ spawn(function()
                             break
                         end
 
-                        topos(EnemyHRP.CFrame * Pos, 500)
+                        topos(EnemyHRP.CFrame * Pos, 280)
                         AutoHaki()
                         EquipWeapon(_G.SelectTool)
                         BringPos = EnemyHRP.CFrame
