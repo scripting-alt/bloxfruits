@@ -28,7 +28,7 @@ return {
     ["Automatically collects the nearest berry bush"] = "Coleta automaticamente o arbusto de bagas mais próximo",
 
     ["Fruits"] = "Frutas",
-    ["Auto Storage Fruits"] = "Armazenamento Automático de Frutas"
+    ["Auto Storage Fruits"] = "Armazenamento Automático de Frutas",
     ["Get Fruits"] = "Pegar Frutas",
     ["Auto Random Fruit"] = "Fruta Aleatória Automática",
     
