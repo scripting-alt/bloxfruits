@@ -1,10 +1,15 @@
+local Library = loadstring(game:HttpGet(
+    "https://raw.githubusercontent.com/scripting-alt/bloxfruits/refs/heads/main/library.luau"
+))()
 
-local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/scripting-alt/bloxfruits/refs/heads/main/library.luau"))()
-Library:AddTranslations("pt", {
-    ["Auto Farm Level"] = "Farm Nível Automático",
-})
-Library.Translations["pt"]
+local pt_br = loadstring(game:HttpGet(
+    "https://raw.githubusercontent.com/scripting-alt/bloxfruits/refs/heads/main/translate/pt_br.lua"
+))()
 
+Library:AddTranslations("pt", pt_br)
+Library:AddTranslations("en", {})
+
+Library.Translations("pt")
 ScriptVersion = {
     Version = "v1.6.9",
     Date = "2026-08-21"
@@ -1775,20 +1780,9 @@ Tab_Farm:AddToggle({
 Tab_Farm:AddToggle({
   Name = "Fast Attack",
   Default = true,
-  Description = "Teste",
   Flag = "fastAttackToggle_flag",
   Callback = function(Value)
     _G.FastAttack = Value
-  end
-})
-
-Tab_Farm:AddToggle({
-  Name = "Fast Attack Fruit",
-  Default = true,
-  Description = "Teste",
-  Flag = "fastAttackFruitToggle_flag",
-  Callback = function(Value)
-    _G.FastAttackFruit = Value
   end
 })
 
