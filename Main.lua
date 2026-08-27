@@ -123,9 +123,13 @@ local function IsFriendly(player)
         return true
     end
 
+    if not player:IsA("Player") then
+        return false
+    end
+
     return CollectionService:HasTag(player, "Ally" .. LocalPlayer.Name)
         or CollectionService:HasTag(LocalPlayer, "Ally" .. player.Name)
-        or (LocalPlayer.Team == game.Teams.Marines and player.Team == game.Teams.Marines)
+        or (LocalPlayer.Team and game:GetService("Teams"):FindFirstChild("Marines") and LocalPlayer.Team == game.Teams.Marines and player.Team == game.Teams.Marines)
 end
 
 local function GetBladeHits()
@@ -3533,9 +3537,14 @@ Tab_Pvp:AddToggle({Name = "Aimbot Target Players",Default = true,Flag = "targetP
 Callback = function(Value)
     _G.BuuutPlayers = Value
 end})
-Tab_Pvp:AddToggle({Name = "Aimbot Target Mobs",Default = true,Flag = "targetMob_flag",
+Tab_Pvp:AddToggle({Name = "Aimbot Target Mobs",Default = false,Flag = "targetMob_flag",
 Callback = function(Value)
     _G.BuuutMobs = Value
+end})
+
+Tab_Pvp:AddToggle({Name = "Aimbot Tracer",Default = false,Flag = "aimbotTracer_flag",
+Callback = function(Value)
+    _G.BuuutTracer = Value
 end})
 
 Tab_Pvp:AddSlider({
@@ -3785,7 +3794,7 @@ local function GetNearestEnemy()
     local Root = Character and Character:FindFirstChild("HumanoidRootPart")
     if not Root then return nil end
 
-    local Closest, Distance = nil, _G.DistanceBuuut or math.huge
+    local Closest, CharClosest, Distance = nil, nil, _G.DistanceBuuut or math.huge
     local Targets = {}
 
     if _G.BuuutPlayers then
@@ -3815,12 +3824,13 @@ local function GetNearestEnemy()
                 if Magnitude < Distance then
                     Distance = Magnitude
                     Closest = HRP
+                    CharClosest = Char
                 end
             end
         end
     end
 
-    return Closest
+    return Closest, CharClosest
 end
 
 local targetPos = Vector3.new(0, 0, 0)
@@ -3868,15 +3878,59 @@ if string.lower(identifyexecutor()) == "delta" then
     end)
 end
 
+local P, RS, LP, Cam = game:GetService("Players"), game:GetService("RunService"), game:GetService("Players").LocalPlayer, workspace.CurrentCamera
+local L = Drawing.new("Line"); L.Thickness, L.Color, L.Visible = 1.5, Color3.new(1,0,0), false
+
+local P, RS, LP, Cam = game:GetService("Players"), game:GetService("RunService"), game:GetService("Players").LocalPlayer, workspace.CurrentCamera
+local L = Drawing.new("Line"); L.Thickness, L.Color, L.Visible = 1.5, Color3.new(1,0,0), false
+
 task.spawn(function()
     while task.wait() do
-        local Target = GetNearestEnemy()
-        if Target then
-            targetSelect = Target
-            targetPos = Target.Position
+        if _G.Buuut then
+            local Target, CharClosest = GetNearestEnemy()
+            if Target then
+                targetSelect = CharClosest
+                targetPos = Target.Position
+            else
+                targetSelect = nil
+                targetPos = Vector3.new(0, 0, 0)
+            end
+
+            if _G.BuuutTracer and targetSelect then
+                local myChar = LP.Character
+                local myHead = myChar and myChar:FindFirstChild("Head")
+                local enemyHead = targetSelect and targetSelect:FindFirstChild("Head")
+                
+                if myHead then
+                    local viewportSize = Cam.ViewportSize
+                    local myScreenPos, myVisible = Cam:WorldToViewportPoint(myHead.Position)
+                    local enemyScreenPos, enemyVisible = Cam:WorldToViewportPoint(enemyHead)
+                    L.From = Vector2.new(myScreenPos.X, myScreenPos.Y)
+                    
+                    if enemyVisible then
+                        L.To = Vector2.new(enemyScreenPos.X, enemyScreenPos.Y)
+                    else
+                        local dir = (Vector2.new(enemyScreenPos.X, enemyScreenPos.Y) - L.From).Unit
+                        local clampedX = math.clamp(enemyScreenPos.X, 0, viewportSize.X)
+                        local clampedY = math.clamp(enemyScreenPos.Y, 0, viewportSize.Y)
+    
+                        if enemyScreenPos.Z < 0 then
+                            clampedX = viewportSize.X - clampedX
+                            clampedY = viewportSize.Y - clampedY
+                        end
+                        
+                        L.To = Vector2.new(clampedX, clampedY)
+                    end
+                    
+                    L.Visible = true
+                else
+                    L.Visible = false
+                end
+            else
+                L.Visible = false
+            end
         else
-            targetSelect = nil
-            targetPos = Vector3.new(0, 0, 0)
+            L.Visible = false
         end
     end
 end)
