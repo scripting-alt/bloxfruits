@@ -1,15 +1,10 @@
-local Library = loadstring(game:HttpGet(
-    "https://raw.githubusercontent.com/scripting-alt/bloxfruits/refs/heads/main/library.luau"
-))()
-
-local pt_br = loadstring(game:HttpGet(
-    "https://raw.githubusercontent.com/scripting-alt/bloxfruits/refs/heads/main/translate/pt_br.lua"
-))()
+local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/scripting-alt/bloxfruits/refs/heads/main/library.luau"))()
+local pt_br = loadstring(game:HttpGet("https://raw.githubusercontent.com/scripting-alt/bloxfruits/refs/heads/main/translate/pt_br.lua"))()
 
 Library:AddTranslations("pt", pt_br)
 Library:AddTranslations("en", {})
+Library:UpdateTranslate("pt")
 
-Library.Translations("pt")
 ScriptVersion = {
     Version = "v1.6.9",
     Date = "2026-08-21"
