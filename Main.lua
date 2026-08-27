@@ -6,7 +6,7 @@ Library:AddTranslations("en", {})
 Library:UpdateTranslate("pt")
 
 ScriptVersion = {
-    Version = "v1.7.0",
+    Version = "v1.7.5",
     Date = "2026-08-21"
 }
 
@@ -3433,7 +3433,7 @@ Tab_Pvp:AddToggle({
                 ButtonManager.new({
                     Name = "RTPBtn",
                     Text = "Random TP",
-                    Size = UDim2.new(0, 100, 0, 45),
+                    Size = UDim2.fromOffset(120,35),
                     Position = UDim2.new(0.1, 0, 0.3, 0),
                     BackgroundColor = Color3.fromRGB(79, 70, 229),
                     Drag = true,
@@ -3452,6 +3452,60 @@ Tab_Pvp:AddToggle({
             if btn and btn.Exist then
                 btn:Hide()
             end
+        end
+    end
+})
+
+local escaping = false
+
+Tab_Pvp:AddToggle({
+    Name = "Escape", Default = false,
+    Callback = function(Value)
+        local btn = ButtonManager.GetButton("EscapeBtn")
+        if Value then
+            if btn and btn.Exist then btn:Show() else
+                ButtonManager.new({
+                    Name = "EscapeBtn", Text = "Escape [OFF]",
+                    Size = UDim2.fromOffset(120, 35), Position = UDim2.new(0.1, 0, 0.4, 0),
+                    BackgroundColor = Color3.fromRGB(79, 70, 229), Drag = true,
+                    IsToggle = true, DefaultToggle = false,
+                    OnToggle = function(state)
+                        local b = ButtonManager.GetButton("EscapeBtn")
+                        if not (b and b.Exist) then return end
+                        b.Text = state and "Escape [ON]" or "Escape [OFF]"
+                        escaping = state
+                        
+                        if state then
+                            task.spawn(function()
+                                while escaping do
+                                    local char = game:GetService("Players").LocalPlayer.Character
+                                    local root = char and char:FindFirstChild("HumanoidRootPart")
+                                    if root then
+                                        local closest, dist = nil, math.huge
+                                        for _, p in ipairs(game:GetService("Players"):GetPlayers()) do
+                                            if p ~= game:GetService("Players").LocalPlayer and not (type(IsFriendly) == "function" and IsFriendly(p)) and p.Character and p.Character:FindFirstChild("HumanoidRootPart") then
+                                                local d = (root.Position - p.Character.HumanoidRootPart.Position).Magnitude
+                                                if d < dist then dist, closest = d, p.Character.HumanoidRootPart end
+                                            end
+                                        end
+                                        if closest and dist <= 500 then
+                                            topos(root.CFrame + Vector3.new(0, (500 - dist) + 20, 0), 280)
+                                        end
+                                    end
+                                    task.wait(0.1)
+                                end
+                            end)
+                        else
+                            stopTeleport()
+                        end
+                    end
+                })
+            end
+        elseif btn and btn.Exist then
+            btn:Hide()
+            escaping = false
+            stopTeleport()
+            btn:SetToggle(false)
         end
     end
 })
