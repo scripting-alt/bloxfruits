@@ -6,7 +6,7 @@ Library:AddTranslations("en", {})
 Library:UpdateTranslate("pt")
 
 ScriptVersion = {
-    Version = "v1.9.0",
+    Version = "v2.0.0",
     Date = "2026-08-21"
 }
 
@@ -240,7 +240,7 @@ local function AttackAll()
     end
 end
 
-function BringMob(MobName)
+function BringMob3(MobName)
     for _, Enemy in ipairs(workspace.Enemies:GetChildren()) do
         local Humanoid = Enemy:FindFirstChild("Humanoid")
         local HumanoidRootPart = Enemy:FindFirstChild("HumanoidRootPart")
@@ -280,6 +280,84 @@ function BringMob(MobName)
            -- sethiddenproperty(plr, "SimulationRadius", math.huge)
 
             Humanoid:ChangeState(11)
+        end
+    end
+end
+
+function BringMob(MobName)
+    local Player = game.Players.LocalPlayer
+    local Character = Player.Character
+    local PlayerRoot = Character and Character:FindFirstChild("HumanoidRootPart")
+
+    if not PlayerRoot then
+        return
+    end
+
+    local NearestNPC = nil
+    local NearestDistance = math.huge
+
+    -- Encontra o NPC mais próximo do jogador
+    for _, Enemy in ipairs(workspace.Enemies:GetChildren()) do
+        if Enemy.Name == MobName then
+            local Humanoid = Enemy:FindFirstChild("Humanoid")
+            local HumanoidRootPart = Enemy:FindFirstChild("HumanoidRootPart")
+
+            if Humanoid
+            and HumanoidRootPart
+            and Humanoid.Health > 0 then
+
+                local Distance = (HumanoidRootPart.Position - PlayerRoot.Position).Magnitude
+
+                if Distance <= _G.BringDistance and Distance < NearestDistance then
+                    NearestDistance = Distance
+                    NearestNPC = Enemy
+                end
+            end
+        end
+    end
+
+    if not NearestNPC then
+        return
+    end
+
+    -- Posição do NPC mais próximo
+    local BringPos = NearestNPC.HumanoidRootPart.CFrame
+
+    -- Puxa todos os NPCs para ele
+    for _, Enemy in ipairs(workspace.Enemies:GetChildren()) do
+        local Humanoid = Enemy:FindFirstChild("Humanoid")
+        local HumanoidRootPart = Enemy:FindFirstChild("HumanoidRootPart")
+
+        if Enemy.Name == MobName
+        and Enemy.Parent
+        and Humanoid
+        and HumanoidRootPart
+        and Humanoid.Health > 0
+        and (HumanoidRootPart.Position - PlayerRoot.Position).Magnitude <= _G.BringDistance then
+
+            HumanoidRootPart.CFrame = BringPos
+            Humanoid.JumpPower = 0
+            Humanoid.WalkSpeed = 0
+            HumanoidRootPart:SetNetworkOwner(Player)
+            HumanoidRootPart.Transparency = 1
+
+            local Head = Enemy:FindFirstChild("Head")
+            if Head then
+                Head.CanCollide = false
+            end
+
+            local Animator = Humanoid:FindFirstChild("Animator")
+            if Animator then
+                Animator:Destroy()
+            end
+
+            if not HumanoidRootPart:FindFirstChild("Lock") then
+                local BodyVelocity = Instance.new("BodyVelocity")
+                BodyVelocity.Name = "Lock"
+                BodyVelocity.Parent = HumanoidRootPart
+                BodyVelocity.MaxForce = Vector3.new(math.huge, math.huge, math.huge)
+                BodyVelocity.Velocity = Vector3.zero
+            end
         end
     end
 end
