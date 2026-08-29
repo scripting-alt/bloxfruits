@@ -113,7 +113,13 @@ Themes=r,
 
 Connections={},
 Options={},
-Tabs={}
+Tabs={},
+
+FarmStatusColors={
+Running="#5CB85C",
+Waiting="#F0AD4E",
+Need="#D9534F"
+}
 }
 
 -- ==========================================================
@@ -163,6 +169,13 @@ s.SetLocale=s.UpdateTranslate
 
 s.Info=s.Information
 s.Save=s.Default
+
+function s:SetFarmStatusColor(aName,aHex)
+	assert(type(aName)=="string","Library.SetFarmStatusColor: 'name' precisa ser string")
+	assert(type(aHex)=="string","Library.SetFarmStatusColor: 'hex' precisa ser string (ex: '#5CB85C')")
+
+	self.FarmStatusColors[aName]=aHex
+end
 
 local t=workspace.CurrentCamera.ViewportSize local u=function(
 
@@ -2436,6 +2449,86 @@ Parent=self,
 Kind="Paragraph"
 },ai)
 end
+
+-- ==========================================================
+-- Farm Details (#Prioridade Nome -> Status/Info)
+-- ==========================================================
+function ah:SetFarmDetail(av)
+if type(av)~="table"then
+error(`"Tab.SetFarmDetail[Configs]". 'table' expected, got {typeof(av)}`,2)
+end
+
+local aw=av[1]or av.Priority or av.ID
+local ax=av[2]or av.Name or av.Title
+local ay=av[3]or av.Status
+local az=av[4]or av.Info or av.Description
+
+assert(type(aw)=="number",`"Tab.SetFarmDetail.Priority". 'number' expected, got {typeof(aw)}`)
+assert(type(ax)=="string",`"Tab.SetFarmDetail.Name". 'string' expected, got {typeof(ax)}`)
+assert(type(ay)=="string",`"Tab.SetFarmDetail.Status". 'string' expected, got {typeof(ay)}`)
+
+if az~=nil and type(az)~="string"then
+error(`"Tab.SetFarmDetail.Info". 'string', or 'nil' expected, got {typeof(az)}`,2)
+end
+
+self.FARM_DETAILS=self.FARM_DETAILS or{}
+
+local aA=`#{aw} {ax}`
+local aB=s.FarmStatusColors[ay]
+local aC=az and`{ay} {az}`or ay
+
+if aB then
+aC=`<font color="{aB}">{aC}</font>`
+end
+
+local aD=self.FARM_DETAILS[aw]
+
+if aD then
+aD:SetTitle(aA)
+aD:SetDescription(aC)
+aD.Priority=aw
+aD.Status=ay
+aD.Info=az
+else
+aD=self:AddParagraph(aA,aC)
+aD.DESTROY_ELEMENT.LayoutOrder=aw
+aD.Priority=aw
+aD.Status=ay
+aD.Info=az
+self.FARM_DETAILS[aw]=aD
+end
+
+return aD
+end
+
+function ah:RemoveFarmDetail(av)
+assert(type(av)=="number",`"Tab.RemoveFarmDetail[param 1]". 'number' expected, got {typeof(av)}`)
+
+local aw=self.FARM_DETAILS and self.FARM_DETAILS[av]
+
+if aw then
+aw:Destroy()
+self.FARM_DETAILS[av]=nil
+end
+end
+
+function ah:GetFarmDetail(av)
+assert(type(av)=="number",`"Tab.GetFarmDetail[param 1]". 'number' expected, got {typeof(av)}`)
+
+return self.FARM_DETAILS and self.FARM_DETAILS[av]
+end
+
+function ah:ClearFarmDetails()
+if not self.FARM_DETAILS then return end
+
+for aw,ax in self.FARM_DETAILS do
+ax:Destroy()
+end
+
+table.clear(self.FARM_DETAILS)
+end
+
+ah.AddFarmDetail=ah.SetFarmDetail
 
 function ah:AddDropdown(av)
 local aw,ax=an("Dropdown",av)

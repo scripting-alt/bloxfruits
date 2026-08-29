@@ -1125,6 +1125,7 @@ spawn(function()
             else
                 CheckQuest()
                 LevelFarmToggle.Description = "Level Farm : "..Mon
+                BringMob(Mon)
                 for _, Enemy in ipairs(workspace.Enemies:GetChildren()) do
                     local Humanoid = Enemy:FindFirstChild("Humanoid")
                     local EnemyHRP = Enemy:FindFirstChild("HumanoidRootPart")
@@ -1157,12 +1158,10 @@ spawn(function()
                                 break
                             end
 
-                            BringPos = EnemyHRP.CFrame
                             topos(EnemyHRP.CFrame * Pos)
                             AutoHaki()
                             EquipWeapon(_G.SelectTool)
-                            BringMob(Mon)
-
+                            BringPos = EnemyHRP.CFrame
                             --EnemyHRP.CanCollide = false
                             Humanoid.WalkSpeed = 0
 
@@ -1694,6 +1693,7 @@ local MobileButton = Minimizer:CreateMobileMinimizer({
 
 local Tab_Discord = Window:MakeTab({ "Discord", "info" })
 local Tab_Farm = Window:MakeTab({ "Farm", "Home" })
+local Tab_FarmDetails = Window:MakeTab({ "Farm Details", "laptop" })
 local Tab_Sea = Window:MakeTab({ "Sea", "waves" })
 local Tab_Race = Window:MakeTab({ "Race", "moon" })
 local Tab_Islands = Window:MakeTab({ "Islands", "palmtree" })
@@ -1764,6 +1764,15 @@ LevelFarmToggle = Tab_Farm:AddToggle({
     --topos(CFrame.new(-1103.513427734375, 13.752052307128906, 3896.091064453125))
   end
 })
+
+Tab_FarmDetails:SetFarmDetail({13, "Collect Fruit", "Need", "a fruit spawn"})
+Tab_FarmDetails:SetFarmDetail({17, "Auto Push", "Running"})
+
+local Details = {}
+
+local function FarmDetails(name, data)
+
+end
 
 Tab_Farm:AddToggle({
   Name = "Auto Farm Nearest",
@@ -2973,15 +2982,6 @@ Tab_Misc:AddToggle({
   end
 })
 
-Tab_Misc:AddToggle({
-  Name = "Infinite Flashstep",
-  Default = false,
-  Flag = "infiniteFlashstep_flag",
-  Callback = function(Value)
-    _G.InfiniteFlashstep = Value
-  end
-})
-
 Tab_Misc:AddSlider({
   Name = "Walk Speed",
   Min = 1,
@@ -3026,11 +3026,6 @@ spawn(function()
                 game.Players.LocalPlayer.Character:SetAttribute("SkyjumpBoost",9999)
             else
                 game.Players.LocalPlayer.Character:SetAttribute("SkyjumpBoost",0)
-            end
-            if _G.InfiniteFlashstep then
-                game.Players.LocalPlayer.Character:SetAttribute("FlashstepCooldown",9999)
-            else
-                game.Players.LocalPlayer.Character:SetAttribute("FlashstepCooldown",0)
             end
             if game.Players.LocalPlayer.Character and game.Players.LocalPlayer.Character:FindFirstChild("Humanoid") then
                 game.Players.LocalPlayer.Character.Humanoid.JumpPower = _G.JumpPower
