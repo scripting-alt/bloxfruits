@@ -964,6 +964,7 @@ PaddingTop=UDim.new(0,10),
 PaddingBottom=UDim.new(0,10)
 },
 ListLayout={
+SortOrder=Enum.SortOrder.LayoutOrder,
 Padding=UDim.new(0,5)
 }
 }
@@ -2475,11 +2476,8 @@ self.FARM_DETAILS=self.FARM_DETAILS or{}
 
 local aA=`#{aw} {ax}`
 local aB=s.FarmStatusColors[ay]
-local aC=az and`{ay} {az}`or ay
-
-if aB then
-aC=`<font color="{aB}">{aC}</font>`
-end
+local aStatus=aB and`<font color="{aB}"><b><font size="13">{ay}</font></b></font>`or`<b><font size="13">{ay}</font></b>`
+local aC=az and`{aStatus} {az}`or aStatus
 
 local aD=self.FARM_DETAILS[aw]
 
@@ -2909,7 +2907,19 @@ function ah:SetTitle(av)
 assert(type(av)=="string",`"Tab.SetTitle". 'string' expected, got {typeof(av)}`)
 
 if self.TITLE_LABEL then
-self.TITLE_LABEL.Text=av
+self.TITLE_LABEL.Text=Localize(av)
+
+for aIndex=1,#s.LocalizedLabels do
+local aEntry=s.LocalizedLabels[aIndex]
+
+if aEntry.Instance==self.TITLE_LABEL then
+aEntry.Original=av
+self.Title=av
+return self
+end
+end
+
+table.insert(s.LocalizedLabels,{Instance=self.TITLE_LABEL,Original=av})
 end
 
 self.Title=av
@@ -2929,12 +2939,27 @@ ac=self
 U[ac].Select()
 end
 
+local function UpdateLocalizedLabel(aInstance,aOriginal)
+for aIndex=1,#s.LocalizedLabels do
+local aEntry=s.LocalizedLabels[aIndex]
+
+if aEntry.Instance==aInstance then
+aEntry.Original=aOriginal
+return nil
+end
+end
+
+table.insert(s.LocalizedLabels,{Instance=aInstance,Original=aOriginal})
+end
+
 function ai:SetTitle(av)
 assert(type(av)=="string",`"Option.SetTitle". 'string' expected, got {typeof(av)}`)
 assert(self.TITLE_LABEL,`"Option.SetTitle". cannot change this option name {self.KIND}:{self.Title}`)
 
-self.TITLE_LABEL.Text=av
+self.TITLE_LABEL.Text=Localize(av)
 self.Title=av
+
+UpdateLocalizedLabel(self.TITLE_LABEL,av)
 return self
 end
 
@@ -2942,8 +2967,13 @@ function ai:SetDescription(av)
 assert(av==nil or type(av)=="string",`"Option.SetDescription". 'string', or 'nil' expected, got {typeof(av)}`)
 assert(self.DESCRIPTION_LABEL,`"Option.SetDescription". cannot change this option description {self.KIND}:{self.Title}`)
 
-self.DESCRIPTION_LABEL.Text=av
+self.DESCRIPTION_LABEL.Text=Localize(av)
 self.Description=av
+
+if av then
+UpdateLocalizedLabel(self.DESCRIPTION_LABEL,av)
+end
+
 return self
 end
 
