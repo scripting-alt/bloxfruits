@@ -2477,7 +2477,7 @@ self.FARM_DETAILS=self.FARM_DETAILS or{}
 local aA=`#{aw} {ax}`
 local aB=s.FarmStatusColors[ay]
 local aStatus=aB and`<font color="{aB}"><b><font size="13">{ay}</font></b></font>`or`<b><font size="13">{ay}</font></b>`
-local aC=az and`{aStatus} {az}`or aStatus
+local aC=az and`{aStatus} <font size="11">{az}</font>`or aStatus
 
 local aD=self.FARM_DETAILS[aw]
 
