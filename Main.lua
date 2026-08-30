@@ -6,7 +6,7 @@ Library:AddTranslations("en", {})
 Library:UpdateTranslate("pt")
 
 ScriptVersion = {
-    Version = "v3.4.4",
+    Version = "v3.6.4",
     Date = "2026-08-30"
 }
 
@@ -424,7 +424,7 @@ function CheckNearestTeleporter(TargetCFrame)
             ["Hydra Island"] = Vector3.new(5660.03125, 1013.2661743164062, -337.931884765625),
             Mansion = Vector3.new(-12462, 375, -7552),
             Castle = Vector3.new(-5036, 315, -3179),
-            ["Dimensional Shift"] = Vector3.new(-2097.3447265625, 4776.24462890625, -15013.4990234375),
+           -- ["Dimensional Shift"] = Vector3.new(-2097.3447265625, 4776.24462890625, -15013.4990234375),
             --["Beautiful Room"] = Vector3.new(5314.58203, 22.5364361, -125.942276),
             ["Temple of Time"] = Vector3.new(28286, 14897, 103),
             --["Tiki Outpost"] = Vector3.new(-16811.107421875, 58.47794723510742, 294.60333251953125),
