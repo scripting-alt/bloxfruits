@@ -84,7 +84,7 @@ _G.ConfigStopFarm = {
 }
 
 local piority = {
-    Chalice = 1
+    Chalice = 1,
     FruitSpawn = 2,
     PirateRaid = 3,
     Factory = 4,
