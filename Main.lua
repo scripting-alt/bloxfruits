@@ -6,8 +6,8 @@ Library:AddTranslations("en", {})
 Library:UpdateTranslate("pt")
 
 ScriptVersion = {
-    Version = "v2.4.4",
-    Date = "2026-08-21"
+    Version = "v3.4.4",
+    Date = "2026-08-30"
 }
 
 _G.SelectTool = "Melee"
@@ -74,6 +74,7 @@ local LastHealth = nil
 local StuckTime = 0
 
 _G.ConfigStopFarm = {
+    Chalice = false,
     FruitSpawn = false,
     PirateRaid = false,
     Saw = false,
@@ -83,10 +84,11 @@ _G.ConfigStopFarm = {
 }
 
 local piority = {
-    FruitSpawn = 1,
-    PirateRaid = 2,
-    Factory = 2,
-    EliteSpawn = 3,
+    Chalice = 1
+    FruitSpawn = 2,
+    PirateRaid = 3,
+    Factory = 4,
+    EliteSpawn = 5,
     LevelFarm = 10,
 }
 
@@ -338,8 +340,9 @@ function BringMob(MobName)
         and Humanoid
         and HumanoidRootPart
         and Humanoid.Health > 0
+        and (HumanoidRootPart.Position - PlayerRoot.Position).Magnitude >= 50
         and (HumanoidRootPart.Position - PlayerRoot.Position).Magnitude <= _G.BringDistance then
-
+            topos(HumanoidRootPart.CFrame)
             HumanoidRootPart.CFrame = BringPos
             Humanoid.JumpPower = 0
             Humanoid.WalkSpeed = 0
@@ -937,7 +940,7 @@ function CheckQuest()
             Mon = "Dragon Crew Warrior"
             LevelQuest = 1
             NameQuest = "DragonCrewQuest"
-            NameMon = "Dragon Crew Warrior"
+            NameMon = "Dragon Crew Warriors"
             CFrameQuest = CFrame.new(6736.88916, 127.604462, -712.792236, -0.514472246, 1.2276959e-08, 0.85750705, -8.18380883e-08, 1, -6.34168345e-08, -0.85750705, -1.02802936e-07, -0.514472246)
             CFrameMon = CFrame.new(6815.59716796875, 80.9439582824707, -876.7154541015625)
         elseif MyLevel == 1600 or MyLevel <= 1624 then 
@@ -974,7 +977,7 @@ function CheckQuest()
             NameQuest = "MarineTreeIsland"
             LevelQuest = 2
             CFrameQuest = CFrame.new(2485.2705078125, 74.4573974609375, -6786.09375)
-            CFrameMon = CFrame.new()
+            CFrameMon = CFrame.new(3724.532958984375, 169.5175018310547, -7036.69580078125)
         elseif MyLevel == 1775 or MyLevel <= 1799 then
             Mon = "Fishman Raider"
             LevelQuest = 1
@@ -1187,9 +1190,9 @@ spawn(function()
                     return
                 end
 
-                local QuestTitle = QuestGui.Container.QuestTitle.Title.Text
+                local QuestTitle = string.lower(QuestGui.Container.QuestTitle.Title.Text)
 
-                if not string.find(QuestTitle, NameMon) then
+                if not string.find(QuestTitle, string.lower(NameMon)) then
                     StartMagnet = false
                     game.ReplicatedStorage.Remotes.CommF_:InvokeServer("AbandonQuest")
                     LevelFarmToggle:SetDescription("Level Farm")
@@ -1223,7 +1226,7 @@ spawn(function()
                         and Humanoid
                         and EnemyHRP
                         and Humanoid.Health > 0
-                        and string.find(QuestTitle, NameMon) then
+                        and string.find(QuestTitle, string.lower(NameMon)) then
 
                             local Distance = (HRP.Position - EnemyHRP.Position).Magnitude
 
@@ -1746,7 +1749,6 @@ spawn(function()
 
                         -- ficou travado
                         if StuckTime >= 20 then
-                            Humanoid.Health = 0
                             break
                         end
 
@@ -1876,6 +1878,28 @@ local function FarmDetails()
         end
     else
         Tab_FarmDetails:RemoveFarmDetail(piority.LevelFarm)
+    end
+    if _G.AutoEliteHunter then
+        local gg, pq = checkStopFarm("EliteSpawn")
+        local EliteNames = {"Diablo", "Deandre", "Urban"}
+        local SpawnedElite
+        for _, Name in ipairs(EliteNames) do
+            if workspace.Enemies:FindFirstChild(Name) or game.ReplicatedStorage:FindFirstChild(Name) then
+                SpawnedElite = Name
+                break
+            end
+        end
+        if not SpawnedElite then
+            Tab_FarmDetails:SetFarmDetail({piority.EliteSpawn, "Elite Hunter", "Need", "a spawned elite"})
+        else
+            if not gg then
+                Tab_FarmDetails:SetFarmDetail({piority.EliteSpawn, "Elite Hunter", "Waiting", "blocked by: "..pq})
+            else
+                Tab_FarmDetails:SetFarmDetail({piority.EliteSpawn, "Elite Hunter", "Running"})
+            end
+        end
+    else
+        Tab_FarmDetails:RemoveFarmDetail(piority.EliteSpawn)
     end
 end
 
@@ -2546,21 +2570,40 @@ spawn(function()
                         repeat topos(CFrame.new(2099.88159, 448.931, 648.997375)) wait() until not _G.AutoBartilo or (game:GetService("Players").LocalPlayer.Character.HumanoidRootPart.Position-Vector3.new(2099.88159, 448.931, 648.997375)).Magnitude <= 10
                     end
                 elseif game:GetService("Players").LocalPlayer.Data.Level.Value >= 800 and game:GetService("ReplicatedStorage").Remotes.CommF_:InvokeServer("BartiloQuestProgress","Bartilo") == 2 then
-                    repeat topos(CFrame.new(-1850.49329, 13.1789551, 1750.89685)) wait() until not _G.AutoBartilo or (game:GetService("Players").LocalPlayer.Character.HumanoidRootPart.Position-Vector3.new(-1850.49329, 13.1789551, 1750.89685)).Magnitude <= 10
-                    wait(1)
-                    repeat topos(CFrame.new(-1858.87305, 19.3777466, 1712.01807)) wait() until not _G.AutoBartilo or (game:GetService("Players").LocalPlayer.Character.HumanoidRootPart.Position-Vector3.new(-1858.87305, 19.3777466, 1712.01807)).Magnitude <= 10
-                    wait(1)
-                    repeat topos(CFrame.new(-1803.94324, 16.5789185, 1750.89685)) wait() until not _G.AutoBartilo or (game:GetService("Players").LocalPlayer.Character.HumanoidRootPart.Position-Vector3.new(-1803.94324, 16.5789185, 1750.89685)).Magnitude <= 10
-                    wait(1)
-                    repeat topos(CFrame.new(-1858.55835, 16.8604317, 1724.79541)) wait() until not _G.AutoBartilo or (game:GetService("Players").LocalPlayer.Character.HumanoidRootPart.Position-Vector3.new(-1858.55835, 16.8604317, 1724.79541)).Magnitude <= 10
-                    wait(1)
-                    repeat topos(CFrame.new(-1869.54224, 15.987854, 1681.00659)) wait() until not _G.AutoBartilo or (game:GetService("Players").LocalPlayer.Character.HumanoidRootPart.Position-Vector3.new(-1869.54224, 15.987854, 1681.00659)).Magnitude <= 10
-                    wait(1)
-                    repeat topos(CFrame.new(-1800.0979, 16.4978027, 1684.52368)) wait() until not _G.AutoBartilo or (game:GetService("Players").LocalPlayer.Character.HumanoidRootPart.Position-Vector3.new(-1800.0979, 16.4978027, 1684.52368)).Magnitude <= 10
-                    wait(1)
-                    repeat topos(CFrame.new(-1819.26343, 14.795166, 1717.90625)) wait() until not _G.AutoBartilo or (game:GetService("Players").LocalPlayer.Character.HumanoidRootPart.Position-Vector3.new(-1819.26343, 14.795166, 1717.90625)).Magnitude <= 10
-                    wait(1)
-                    repeat topos(CFrame.new(-1813.51843, 14.8604736, 1724.79541)) wait() until not _G.AutoBartilo or (game:GetService("Players").LocalPlayer.Character.HumanoidRootPart.Position-Vector3.new(-1813.51843, 14.8604736, 1724.79541)).Magnitude <= 10
+                    local Player = game:GetService("Players").LocalPlayer
+                    local Character = Player.Character
+                    local HRP = Character and Character:FindFirstChild("HumanoidRootPart")
+                    local Plates = workspace.Map.Dressrosa.BartiloPlates
+                    local Position = CFrame.new(-1835.6300048828125, 11.094196319580078, 1674.2493896484375)
+
+                    if HRP then
+                        repeat
+                            HRP.CFrame = Position
+                            task.wait()
+                        until not _G.AutoBartilo or (HRP.Position - Position.Position).Magnitude <= 50
+
+                        if _G.AutoBartilo then
+                            for i = 1, 8 do
+                                if not _G.AutoBartilo then break end
+
+                                local Plate = Plates:FindFirstChild("Plate" .. i)
+
+                                if Plate then
+                                    local Part = HRP
+                                    local ToTouch = Plate:IsA("BasePart") and Plate or Plate:FindFirstChildWhichIsA("BasePart")
+
+                                    if ToTouch then
+                                        HRP.CFrame = ToTouch.CFrame + Vector3.new(0, 3, 0)
+                                        task.wait(0.1)
+                                        firetouchinterest(Part, ToTouch, 0)
+                                        task.wait(0.1)
+                                        firetouchinterest(Part, ToTouch, 1)
+                                        task.wait(0.3)
+                                    end
+                                end
+                            end
+                        end
+                    end
                 end
             end 
         end
@@ -3243,17 +3286,18 @@ Tab_Misc:AddButton({
 })
 
 spawn(function()
-    local VirtualUser = game:GetService("VirtualUser")
-    game:GetService("Players").LocalPlayer.Idled:Connect(function()
-        pcall(function()
-            if _G.AntiAFK then
-                VirtualUser:CaptureController()
-                VirtualUser:ClickButton2(Vector2.new())
-            end
-        end)
+    local VirtualInputManager = game:GetService("VirtualInputManager")
+    local Players = game:GetService("Players")
+    Players.LocalPlayer.Idled:Connect(function()
+        if _G.AntiAFK then
+            pcall(function()
+                VirtualInputManager:SendKeyEvent(true, Enum.KeyCode.W, false, game)
+                task.wait(0.2)
+                VirtualInputManager:SendKeyEvent(false, Enum.KeyCode.W, false, game)
+            end)
+        end
     end)
 end)
-
 Tab_Stats:AddSection("Auto Stats")
 Tab_Stats:AddToggle({Name = "Auto Stats Melee",Default = false,Flag = "statsMelee_flag",
 Callback = function(Value)
@@ -3995,7 +4039,7 @@ if string.lower(identifyexecutor()) == "delta" then
                     if typeof(args[1]) == "Vector3" then
                         args[1] = targetPos
                     end
-                    args[2] = {targetSelect}
+                    args[2] = {targetSelect.HumanoidRootPart}
 
                     return oldNamecall(self, unpack(args))
                 end
