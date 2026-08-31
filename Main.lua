@@ -6,7 +6,7 @@ Library:AddTranslations("en", {})
 Library:UpdateTranslate("pt")
 
 ScriptVersion = {
-    Version = "v3.8.4",
+    Version = "v3.8.7",
     Date = "2026-08-31"
 }
 
@@ -201,9 +201,9 @@ local function GetBladeHits()
     for _, part in pairs({game.Workspace.Enemies, game.Workspace.Characters}) do
         for _, v in pairs(part:GetChildren()) do
             if v:FindFirstChild("HumanoidRootPart") and v:FindFirstChild("Head") and v:FindFirstChild("Humanoid") then
-                --if game.Players:GetPlayerFromCharacter(v) and IsFriendly(game.Players:GetPlayerFromCharacter(v)) then
-                --    continue
-                --end
+                if game.Players:GetPlayerFromCharacter(v) and IsFriendly(game.Players:GetPlayerFromCharacter(v)) then
+                    continue
+                end
                 
                 if GetDistance(v.HumanoidRootPart) < 60 then
                     table.insert(targets, v)
