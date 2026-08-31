@@ -6,8 +6,8 @@ Library:AddTranslations("en", {})
 Library:UpdateTranslate("pt")
 
 ScriptVersion = {
-    Version = "v3.6.4",
-    Date = "2026-08-30"
+    Version = "v3.8.4",
+    Date = "2026-08-31"
 }
 
 _G.SelectTool = "Melee"
@@ -147,29 +147,6 @@ local function IsFriendly(player)
         or (LocalPlayer.Team and game:GetService("Teams"):FindFirstChild("Marines") and LocalPlayer.Team == game.Teams.Marines and player.Team == game.Teams.Marines)
 end
 
-local function GetBladeHits()
-    local targets = {}
-    local function GetDistance(v)
-        return (v.Position - game.Players.LocalPlayer.Character.HumanoidRootPart.Position).Magnitude
-    end
-    
-    for _, part in pairs({game.Workspace.Enemies, game.Workspace.Characters}) do
-        for _, v in pairs(part:GetChildren()) do
-            if v:FindFirstChild("HumanoidRootPart") and v:FindFirstChild("Head") and v:FindFirstChild("Humanoid") then
-                if game.Players:GetPlayerFromCharacter(v) and IsFriendly(game.Players:GetPlayerFromCharacter(v)) then
-                    continue
-                end
-                
-                if GetDistance(v.HumanoidRootPart) < 60 then
-                    table.insert(targets, v)
-                end
-            end
-        end
-    end
-
-    return targets
-end
-
 local function EquipWeapon(weapon)
     if not weapon then
         return
@@ -215,6 +192,29 @@ end
 
 local cd = 1        
 
+local function GetBladeHits()
+    local targets = {}
+    local function GetDistance(v)
+        return (v.Position - game.Players.LocalPlayer.Character.HumanoidRootPart.Position).Magnitude
+    end
+    
+    for _, part in pairs({game.Workspace.Enemies, game.Workspace.Characters}) do
+        for _, v in pairs(part:GetChildren()) do
+            if v:FindFirstChild("HumanoidRootPart") and v:FindFirstChild("Head") and v:FindFirstChild("Humanoid") then
+                --if game.Players:GetPlayerFromCharacter(v) and IsFriendly(game.Players:GetPlayerFromCharacter(v)) then
+                --    continue
+                --end
+                
+                if GetDistance(v.HumanoidRootPart) < 60 then
+                    table.insert(targets, v)
+                end
+            end
+        end
+    end
+
+    return targets
+end
+
 local function AttackAll()
     local player = game.Players.LocalPlayer
     local character = player.Character
@@ -229,11 +229,6 @@ local function AttackAll()
     if equippedWeapon and equippedWeapon:FindFirstChild("LeftClickRemote") and enemies[1] then
         local direction = (enemies[1].HumanoidRootPart.Position - character:GetPivot().Position).Unit
         equippedWeapon:FindFirstChild("LeftClickRemote"):FireServer(direction, cd)
-        warn(cd, "Fired LeftClickRemote with direction: ", direction)
-        cd = cd + 1
-        if cd > 3 then
-            cd = 1
-        end
     end
 
     if #enemies > 0 then
@@ -246,9 +241,6 @@ local function AttackAll()
                 args[1] = v.Head
             end
             args[2][i] = {v, v.HumanoidRootPart}
-        end
-        if game.Players.LocalPlayer.Character:FindFirstChildOfClass("Tool") and game.Players.LocalPlayer.Character:FindFirstChildOfClass("Tool"):FindFirstChild("LeftClickRemote") then
-            game.Players.LocalPlayer.Character:FindFirstChildOfClass("Tool"):FindFirstChild("LeftClickRemote"):FireServer(game.Players.LocalPlayer.Character.HumanoidRootPart.Position, 1, true)
         end
 
         netModule:WaitForChild("RE/RegisterHit"):FireServer(unpack(args))
@@ -2367,13 +2359,60 @@ elseif World3 then
                 stopTeleport()
               end
             })
-
+    Tab_Quests:AddSection("Holy Torch/Tushita")
+    Tab_Quests:AddToggle({
+        Name = "Auto Holy Torch",
+        Default = false,
+        Callback = function(Value)
+        _G.AutoHolyTorch = Value
+        stopTeleport()
+        end
+    })
 
 
     spawn(function()
         while wait() do
-            if _G.AutoDragonHunter and World3 then
-                
+            if _G.AutoHolyTorch then
+                pcall(function()
+                    game:GetService('ReplicatedStorage').Remotes.CommF_:InvokeServer('requestEntrance', Vector3.new(5657.88623046875, 1013.0790405273438, -335.4996337890625))
+                    wait(1)
+                    topos(CFrame.new(5711.87451171875, 45.82802963256836, 254.17005920410156))
+                    wait(15)
+                    EquipWeapon('Holy Torch')
+
+                    repeat
+                        topos(CFrame.new(-10752, 417, -9366))
+                        wait()
+                    until not _G.AutoHolyTorch or (game.Players.LocalPlayer.Character.HumanoidRootPart.Position - Vector3.new(-10752, 417, -9366)).Magnitude <= 10
+
+                    wait(1)
+
+                    repeat
+                        topos(CFrame.new(-11672, 334, -9474))
+                        wait()
+                    until not _G.AutoHolyTorch or (game.Players.LocalPlayer.Character.HumanoidRootPart.Position - Vector3.new(-11672, 334, -9474)).Magnitude <= 10
+
+                    wait(1)
+
+                    repeat
+                        topos(CFrame.new(-12132, 521, -10655))
+                        wait()
+                    until not _G.AutoHolyTorch or (game.Players.LocalPlayer.Character.HumanoidRootPart.Position - Vector3.new(-12132, 521, -10655)).Magnitude <= 10
+
+                    wait(1)
+
+                    repeat
+                        topos(CFrame.new(-13336, 486, -6985))
+                        wait()
+                    until not _G.AutoHolyTorch or (game.Players.LocalPlayer.Character.HumanoidRootPart.Position - Vector3.new(-13336, 486, -6985)).Magnitude <= 10
+
+                    wait(1)
+
+                    repeat
+                        topos(CFrame.new(-13489, 332, -7925))
+                        wait()
+                    until not _G.AutoHolyTorch or (game.Players.LocalPlayer.Character.HumanoidRootPart.Position - Vector3.new(-13489, 332, -7925)).Magnitude <= 10
+                end)
             end
         end
     end)
