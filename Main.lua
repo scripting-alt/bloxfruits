@@ -6,7 +6,7 @@ Library:AddTranslations("en", {})
 Library:UpdateTranslate("pt")
 
 ScriptVersion = {
-    Version = "v3.8.7",
+    Version = "v3.9.8",
     Date = "2026-08-31"
 }
 
