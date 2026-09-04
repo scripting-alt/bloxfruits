@@ -43,6 +43,10 @@ return {
     ["Server"] = "Servidor",
     ["Rejoin Server"] = "Reentrar no Servidor",
 
+    ["Configs"] = "Configurações",
+    ["Config"] = "Configuração"
+
+    
 }
 
 --
