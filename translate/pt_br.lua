@@ -46,7 +46,10 @@ return {
     ["Configs"] = "Configurações",
     ["Config"] = "Configuração"
 
-    
+    ["ChangeLog"] = "Registro de Alterações",
+    ["Info"] = "Informações"
+
+    ["[+] Added: Auto Gun Shoot"] = "[+] Adicionado: Tiro Automático de Arma"
 }
 
 --

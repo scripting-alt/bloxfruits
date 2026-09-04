@@ -1837,7 +1837,7 @@ Window = Library:MakeWindow({
 })
 
 if getnamecallmethod and hookmetamethod then
-    
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/scripting-alt/bloxfruits/refs/heads/main/utils/AutoShoot.lua"))()
 else
   Window:MakeNotification({
     Title = "Executor Not Detected",
@@ -1890,6 +1890,7 @@ Tab_Discord:AddDiscordInvite({
 Tab_Discord:AddSection("ChangeLog")
 Tab_Discord:AddParagraph("[+] Added: Auto Gun Shoot")
 
+Tab_Discord:AddSection("Info")
 Tab_Discord:AddParagraph("Version:", ScriptVersion.Version)
 Tab_Discord:AddParagraph("Date:", ScriptVersion.Date)
 Tab_Discord:AddParagraph("Executor:", identifyexecutor() or "Unknown")
