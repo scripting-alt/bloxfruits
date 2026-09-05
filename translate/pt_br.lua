@@ -44,7 +44,7 @@ return {
     ["Rejoin Server"] = "Reentrar no Servidor",
 
     ["Configs"] = "Configurações",
-    ["Config"] = "Configuração"
+    ["Config"] = "Configuração",
 
     ["ChangeLog"] = "Registro de Alterações",
     ["Info"] = "Informações",
