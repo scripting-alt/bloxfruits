@@ -130,7 +130,7 @@ end
 
 local function hookRequestM1()
     local success, requestFunc = pcall(function()
-        return require(ReplicatedStorage:WaitForChild("Effect"):WaitForChild("Container"):WaitForChild("Gun_M1"):WaitForChild("RequestM1"))
+        return require(ReplicatedStorage:WaitForChild("EffectContainer"):WaitForChild("Gun_M1"):WaitForChild("RequestM1"))
     end)
     if not success or type(requestFunc) ~= "function" then
         return

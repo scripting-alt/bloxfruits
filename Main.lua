@@ -82,6 +82,7 @@ _G.ConfigStopFarm = {
     EliteSpawn = false,
     AutoTushita = false,
     LevelFarm = false,
+    AutoKillEvent = false,
 }
 
 local piority = {
@@ -90,7 +91,8 @@ local piority = {
     PirateRaid = 3,
     Factory = 4,
     EliteSpawn = 5,
-    AutoTushita = 6,
+    AutoKillEvent = 6,
+    AutoTushita = 7,
     LevelFarm = 10,
 }
 
@@ -196,56 +198,83 @@ local cd = 1
 
 local function GetBladeHits()
     local targets = {}
-    local function GetDistance(v)
-        return (v.Position - game.Players.LocalPlayer.Character.HumanoidRootPart.Position).Magnitude
-    end
-    
-    for _, part in pairs({game.Workspace.Enemies, game.Workspace.Characters}) do
-        for _, v in pairs(part:GetChildren()) do
-            if v:FindFirstChild("HumanoidRootPart") and v:FindFirstChild("Head") and v:FindFirstChild("Humanoid") then
-                if game.Players:GetPlayerFromCharacter(v) and IsFriendly(game.Players:GetPlayerFromCharacter(v)) then
-                    continue
-                end
-                
-                if GetDistance(v.HumanoidRootPart) < 60 then
-                    table.insert(targets, v)
+    local playerChar = game.Players.LocalPlayer.Character
+    if not playerChar or not playerChar:FindFirstChild("HumanoidRootPart") then return targets end
+    local rootPos = playerChar.HumanoidRootPart.Position
+
+    for _, folder in pairs({workspace:FindFirstChild("Enemies"), workspace:FindFirstChild("Characters")}) do
+        if folder then
+            for _, v in pairs(folder:GetChildren()) do
+                if v:FindFirstChild("HumanoidRootPart") and v:FindFirstChild("Head") and v:FindFirstChild("Humanoid") then
+                    local plr = game.Players:GetPlayerFromCharacter(v)
+                    if not (plr and IsFriendly and IsFriendly(plr)) then
+                        if (v.HumanoidRootPart.Position - rootPos).Magnitude < 60 then
+                            table.insert(targets, v)
+                        end
+                    end
                 end
             end
         end
     end
-
     return targets
 end
 
 local function AttackAll()
-    local player = game.Players.LocalPlayer
-    local character = player.Character
-    if not character then return end
+    local character = game.Players.LocalPlayer.Character
+    if not character or not character:FindFirstChild("HumanoidRootPart") then return end
+    
+    local tool = character:FindFirstChildOfClass("Tool")
+    if not tool then return end
 
-    local equippedWeapon = character:FindFirstChildOfClass("Tool")
-    if not equippedWeapon then return end
-
-
+    local net = game:GetService("ReplicatedStorage"):WaitForChild("Modules"):WaitForChild("Net")
+    local rootPos = character.HumanoidRootPart.Position
     local enemies = GetBladeHits()
 
-    if equippedWeapon and equippedWeapon:FindFirstChild("LeftClickRemote") and enemies[1] then
-        local direction = (enemies[1].HumanoidRootPart.Position - character:GetPivot().Position).Unit
-        equippedWeapon:FindFirstChild("LeftClickRemote"):FireServer(direction, cd)
+    if tool:FindFirstChild("LeftClickRemote") and enemies[1] then
+        tool.LeftClickRemote:FireServer((enemies[1].HumanoidRootPart.Position - character:GetPivot().Position).Unit, cd)
     end
 
     if #enemies > 0 then
-        local netModule = game:GetService("ReplicatedStorage"):WaitForChild("Modules"):WaitForChild("Net")
-        netModule:WaitForChild("RE/RegisterAttack"):FireServer(-math.huge)
-        
+        net:WaitForChild("RE/RegisterAttack"):FireServer(-math.huge)
         local args = {nil, {}}
         for i, v in pairs(enemies) do
-            if not args[1] then
-                args[1] = v.Head
-            end
+            if not args[1] then args[1] = v.Head end
             args[2][i] = {v, v.HumanoidRootPart}
         end
+        net:WaitForChild("RE/RegisterHit"):FireServer(unpack(args))
+    end
 
-        netModule:WaitForChild("RE/RegisterHit"):FireServer(unpack(args))
+    local tablet = workspace:FindFirstChild("Archaeologist's Tablet")
+    if tablet and tablet:FindFirstChild("Pillars") then
+        local closestPart, minDist = nil, 60
+        for _, pillar in ipairs(tablet.Pillars:GetChildren()) do
+            if (pillar:GetAttribute("NumHits") or 0) < 3 and pillar:FindFirstChild("SandLayer3") then
+                local dist = (pillar.SandLayer3.Position - rootPos).Magnitude
+                if dist < minDist then minDist, closestPart = dist, pillar.SandLayer3 end
+            end
+        end
+        if closestPart then
+            net:WaitForChild("RE/RegisterAttack"):FireServer(-math.huge)
+            task.wait()
+            net:WaitForChild("RE/RegisterHit"):FireServer(closestPart)
+        end
+    end
+
+    local cloudPieces = workspace:FindFirstChild("CloudPieces")
+    if cloudPieces then
+        for _, mesh in ipairs(cloudPieces:GetChildren()) do
+            if mesh:IsA("BasePart") and (mesh.Position - rootPos).Magnitude < 150 then
+                net:WaitForChild("RE/RegisterAttack"):FireServer(-math.huge)
+                net:WaitForChild("RE/RegisterHit"):FireServer(mesh)
+            end
+        end
+    end
+
+    local map = workspace:FindFirstChild("Map")
+    local rock = map and map:FindFirstChild("Magma") and map.Magma:FindFirstChild("BonusMoment_Locations") and map.Magma.BonusMoment_Locations:FindFirstChild("SlimeGeyser") and map.Magma.BonusMoment_Locations.SlimeGeyser:FindFirstChild("Rock.001")
+    if rock and rock:IsA("BasePart") and (rock.Position - rootPos).Magnitude < 60 then
+        net:WaitForChild("RE/RegisterAttack"):FireServer(-math.huge)
+        net:WaitForChild("RE/RegisterHit"):FireServer(rock)
     end
 end
 
@@ -517,10 +546,15 @@ function topos(TargetCFrame, speed)
     end
 
     TweenON = true
+    local adjustedSpeed = speed
+    if Distance < 250 then
+        local alpha = 1 - (Distance / 250)
+        adjustedSpeed = speed + (speed * 0.05) * alpha
+    end
 
     local Tween = game:GetService("TweenService"):Create(
         PartTele,
-        TweenInfo.new(Distance / speed, Enum.EasingStyle.Linear),
+        TweenInfo.new(Distance / adjustedSpeed, Enum.EasingStyle.Linear),
         {
             CFrame = TargetCFrame
         }
@@ -1209,7 +1243,7 @@ function CheckQuest()
             NameMon = "High Disciple"
             CFrameQuest = CFrame.new(9638.0986328125, -1992.4205322265625, 9614.837890625)
             CFrameMon = CFrame.new(9829.943359375, -1941.1346435546875, 9696.0361328125)
-        elseif MyLevel == 2700 or MyLevel <= 2800 then
+        elseif MyLevel == 2700 or MyLevel <= 3000 then
             Mon = "Grand Devotee"
             LevelQuest = 2
             NameQuest = "SubmergedQuest3"
@@ -1225,16 +1259,19 @@ spawn(function()
         if _G.AutoFarmLevel and checkStopFarm("LevelFarm") then
             pcall(function()
                 local Player = game.Players.LocalPlayer
-                local QuestGui = Player.PlayerGui.Main.Quest
+                local QuestGui = Player.PlayerGui:FindFirstChild("TrackedQuestFrame")
                 local HRP = Player.Character and Player.Character:FindFirstChild("HumanoidRootPart")
+                local QuestEnemy = "NENHUM"
 
                 if not HRP then
                     return
                 end
 
-                local QuestTitle = string.lower(QuestGui.Container.QuestTitle.Title.Text)
+                if QuestGui then
+                    QuestEnemy = QuestGui.Frame.description.Text:lower()
+                end
 
-                if not string.find(QuestTitle, string.lower(NameMon)) then
+                if QuestGui and not string.find(QuestEnemy, string.lower(NameMon)) then
                     StartMagnet = false
                     game.ReplicatedStorage.Remotes.CommF_:InvokeServer("AbandonQuest")
                     LevelFarmToggle:SetDescription("Level Farm")
@@ -1256,7 +1293,7 @@ spawn(function()
                     end
                 end
 
-                if not QuestGui.Visible then
+                if not QuestGui then
                     StartMagnet = false
                     CheckQuest()
                     topos(CFrameQuest)
@@ -1283,7 +1320,7 @@ spawn(function()
                         and Humanoid
                         and EnemyHRP
                         and Humanoid.Health > 0
-                        and string.find(QuestTitle, string.lower(NameMon)) then
+                        and string.find(QuestEnemy, string.lower(NameMon)) then
 
                             local Distance = (HRP.Position - EnemyHRP.Position).Magnitude
 
@@ -1338,7 +1375,7 @@ spawn(function()
                             or not checkStopFarm()
                             or Humanoid.Health <= 0
                             or not Enemy.Parent
-                            or not QuestGui.Visible
+                            or not QuestGui
 
                     else
                         StartMagnet = false
@@ -1732,7 +1769,7 @@ function reload()
             storageFruit(v)
         end
     end)
-    workspace._WorldOrigin["Foam;"].CanCollide = _G.WaterWalk
+    workspace._WorldOrigin.WaterCFrame["Foam;"].CanCollide = _G.WaterWalk
     game.Players.LocalPlayer.Character:SetAttribute("SpeedMultiplier",_G.Speed)
     game.Players.LocalPlayer.Character:SetAttribute("DashLength",_G.DashDistance)
     game.Players.LocalPlayer.Character.ChildAdded:Connect(function(v)
@@ -1745,10 +1782,16 @@ end
 game.Players.LocalPlayer.CharacterAdded:connect(reload)
 reload()
 
+local GachaEvent = game:GetService("ReplicatedStorage").Modules.Net["RF/GachaNetworkRF"]
+
 spawn(function()
     while task.wait(1) do
-        if _G.randomFruits then
-            game:GetService("ReplicatedStorage").Remotes.CommF_:InvokeServer("Cousin","DLCBoxData")
+        if _G.randomFruits and not _G.randomFruitsEvent then
+            GachaEvent:InvokeServer({"Purchase","ZiolesGacha"})
+        end
+
+        if _G.randomFruitsEvent then
+            GachaEvent:InvokeServer({"Purchase","MagnetEventGacha26"})
         end
 
         if _G.getFruits and not checkStopFarm("FruitSpawn") then
@@ -1836,6 +1879,8 @@ Window = Library:MakeWindow({
   ScriptFolder = "redz-library-V5"
 })
 
+Window:SetFlag("tweenSpeed_flag", 200)
+
 if getnamecallmethod and hookmetamethod then
     loadstring(game:HttpGet("https://raw.githubusercontent.com/scripting-alt/bloxfruits/refs/heads/main/utils/AutoShoot.lua"))()
 else
@@ -1889,6 +1934,8 @@ Tab_Discord:AddDiscordInvite({
 
 Tab_Discord:AddSection("ChangeLog")
 Tab_Discord:AddParagraph("[+] Added: Auto Gun Shoot")
+Tab_Discord:AddParagraph("[/] Fixed: Auto Farm Level Stuck")
+Tab_Discord:AddParagraph("[/] Fixed: Tween Speed Max Is 200")
 
 Tab_Discord:AddSection("Info")
 Tab_Discord:AddParagraph("Version:", ScriptVersion.Version)
@@ -1952,6 +1999,21 @@ local function FarmDetails()
     else
         Tab_FarmDetails:RemoveFarmDetail(piority.LevelFarm)
     end
+    if _G.AutoKillEvent then
+        local gg, pq = checkStopFarm("AutoKillEvent")
+        local SpawnedElite
+        if not SpawnedElite then
+            Tab_FarmDetails:SetFarmDetail({piority.AutoKillEvent, "Magnet Event", "Need", "a spawned enemies"})
+        else
+            if not gg then
+                Tab_FarmDetails:SetFarmDetail({piority.AutoKillEvent, "Magnet Event", "Waiting", "blocked by: "..pq})
+            else
+                Tab_FarmDetails:SetFarmDetail({piority.AutoKillEvent, "Magnet Event", "Running"})
+            end
+        end
+    else
+        Tab_FarmDetails:RemoveFarmDetail(piority.AutoKillEvent)
+    end
     if _G.AutoEliteHunter then
         local gg, pq = checkStopFarm("EliteSpawn")
         local EliteNames = {"Diablo", "Deandre", "Urban"}
@@ -2014,6 +2076,19 @@ Tab_Farm:AddSlider({
   end
 })
 
+Tab_Farm:AddSection("Event")
+
+Tab_Farm:AddToggle({
+  Name = "Auto Magnet Event",
+  Default = false,
+  Description = "Defeat the Magnet event enemies",
+  Flag = "killEvent_flag",
+  Callback = function(Value)
+    _G.AutoKillEvent = Value
+    stopTeleport()
+  end
+})
+
 Tab_Farm:AddSection("Berries")
 
 Tab_Farm:AddToggle({
@@ -2058,6 +2133,16 @@ Tab_Fruit:AddToggle({
   Flag = "randomFruits_flag",
   Callback = function(Value)
     _G.randomFruits = Value
+  end
+})
+
+Tab_Fruit:AddToggle({
+  Name = "Auto Random Fruit Event",
+  Default = false,
+  Description = "Automatically purchases random fruits from the event gacha - 500 Magnet Tokens",
+  Flag = "randomFruitsEvent_flag",
+  Callback = function(Value)
+    _G.randomFruitsEvent = Value
   end
 })
 
@@ -3312,7 +3397,7 @@ Tab_Misc:AddToggle({
   Flag = "waterWalk_flag",
   Callback = function(Value)
     _G.WaterWalk = Value
-    workspace._WorldOrigin["Foam;"].CanCollide = _G.WaterWalk
+    workspace._WorldOrigin.WaterCFrame["Foam;"].CanCollide = _G.WaterWalk
   end
 })
 
