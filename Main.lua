@@ -6,7 +6,7 @@ Library:AddTranslations("en", {})
 Library:UpdateTranslate("pt")
 
 ScriptVersion = {
-    Version = "v3.9.8",
+    Version = "v4.9.8",
     Date = "2026-08-31"
 }
 
@@ -4262,7 +4262,7 @@ end
 local targetPos = Vector3.new(0, 0, 0)
 local targetSelect = nil
 
-if string.lower(identifyexecutor()) == "real" then
+if getnamecallmethod and hookmetamethod then
     local oldNamecall
 
     oldNamecall = hookmetamethod(game, "__namecall", function(self, ...)
@@ -4358,7 +4358,7 @@ task.spawn(function()
             continue
         end
 
-        if _G.Buuut and targetSelect and string.lower(identifyexecutor()) ~= "real" then
+        if _G.Buuut and targetSelect and (not getnamecallmethod or not hookmetamethod) then
             local Remote = Tool:FindFirstChild("RemoteEvent")
 
             if Remote and not Tool:FindFirstChild("OR_RemoteEvent") then

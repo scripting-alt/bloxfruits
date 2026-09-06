@@ -34,6 +34,9 @@ local function GetBladeHits(distance)
     end
 
     for _, containerName in ipairs({"Enemies", "Characters"}) do
+        if containerName == "Enemies" and not (not _G.Buuut or _G.BuuutMobs) then
+            continue
+        end
         local container = workspace:FindFirstChild(containerName)
         if container then
             for _, v in ipairs(container:GetChildren()) do
@@ -58,7 +61,7 @@ local function GetBladeHits(distance)
     end
 
     local enemiesFolder = workspace:FindFirstChild("Enemies")
-    if enemiesFolder then
+    if enemiesFolder and (not _G.Buuut or _G.BuuutMobs) then
         for _, v in ipairs(enemiesFolder:GetChildren()) do
             if v:IsA("Model") and not seen[v] then
                 local seat = v:FindFirstChildOfClass("VehicleSeat") or v:FindFirstChild("VehicleSeat", true)
@@ -79,7 +82,7 @@ local function GetBladeHits(distance)
     end
 
     local seaFolder = workspace:FindFirstChild("SeaBeasts")
-    if seaFolder then
+    if seaFolder and (not _G.Buuut or _G.BuuutMobs) then
         for _, v in ipairs(seaFolder:GetChildren()) do
             if v:IsA("Model") and not seen[v] then
                 local hrp = v:FindFirstChild("HumanoidRootPart")
@@ -147,7 +150,7 @@ local function hookRequestM1()
 end
 
 pcall(hookShootEvent)
-pcall(hookRequestM1)
+--pcall(hookRequestM1)
 
 local function ensureShootAttachment(tool)
     if not tool then return end
