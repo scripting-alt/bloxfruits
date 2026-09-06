@@ -1278,7 +1278,7 @@ spawn(function()
                 end
 
                 MyLevel = game:GetService("Players").LocalPlayer.Data.Level.Value
-                if (MyLevel >= 2600 and MyLevel <= 2800) then
+                if (MyLevel >= 2600 and MyLevel <= 3000) then
                     if Player:GetAttribute("ExactLocation") ~= "Submerged Island" and Player:GetAttribute("ExactLocation") ~= "Sealed Cavern" then
                         if (HRP.Position - Vector3.new(-16270.4970703125, 25.253189086914062, 1370.1156005859375)).Magnitude <= 15 then
                             game:GetService("ReplicatedStorage").Modules.Net["RF/SubmarineWorkerSpeak"]:InvokeServer("TravelToSubmergedIsland")
