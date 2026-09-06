@@ -547,8 +547,8 @@ function topos(TargetCFrame, speed)
 
     TweenON = true
     local adjustedSpeed = speed
-    if Distance < 250 then
-        local alpha = 1 - (Distance / 250)
+    if Distance < 100 then
+        local alpha = 1 - (Distance / 100)
         adjustedSpeed = speed + (speed * 0.05) * alpha
     end
 
@@ -1882,7 +1882,9 @@ Window = Library:MakeWindow({
 Window:SetFlag("tweenSpeed_flag", 200)
 
 if getnamecallmethod and hookmetamethod then
-    loadstring(game:HttpGet("https://raw.githubusercontent.com/scripting-alt/bloxfruits/refs/heads/main/utils/AutoShoot.lua"))()
+    pcall(function()
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/scripting-alt/bloxfruits/refs/heads/main/utils/AutoShoot.lua"))()
+    end)
 else
   Window:MakeNotification({
     Title = "Executor Not Detected",
@@ -4260,7 +4262,7 @@ end
 local targetPos = Vector3.new(0, 0, 0)
 local targetSelect = nil
 
-if string.lower(identifyexecutor()) == "delta" then
+if string.lower(identifyexecutor()) == "real" then
     local oldNamecall
 
     oldNamecall = hookmetamethod(game, "__namecall", function(self, ...)
@@ -4356,7 +4358,7 @@ task.spawn(function()
             continue
         end
 
-        if _G.Buuut and targetSelect and string.lower(identifyexecutor()) ~= "delta" then
+        if _G.Buuut and targetSelect and string.lower(identifyexecutor()) ~= "real" then
             local Remote = Tool:FindFirstChild("RemoteEvent")
 
             if Remote and not Tool:FindFirstChild("OR_RemoteEvent") then
