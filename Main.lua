@@ -547,10 +547,6 @@ function topos(TargetCFrame, speed)
 
     TweenON = true
     local adjustedSpeed = speed
-    if Distance < 100 then
-        local alpha = 1 - (Distance / 100)
-        adjustedSpeed = speed + (speed * 0.05) * alpha
-    end
 
     local Tween = game:GetService("TweenService"):Create(
         PartTele,
@@ -1787,11 +1783,11 @@ local GachaEvent = game:GetService("ReplicatedStorage").Modules.Net["RF/GachaNet
 spawn(function()
     while task.wait(1) do
         if _G.randomFruits and not _G.randomFruitsEvent then
-            GachaEvent:InvokeServer({"Purchase","ZiolesGacha"})
+            GachaEvent:InvokeServer({Context="Purchase",BoxName="ZiolesGacha"})
         end
 
         if _G.randomFruitsEvent then
-            GachaEvent:InvokeServer({"Purchase","MagnetEventGacha26"})
+            GachaEvent:InvokeServer({Context="Purchase",BoxName="MagnetEventGacha26"})
         end
 
         if _G.getFruits and not checkStopFarm("FruitSpawn") then
@@ -1852,7 +1848,7 @@ spawn(function()
                             break
                         end
 
-                        topos(EnemyHRP.CFrame * Pos, 280)
+                        topos(EnemyHRP.CFrame * Pos)
                         AutoHaki()
                         EquipWeapon(_G.SelectTool)
                         BringPos = EnemyHRP.CFrame
@@ -4287,6 +4283,15 @@ if getnamecallmethod and hookmetamethod then
                     return oldNamecall(self, ...)
                 end
             end
+
+            if method == "InvokeServer" and self.Name == "" then
+                if typeof(args[2]) == "Vector3" then
+                    args[2] = targetPos
+                end
+
+                return oldNamecall(self, unpack(args))
+            end
+
         end
 
         return oldNamecall(self, ...)
