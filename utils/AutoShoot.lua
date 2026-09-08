@@ -2,27 +2,12 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Players = game:GetService("Players")
 local LocalPlayer = Players.LocalPlayer
 local UserInputService = game:GetService("UserInputService")
-local CollectionService = game:GetService("CollectionService")
 
 local CombatController = require(ReplicatedStorage.Controllers.CombatController)
 local CombatUtil = require(ReplicatedStorage.Modules.CombatUtil)
 
 local TargetPart = nil
 local TargetModel = nil
-
-local function IsFriendly(player)
-    if player == LocalPlayer then
-        return true
-    end
-
-    if not player:IsA("Player") then
-        return false
-    end
-
-    return CollectionService:HasTag(player, "Ally" .. LocalPlayer.Name)
-        or CollectionService:HasTag(LocalPlayer, "Ally" .. player.Name)
-        or (LocalPlayer.Team and game:GetService("Teams"):FindFirstChild("Marines") and LocalPlayer.Team == game.Teams.Marines and player.Team == game.Teams.Marines)
-end
 
 local function getModelHealth(model)
     if not model then return math.huge end
@@ -58,9 +43,6 @@ local function GetBladeHits(distance)
                 if v:FindFirstChild("HumanoidRootPart") and v:FindFirstChild("Head") and v:FindFirstChildOfClass("Humanoid") then
                     local player = Players:GetPlayerFromCharacter(v)
                     if player and player == LocalPlayer then
-                        continue
-                    end
-                    if IsFriendly(player) then
                         continue
                     end
                     local health = getModelHealth(v)
@@ -310,11 +292,53 @@ local function ShootAll()
     ensureShootAttachment(tool)
     local weaponName = CombatUtil:GetWeaponName(tool)
     local wdata = CombatUtil:GetWeaponData(weaponName)
-    local fakeInput = makeFakeInput()
-    CombatController:Attack(tool, fakeInput)
 
-    if wdata and wdata.ShootStyle == "Gatling" then
-        local OverheatLimit = wdata.OverheatLimit or 100
+    if not (wdata and wdata.ShootStyle == "Gatling") then
+        local fakeInput = makeFakeInput()
+        CombatController:Attack(tool, fakeInput)
+        task.delay(0.06, function()
+            fakeInput:SetState(Enum.UserInputState.End)
+        end)
+        return
+    end
+
+    local OverheatLimit = 100
+
+    while true do
+        if not tool or not tool.Parent or tool.Parent ~= LocalPlayer.Character then
+            TargetPart = nil
+            TargetModel = nil
+            return
+        end
+        if not TargetPart or not TargetPart.Parent then
+            TargetModel = nil
+            return
+        end
+        local hCheck = getModelHealth(TargetModel)
+        if hCheck <= 0 then
+            TargetPart = nil
+            TargetModel = nil
+            return
+        end
+
+        local waitTicks = 0
+        while tool:GetAttribute("IsReloading_Client") or not tool.Enabled do
+            if not tool or not tool.Parent or tool.Parent ~= LocalPlayer.Character then
+                TargetPart = nil
+                TargetModel = nil
+                return
+            end
+            task.wait(0.05)
+            waitTicks += 1
+            if waitTicks > 200 then
+                return
+            end
+        end
+
+        local fakeInput = makeFakeInput()
+        CombatController:Attack(tool, fakeInput)
+
+        waitTicks = 0
         while not tool:GetAttribute("IsAutoShooting") do
             if not tool or not tool.Parent or tool.Parent ~= LocalPlayer.Character then
                 fakeInput:SetState(Enum.UserInputState.End)
@@ -323,20 +347,22 @@ local function ShootAll()
                 return
             end
             task.wait(0.03)
+            waitTicks += 1
+            if waitTicks > 50 then
+                fakeInput:SetState(Enum.UserInputState.End)
+                return
+            end
         end
 
-        local holdStart = os.clock()
-        local maxHold = 6 -- evita segurar indefinidamente; ajuste conforme desejar
         while true do
             local over = tool:GetAttribute("LocalOverheat") or 0
             local isAuto = tool:GetAttribute("IsAutoShooting")
+
             if (over >= OverheatLimit) then
+                fakeInput:SetState(Enum.UserInputState.End)
                 break
             end
             if not isAuto then
-                break
-            end
-            if os.clock() - holdStart >= maxHold then
                 break
             end
             if not tool or not tool.Parent or tool.Parent ~= LocalPlayer.Character then
@@ -345,18 +371,26 @@ local function ShootAll()
             if not TargetPart or not TargetPart.Parent then
                 break
             end
+
             local h = getModelHealth(TargetModel)
             if h <= 0 then
                 break
             end
+
             task.wait(0.05)
         end
 
         fakeInput:SetState(Enum.UserInputState.End)
-    else
-        task.delay(0.06, function()
-            fakeInput:SetState(Enum.UserInputState.End)
-        end)
+
+        if not tool or not tool.Parent or tool.Parent ~= LocalPlayer.Character then
+            return
+        end
+        local hAfter = getModelHealth(TargetModel)
+        if not TargetModel or hAfter <= 0 then
+            TargetPart = nil
+            TargetModel = nil
+            return
+        end
     end
 end
 
