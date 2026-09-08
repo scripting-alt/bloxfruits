@@ -133,24 +133,48 @@ end
 
 local function hookRequestM1()
     local success, requestFunc = pcall(function()
-        return require(ReplicatedStorage:WaitForChild("EffectContainer"):WaitForChild("Gun_M1"):WaitForChild("RequestM1"))
+        return require(
+            ReplicatedStorage
+                :WaitForChild("EffectContainer")
+                :WaitForChild("Gun_M1")
+                :WaitForChild("RequestM1")
+        )
     end)
+
     if not success or type(requestFunc) ~= "function" then
         return
     end
-    local old; old = clonefunction(hookfunction(requestFunc, newcclosure(function(p1, ...)
-        if type(p1) == "table" and TargetPart and TargetPart.Parent then
-            p1.TargetPosition = TargetPart.Position
-            if p1.ExplodePos then
-                p1.ExplodePos = TargetPart.Position
+
+    local old
+    old = clonefunction(hookfunction(requestFunc, newcclosure(function(p1, ...)
+        if type(p1) == "table"
+            and TargetPart
+            and TargetPart.Parent
+            and p1.origin
+            and LocalPlayer.Character
+            and LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
+        then
+            local hrp = LocalPlayer.Character.HumanoidRootPart
+
+            -- Distância entre a origem do tiro e o jogador
+            local distance = (p1.origin - hrp.Position).Magnitude
+
+            if distance <= 30 then
+                p1.TargetPosition = TargetPart.Position
+
+                if p1.ExplodePos then
+                    p1.ExplodePos = TargetPart.Position
+                end
             end
         end
+
         return old(p1, ...)
     end)))
+
 end
 
 pcall(hookShootEvent)
---pcall(hookRequestM1)
+pcall(hookRequestM1)
 
 local function ensureShootAttachment(tool)
     if not tool then return end
