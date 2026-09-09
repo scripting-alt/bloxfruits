@@ -167,6 +167,32 @@ end
 
 s.SetLocale=s.UpdateTranslate
 
+-- ==========================================================
+-- Tradução de textos dinâmicos (com valores que mudam)
+-- Uso: Library:Translate("Server Time : %s", TimerModule:GetUptime(true))
+-- Cadastre a chave com "%s" no lugar do valor:
+--   Library:AddTranslations("pt", { ["Server Time : %s"]="Tempo do Servidor : %s" })
+-- ==========================================================
+function s:Translate(aTemplate,...)
+	assert(type(aTemplate)=="string","Library.Translate: template precisa ser string")
+
+	local aTranslatedTemplate=Localize(aTemplate)
+
+	if select("#",...)>0 then
+		local aOk,aResult=pcall(string.format,aTranslatedTemplate,...)
+
+		if aOk then
+			return aResult
+		end
+
+		-- fallback: a tradução tem %s divergente do original, usa o template original formatado
+		local aOk2,aResult2=pcall(string.format,aTemplate,...)
+		return aOk2 and aResult2 or aTranslatedTemplate
+	end
+
+	return aTranslatedTemplate
+end
+
 s.Info=s.Information
 s.Save=s.Default
 
