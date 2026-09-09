@@ -50,6 +50,11 @@ return {
     ["Info"] = "Informações",
 
     ["[+] Added: Auto Gun Shoot"] = "[+] Adicionado: Tiro Automático de Arma",
+
+    ["LOADING..."] = "CARREGANDO...",
+    ["Server Time : %s"] = "Tempo do Servidor : %s",
+    ["Fruit Spawn : %s"] = "Spawn de Frutas : %s",
+    ["Uptime"] = "Tempo de Atividade",
 }
 
 --
