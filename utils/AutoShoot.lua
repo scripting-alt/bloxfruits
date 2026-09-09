@@ -2,12 +2,27 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Players = game:GetService("Players")
 local LocalPlayer = Players.LocalPlayer
 local UserInputService = game:GetService("UserInputService")
+local CollectionService = game:GetService("CollectionService")
 
 local CombatController = require(ReplicatedStorage.Controllers.CombatController)
 local CombatUtil = require(ReplicatedStorage.Modules.CombatUtil)
 
 local TargetPart = nil
 local TargetModel = nil
+
+local function IsFriendly(player)
+    if not player or not player:IsA("Player") then
+        return false
+    end
+
+    if player == LocalPlayer then
+        return true
+    end
+
+    return CollectionService:HasTag(player, "Ally" .. LocalPlayer.Name)
+        or CollectionService:HasTag(LocalPlayer, "Ally" .. player.Name)
+        or (LocalPlayer.Team and game:GetService("Teams"):FindFirstChild("Marines") and LocalPlayer.Team == game.Teams.Marines and player.Team == game.Teams.Marines)
+end
 
 local function getModelHealth(model)
     if not model then return math.huge end
@@ -42,7 +57,8 @@ local function GetBladeHits(distance)
             for _, v in ipairs(container:GetChildren()) do
                 if v:FindFirstChild("HumanoidRootPart") and v:FindFirstChild("Head") and v:FindFirstChildOfClass("Humanoid") then
                     local player = Players:GetPlayerFromCharacter(v)
-                    if player and player == LocalPlayer then
+                    -- Ignora se for o próprio jogador ou se for aliado
+                    if player and IsFriendly(player) then
                         continue
                     end
                     local health = getModelHealth(v)
@@ -170,7 +186,6 @@ local function hookRequestM1()
 
         return old(p1, ...)
     end)))
-
 end
 
 pcall(hookShootEvent)
@@ -277,10 +292,15 @@ end
 local function ShootAll()
     local char = LocalPlayer and LocalPlayer.Character
     local tool = char and char:FindFirstChildOfClass("Tool")
+
+    local weaponName = CombatUtil:GetWeaponName(tool)
+    local wdata = CombatUtil:GetWeaponData(weaponName)
+
     if not (char and tool) then return end
     if tool.ToolTip ~= "Gun" then return end
+    if wdata then else return end
 
-    local enemies = GetBladeHits(500)
+    local enemies = GetBladeHits(wdata.Range or 500)
     local closestEnemy = chooseClosest(enemies)
     if not closestEnemy then
         TargetPart = nil
@@ -314,8 +334,6 @@ local function ShootAll()
     end
 
     ensureShootAttachment(tool)
-    local weaponName = CombatUtil:GetWeaponName(tool)
-    local wdata = CombatUtil:GetWeaponData(weaponName)
 
     if not (wdata and wdata.ShootStyle == "Gatling") then
         local fakeInput = makeFakeInput()
