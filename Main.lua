@@ -6,7 +6,7 @@ Library:AddTranslations("en", {})
 Library:UpdateTranslate("pt")
 
 ScriptVersion = {
-    Version = "v4.9.8",
+    Version = "v5.9.8",
     Date = "2026-08-31"
 }
 
@@ -326,68 +326,74 @@ function BringMob(MobName)
     local Player = game.Players.LocalPlayer
     local Character = Player.Character
     local PlayerRoot = Character and Character:FindFirstChild("HumanoidRootPart")
-    if not PlayerRoot then
-        return
-    end
-    local NearestNPC = nil
+    if not PlayerRoot then return end
+
+    local EnemiesFolder = workspace:FindFirstChild("Enemies")
+    if not EnemiesFolder then return end
+
+    local ValidMobs = {}
+    local NearestHRP = nil
     local NearestDistance = math.huge
-    for _, Enemy in ipairs(workspace.Enemies:GetChildren()) do
+    local playerPos = PlayerRoot.Position
+
+    for _, Enemy in ipairs(EnemiesFolder:GetChildren()) do
         if Enemy.Name == MobName then
             local Humanoid = Enemy:FindFirstChild("Humanoid")
-            local HumanoidRootPart = Enemy:FindFirstChild("HumanoidRootPart")
+            local HRP = Enemy:FindFirstChild("HumanoidRootPart")
 
-            if Humanoid
-            and HumanoidRootPart
-            and Humanoid.Health > 0 then
+            if Humanoid and HRP and Humanoid.Health > 0 then
+                local dist = (HRP.Position - playerPos).Magnitude
 
-                local Distance = (HumanoidRootPart.Position - PlayerRoot.Position).Magnitude
-
-                if Distance <= _G.BringDistance and Distance < NearestDistance then
-                    NearestDistance = Distance
-                    NearestNPC = Enemy
+                if dist <= _G.BringDistance then
+                    table.insert(ValidMobs, {Enemy = Enemy, Hum = Humanoid, HRP = HRP})
+                    
+                    if dist < NearestDistance then
+                        NearestDistance = dist
+                        NearestHRP = HRP
+                    end
                 end
             end
         end
     end
 
-    if not NearestNPC then
-        return
-    end
-    local BringPos = NearestNPC.HumanoidRootPart.CFrame
-    for _, Enemy in ipairs(workspace.Enemies:GetChildren()) do
-        local Humanoid = Enemy:FindFirstChild("Humanoid")
-        local HumanoidRootPart = Enemy:FindFirstChild("HumanoidRootPart")
+    if not NearestHRP or #ValidMobs == 0 then return end
 
-        if Enemy.Name == MobName
-        and Enemy.Parent
-        and Humanoid
-        and HumanoidRootPart
-        and Humanoid.Health > 0
-        and (HumanoidRootPart.Position - PlayerRoot.Position).Magnitude >= 50
-        and (HumanoidRootPart.Position - PlayerRoot.Position).Magnitude <= _G.BringDistance then
-            HumanoidRootPart.CFrame = BringPos
-            Humanoid.JumpPower = 0
-            Humanoid.WalkSpeed = 0
-            HumanoidRootPart.Transparency = 1
-            HumanoidRootPart.CanCollide = false
+    local BringPos = NearestHRP.CFrame
 
-            local Head = Enemy:FindFirstChild("Head")
-            if Head then
-                Head.CanCollide = false
+    for _, mobData in ipairs(ValidMobs) do
+        local Enemy = mobData.Enemy
+        local Humanoid = mobData.Hum
+        local HRP = mobData.HRP
+
+        if HRP ~= NearestHRP then
+            HRP.CFrame = BringPos
+        end
+
+        HRP.Velocity = Vector3.zero
+        HRP.RotVelocity = Vector3.zero
+
+        Humanoid.WalkSpeed = 0
+        Humanoid.JumpPower = 0
+
+        local Lock = HRP:FindFirstChild("Lock")
+        if not Lock then
+            Lock = Instance.new("BodyVelocity")
+            Lock.Name = "Lock"
+            Lock.MaxForce = Vector3.new(math.huge, math.huge, math.huge)
+            Lock.Velocity = Vector3.zero
+            Lock.Parent = HRP
+        end
+
+        for _, part in ipairs(Enemy:GetChildren()) do
+            if part:IsA("BasePart") then
+                part.CanCollide = false
             end
+        end
 
-            local Animator = Humanoid:FindFirstChild("Animator")
-            if Animator then
-                Animator:Destroy()
-            end
-
-            if not HumanoidRootPart:FindFirstChild("Lock") then
-                local BodyVelocity = Instance.new("BodyVelocity")
-                BodyVelocity.Name = "Lock"
-                BodyVelocity.Parent = HumanoidRootPart
-                BodyVelocity.MaxForce = Vector3.new(math.huge, math.huge, math.huge)
-                BodyVelocity.Velocity = Vector3.zero
-            end
+        if sethiddenproperty then
+            pcall(function()
+                sethiddenproperty(HRP, "NetworkIsSleeping", false)
+            end)
         end
     end
 end
@@ -491,18 +497,14 @@ function requestEntrance(entrance)
     task.wait(0.5)
 end
 
-function topos(TargetCFrame, speed)
-    speed = speed or _G.TweenSpeed
-    if not TargetCFrame then
-        return
-    end
+local CurrentTween = nil
+
+function topos(TargetCFrame)
+    if not TargetCFrame then return end
 
     local Player = game.Players.LocalPlayer
     local Character = Player.Character
-
-    if not Character then
-        return
-    end
+    if not Character then return end
 
     local Humanoid = Character:FindFirstChild("Humanoid")
     local HumanoidRootPart = Character:FindFirstChild("HumanoidRootPart")
@@ -511,61 +513,112 @@ function topos(TargetCFrame, speed)
         return
     end
 
-    local Distance = (TargetCFrame.Position - HumanoidRootPart.Position).Magnitude
+    -- Cancela tween anterior se existir
+    if CurrentTween then
+        CurrentTween:Cancel()
+        CurrentTween = nil
+    end
 
     local NearestTeleporter = CheckNearestTeleporter(TargetCFrame)
     if NearestTeleporter then
         requestEntrance(NearestTeleporter)
         warn("[REDZ HUB] Teleported to nearest teleporter: " .. tostring(NearestTeleporter))
+        task.wait(0.2)
     end
 
+    -- Cria a PartTele invisível
     local PartTele = Character:FindFirstChild("PartTele")
-
     if not PartTele then
         PartTele = Instance.new("Part")
         PartTele.Name = "PartTele"
-        PartTele.Size = Vector3.new(10, 1, 10)
+        PartTele.Size = Vector3.new(6, 1, 6)
         PartTele.Anchored = true
         PartTele.Transparency = 1
-        PartTele.CanCollide = true
-        PartTele.CFrame = WaitHRP(Player).CFrame
+        PartTele.CanCollide = false
+        PartTele.CFrame = HumanoidRootPart.CFrame
         PartTele.Parent = Character
-
-        PartTele:GetPropertyChangedSignal("CFrame"):Connect(function()
-            if not TweenON then
-                return
-            end
-
-            task.wait()
-
-            local Root = WaitHRP(Player)
-            if Root then
-                --Root.CFrame = PartTele.CFrame
-            end
-        end)
     end
 
     TweenON = true
-    local adjustedSpeed = speed
 
-    local Tween = game:GetService("TweenService"):Create(
-        PartTele,
-        TweenInfo.new(Distance / adjustedSpeed, Enum.EasingStyle.Linear),
-        {
-            CFrame = TargetCFrame
-        }
-    )
+    task.spawn(function()
+        -- CONFIGURAÇÕES DO CICLO
+        local FAST_SPEED = 300      -- Velocidade máxima
+        local SLOW_SPEED = 50       -- Velocidade de resfriamento (anti-rollback)
+        local FAST_DISTANCE = 150   -- Quantos studs ele anda no modo rápido antes de frear
+        local SLOW_DURATION = 3   -- Quantos segundos ele fica no modo lento (50 speed)
 
-    Tween:Play()
+        local isFast = true
 
-    Tween.Completed:Connect(function(State)
-        if State == Enum.PlaybackState.Completed then
-            if Character:FindFirstChild("PartTele") then
-                Character.PartTele:Destroy()
+        while TweenON and Character and Humanoid.Health > 0 do
+            local currentPos = HumanoidRootPart.Position
+            local targetPos = TargetCFrame.Position
+            local totalDistance = (targetPos - currentPos).Magnitude
+
+            -- Chegou ao destino final
+            if totalDistance <= 6 then
+                PartTele.CFrame = TargetCFrame
+                break
             end
 
-            TweenON = false
+            local speed = FAST_SPEED
+            local stepDistance = totalDistance
+
+            -- Se a distância for longa, ativa o ciclo de alternância
+            if totalDistance > FAST_DISTANCE then
+                if isFast then
+                    -- FASE 1: RÁPIDO (300 Speed)
+                    speed = FAST_SPEED
+                    stepDistance = FAST_DISTANCE
+                else
+                    -- FASE 2: LENTO (50 Speed por ~2 segundos = anda ~100 studs)
+                    speed = SLOW_SPEED
+                    stepDistance = math.min(totalDistance, SLOW_SPEED * SLOW_DURATION)
+                end
+            else
+                -- Distância curta: vai direto na velocidade máxima
+                speed = FAST_SPEED
+                stepDistance = totalDistance
+            end
+
+            -- Calcula o próximo ponto do trajeto
+            local direction = (targetPos - currentPos).Unit
+            local nextPosition = currentPos + (direction * stepDistance)
+            local nextCFrame = CFrame.new(nextPosition, targetPos)
+
+            local tweenDuration = stepDistance / speed
+
+            CurrentTween = game:GetService("TweenService"):Create(
+                PartTele,
+                TweenInfo.new(tweenDuration, Enum.EasingStyle.Linear),
+                { CFrame = nextCFrame }
+            )
+
+            CurrentTween:Play()
+
+            -- Trava o HumanoidRootPart na PartTele com segurança
+            local conn
+            conn = game:GetService("RunService").Heartbeat:Connect(function()
+                if not TweenON or not PartTele or not PartTele.Parent then
+                    conn:Disconnect()
+                    return
+                end
+            end)
+
+            CurrentTween.Completed:Wait()
+            conn:Disconnect()
+
+            -- Alterna entre Rápido (300) e Devagar (50)
+            isFast = not isFast
+            task.wait(0.02)
         end
+
+        -- Limpa a peça ao chegar
+        if Character:FindFirstChild("PartTele") then
+            Character.PartTele:Destroy()
+        end
+        TweenON = false
+        CurrentTween = nil
     end)
 end
 
@@ -1781,7 +1834,7 @@ reload()
 local GachaEvent = game:GetService("ReplicatedStorage").Modules.Net["RF/GachaNetworkRF"]
 
 spawn(function()
-    while task.wait(1) do
+    while task.wait(5) do
         if _G.randomFruits and not _G.randomFruitsEvent then
             GachaEvent:InvokeServer({Context="Purchase",BoxName="ZiolesGacha"})
         end
@@ -1789,7 +1842,11 @@ spawn(function()
         if _G.randomFruitsEvent then
             GachaEvent:InvokeServer({Context="Purchase",BoxName="MagnetEventGacha26"})
         end
-
+    end
+end)
+spawn(function()
+    while task.wait(1) do
+    
         if _G.getFruits and not checkStopFarm("FruitSpawn") then
             _G.ConfigStopFarm.FruitSpawn = false
 
@@ -1933,7 +1990,7 @@ Tab_Discord:AddDiscordInvite({
 Tab_Discord:AddSection("ChangeLog")
 Tab_Discord:AddParagraph("[+] Added: Auto Gun Shoot")
 Tab_Discord:AddParagraph("[/] Fixed: Auto Farm Level Stuck")
-Tab_Discord:AddParagraph("[/] Fixed: Tween Speed Max Is 200")
+Tab_Discord:AddParagraph("[/] Fixed: Tween Speed Max Is 150")
 
 Tab_Discord:AddSection("Info")
 Tab_Discord:AddParagraph("Version:", ScriptVersion.Version)
@@ -4395,3 +4452,18 @@ task.spawn(function()
     end
 end)
 
+local TimerModule = loadstring(game:HttpGet("https://raw.githubusercontent.com/scripting-alt/bloxfruits/refs/heads/main/utils/TimerModule.lua"))()
+TimerModule:Init()
+TimerModule:SetFormatStyle("short")
+
+Tab_Status:AddSection("Status")
+ServerTimerParagraph = Tab_Status:AddParagraph("Server Time : LOADING...")
+FruitSpawnParagraph = Tab_Status:AddParagraph("Fruit Spawn : LOADING...")
+CountFruitSpawnParagraph = Tab_Status:AddParagraph("Count Fruit Spawn : LOADING...")
+spawn(function()
+    while wait(1) do
+        ServerTimerParagraph:SetTitle(Library:Translate("Server Time : %s", TimerModule:GetUptime(true)))
+        FruitSpawnParagraph:SetTitle(Library:Translate("Fruit Spawn : %s", TimerModule:GetTimeUntil("FruitSpawn", true)))
+        --CountFruitSpawnParagraph:SetTitle(Library:Translate("Count Fruit Spawn : %s", TimerModule:GetCycleCount("FruitSpawn")))
+    end
+end)	
