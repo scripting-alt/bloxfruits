@@ -4462,8 +4462,8 @@ FruitSpawnParagraph = Tab_Status:AddParagraph("Fruit Spawn : LOADING...")
 CountFruitSpawnParagraph = Tab_Status:AddParagraph("Count Fruit Spawn : LOADING...")
 spawn(function()
     while wait(1) do
-        ServerTimerParagraph:SetTitle(Library:Translate("Server Time : %s", TimerModule:GetUptime(true)))
-        FruitSpawnParagraph:SetTitle(Library:Translate("Fruit Spawn : %s", TimerModule:GetTimeUntil("FruitSpawn", true)))
+        --ServerTimerParagraph:SetTitle(Library:Translate("Server Time : %s", TimerModule:GetUptime(true)))
+        --FruitSpawnParagraph:SetTitle(Library:Translate("Fruit Spawn : %s", TimerModule:GetTimeUntil("FruitSpawn", true)))
         --CountFruitSpawnParagraph:SetTitle(Library:Translate("Count Fruit Spawn : %s", TimerModule:GetCycleCount("FruitSpawn")))
     end
 end)	
