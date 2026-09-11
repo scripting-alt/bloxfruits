@@ -1,3 +1,5 @@
+if not game:IsLoaded() then game.Loaded:Wait() end
+
 local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/scripting-alt/bloxfruits/refs/heads/main/library.luau"))()
 local pt_br = loadstring(game:HttpGet("https://raw.githubusercontent.com/scripting-alt/bloxfruits/refs/heads/main/translate/pt_br.lua"))()
 
