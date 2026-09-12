@@ -1,8 +1,19 @@
 if not game:IsLoaded() then game.Loaded:Wait() end
+spawn(function()
+    pcall(function()
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/scripting-alt/bloxfruits/refs/heads/main/utils/Loading.lua"))()
+    end)
+end)
+task.wait(15)
+
+if _G.RedzHub then
+    warn("[REDZ HUB] RedzHub is already running. Stopping execution.")
+    return
+end
 
 local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/scripting-alt/bloxfruits/refs/heads/main/library.luau"))()
 local pt_br = loadstring(game:HttpGet("https://raw.githubusercontent.com/scripting-alt/bloxfruits/refs/heads/main/translate/pt_br.lua"))()
-
+_G.RedzHub = true
 Library:AddTranslations("pt", pt_br)
 Library:AddTranslations("en", {})
 Library:UpdateTranslate("pt")
@@ -64,6 +75,10 @@ elseif WorldSea == "Sea3" then
 elseif WorldSea == "Dungeons" then
     World3 = true
     warn("[REDZ HUB] Dungeons")
+else
+    warn("[REDZ HUB] Unknown World")
+    Library:Destroy()
+    return
 end
 
 local Window
@@ -4464,8 +4479,8 @@ FruitSpawnParagraph = Tab_Status:AddParagraph("Fruit Spawn : LOADING...")
 CountFruitSpawnParagraph = Tab_Status:AddParagraph("Count Fruit Spawn : LOADING...")
 spawn(function()
     while wait(1) do
-        --ServerTimerParagraph:SetTitle(Library:Translate("Server Time : %s", TimerModule:GetUptime(true)))
-        --FruitSpawnParagraph:SetTitle(Library:Translate("Fruit Spawn : %s", TimerModule:GetTimeUntil("FruitSpawn", true)))
+        ServerTimerParagraph:SetTitle(Library:Translate("Server Time : %s", TimerModule:GetUptime(true)))
+        FruitSpawnParagraph:SetTitle(Library:Translate("Fruit Spawn : %s", TimerModule:GetTimeUntil("FruitSpawn", true)))
         --CountFruitSpawnParagraph:SetTitle(Library:Translate("Count Fruit Spawn : %s", TimerModule:GetCycleCount("FruitSpawn")))
     end
 end)	
