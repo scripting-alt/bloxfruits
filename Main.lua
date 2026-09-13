@@ -3559,7 +3559,7 @@ Tab_Misc:AddSlider({
   Min = 1,
   Max = 300,
   Increment = 10,
-  Default = game.Players.LocalPlayer.Character:GetAttribute("DashLength") or 10,
+  Default = 30,
   Callback = function(Value)
     if game.Players.LocalPlayer.Character then
     game.Players.LocalPlayer.Character:SetAttribute("DashLength",Value)
