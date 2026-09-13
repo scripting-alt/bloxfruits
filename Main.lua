@@ -4,8 +4,6 @@ repeat task.wait() until game:IsLoaded()
 -- 2. Aguarda o Jogador Local, Personagem e Físicas carregarem
 local Players = game:GetService("Players")
 local LocalPlayer = Players.LocalPlayer or Players.PlayerAdded:Wait()
-local Character = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
-Character:WaitForChild("HumanoidRootPart")
 LocalPlayer:WaitForChild("PlayerGui")
 
 -- 3. Tela de carregamento externa
