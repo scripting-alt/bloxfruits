@@ -1,2588 +1,4346 @@
--- ==========================================================
--- REDZ LIBRARY V5 - FULL EXPANDED EDITION (PARTICLES & ANIMS)
--- ==========================================================
+local a=cloneref or(function(...)return...end)
 
-local cloneref = cloneref or (function(...) return ... end)
-local delfolder = delfolder or deletefolder
-local delfile = delfile or deletefile
-local makefolder = makefolder
-local writefile = writefile
-local readfile = readfile
+local b=delfolder or deletefolder
+local c=delfile or deletefile
+local d=makefolder
+local e=writefile
+local f=readfile
 
-local Services = setmetatable({}, {
-    __index = function(self, serviceName)
-        local service = cloneref(game:GetService(serviceName))
-        rawset(self, serviceName, service)
-        return service
-    end
+local g=setmetatable({},{
+__index=function(g,h)
+rawset(g,h,a(game:GetService(h)))
+return rawget(g,h)
+end
 })
 
-local MarketplaceService = Services.MarketplaceService
-local UserInputService   = Services.UserInputService
-local TweenService       = Services.TweenService
-local HttpService        = Services.HttpService
-local RunService         = Services.RunService
-local Players            = Services.Players
+local h=g.MarketplaceService
+local i=g.UserInputService
+local j=g.TweenService
+local k=g.HttpService
+local l=g.RunService
+local m=g.Players
 
-local Heartbeat = RunService.Heartbeat
-local LocalPlayer = Players.LocalPlayer
-local Mouse = LocalPlayer:GetMouse()
+local n=l.Heartbeat
 
-local CoreGui = (gethui or function() return Services.CoreGui end)()
+local o=m.LocalPlayer
+local p=o:GetMouse()
 
--- ==========================================================
--- TEMAS & CORES DA INTERFACE
--- ==========================================================
-local ThemesList = {
-    Darker = {
-        Colors = {
-            Background = ColorSequence.new{
-                ColorSequenceKeypoint.new(0.00, Color3.fromRGB(18, 18, 22)),
-                ColorSequenceKeypoint.new(0.50, Color3.fromRGB(26, 26, 32)),
-                ColorSequenceKeypoint.new(1.00, Color3.fromRGB(18, 18, 22))
-            },
-            Primary = Color3.fromRGB(255, 35, 65),
-            OnPrimary = Color3.fromRGB(90, 20, 30),
-            ScrollBar = Color3.fromRGB(255, 35, 65),
-            Stroke = Color3.fromRGB(48, 48, 56),
+local q=(gethui or function()return g.CoreGui end)()
 
-            Error = Color3.fromRGB(255, 80, 80),
-            Icons = Color3.fromRGB(235, 235, 240),
+local r={
+Darker={
+Colors={
+Background=ColorSequence.new{
+ColorSequenceKeypoint.new(0.00,Color3.fromRGB(25,25,25)),
+ColorSequenceKeypoint.new(0.50,Color3.fromRGB(32.5,32.5,32.5)),
+ColorSequenceKeypoint.new(1.00,Color3.fromRGB(25,25,25))
+},
+Primary=Color3.fromRGB(88,101,242),
+OnPrimary=Color3.fromRGB(61,67,135),
+ScrollBar=Color3.fromRGB(1,76,105),
+Stroke=Color3.fromRGB(45,45,45),
 
-            JoinButton = Color3.fromRGB(37, 128, 69),
-            Link = Color3.fromRGB(40, 150, 255),
+Error=Color3.fromRGB(255,102,102),
+Icons=Color3.fromRGB(232,233,235),
 
-            Dialog = {
-                Background = Color3.fromRGB(22, 22, 26)
-            },
-            Buttons = {
-                Holding = Color3.fromRGB(36, 36, 44),
-                Default = Color3.fromRGB(26, 26, 30)
-            },
-            Border = {
-                Holding = Color3.fromRGB(65, 65, 75),
-                Default = Color3.fromRGB(38, 38, 44),
-            },
-            Text = {
-                Default = Color3.fromRGB(255, 255, 255),
-                Dark = Color3.fromRGB(195, 195, 205),
-                Darker = Color3.fromRGB(145, 145, 155),
-            },
-            Slider = {
-                SliderBar = Color3.fromRGB(255, 35, 65),
-                SliderNumber = Color3.fromRGB(240, 240, 245),
-            },
-            Dropdown = {
-                Holder = Color3.fromRGB(24, 24, 28),
-            }
-        },
-        Icons = {
-            Error = "rbxassetid://10709752996",
-            Button = "rbxassetid://10709791437",
-            Close = "rbxassetid://10747384394",
-            TextBox = "rbxassetid://15637081879",
-            Search = "rbxassetid://10734943674",
-            Keybind = "rbxassetid://10734982144",
-            Dropdown = {
-                Open = "rbxassetid://10709791523",
-                Close = "rbxassetid://10709790948"
-            }
-        },
-        Font = {
-            Normal = Enum.Font.BuilderSans,
-            Medium = Enum.Font.BuilderSansMedium,
-            Bold = Enum.Font.BuilderSansBold,
-            ExtraBold = Enum.Font.BuilderSansExtraBold,
-            SliderValue = Enum.Font.FredokaOne
-        },
-        BackgroundTransparency = 0.04
-    }
+JoinButton=Color3.fromRGB(37,128,69),
+Link=Color3.fromRGB(40,150,255),
+
+Dialog={
+Background=Color3.fromRGB(28,28,28)
+},
+Buttons={
+Holding=Color3.fromRGB(34,34,34),
+Default=Color3.fromRGB(28,28,30)
+},
+Border={
+Holding=Color3.fromRGB(60,60,60),
+Default=Color3.fromRGB(38,38,38),
+},
+Text={
+Default=Color3.fromRGB(255,255,255),
+Dark=Color3.fromRGB(200,200,200),
+Darker=Color3.fromRGB(175,175,175),
+},
+Slider={
+SliderBar=Color3.fromRGB(1,76,105),
+SliderNumber=Color3.fromRGB(232,233,235),
+},
+Dropdown={
+Holder=Color3.fromRGB(30,30,30),
+}
+},
+Icons={
+Error="rbxassetid://10709752996",
+Button="rbxassetid://10709791437",
+Close="rbxassetid://10747384394",
+TextBox="rbxassetid://15637081879",
+Search="rbxassetid://10734943674",
+Keybind="rbxassetid://10734982144",
+Dropdown={
+Open="rbxassetid://10709791523",
+Close="rbxassetid://10709790948"
+}
+},
+Font={
+Normal=Enum.Font.BuilderSans,
+Medium=Enum.Font.BuilderSansMedium,
+Bold=Enum.Font.BuilderSansBold,
+ExtraBold=Enum.Font.BuilderSansExtraBold,
+SliderValue=Enum.Font.FredokaOne
+},
+BackgroundTransparency=0.03
+}
 }
 
-for themeName, themeData in ThemesList do
-    themeData.Name = themeName
-    table.freeze(themeData)
+for s,t in r do
+t.Name=s
+table.freeze(t)
 end
 
-local Library = {
-    Information = {
-        Version = "v2.2.0",
-        GitHubOwner = "tlredz"
-    },
-    Default = {
-        Theme = "Darker",
-        UISize = UDim2.fromOffset(560, 390),
-        TabSize = 160
-    },
+local s={
+Information={
+Version="v2.0.1",
+GitHubOwner="tlredz"
+},
+Default={
+Theme="Darker",
+UISize=UDim2.fromOffset(550,380),
+TabSize=160
+},
 
-    Themes = ThemesList,
-    Connections = {},
-    Options = {},
-    Tabs = {},
+Themes=r,
 
-    FarmStatusColors = {
-        Running = "#5CB85C",
-        Waiting = "#F0AD4E",
-        Need = "#D9534F"
-    }
+Connections={},
+Options={},
+Tabs={},
+
+FarmStatusColors={
+Running="#5CB85C",
+Waiting="#F0AD4E",
+Need="#D9534F"
+}
 }
 
 -- ==========================================================
--- SISTEMA DE LOCALIZAÇÃO / TRADUÇÃO
+-- Sistema de tradução embutido
 -- ==========================================================
-local function Localize(text)
-    if type(text) ~= "string" or text == "" then
-        return text
-    end
-    local pack = Library.Translations[Library.Locale]
-    return (pack and pack[text]) or text
+local function Localize(aText)
+	if type(aText)~="string" or aText=="" then
+		return aText
+	end
+
+	local aPack=s.Translations[s.Locale]
+	return (aPack and aPack[aText]) or aText
 end
 
-Library.Locale = "en"
-Library.Translations = {}
-Library.LocalizedLabels = {}
+s.Locale="en"
+s.Translations={}
+s.LocalizedLabels={}
 
-function Library:AddTranslations(locale, tbl)
-    assert(type(locale) == "string", "Library.AddTranslations: locale precisa ser string")
-    assert(type(tbl) == "table", "Library.AddTranslations: translations precisa ser uma table")
+function s:AddTranslations(aLocale,aTable)
+	assert(type(aLocale)=="string","Library.AddTranslations: locale precisa ser string")
+	assert(type(aTable)=="table","Library.AddTranslations: translations precisa ser uma table")
 
-    self.Translations[locale] = self.Translations[locale] or {}
-    for k, v in tbl do
-        self.Translations[locale][k] = v
-    end
+	self.Translations[aLocale]=self.Translations[aLocale] or {}
+
+	for aKey,aValue in aTable do
+		self.Translations[aLocale][aKey]=aValue
+	end
 end
 
-function Library:UpdateTranslate(locale)
-    if locale then
-        self.Locale = locale
-    end
-    for i = #self.LocalizedLabels, 1, -1 do
-        local entry = self.LocalizedLabels[i]
-        if entry.Instance and entry.Instance.Parent then
-            entry.Instance.Text = Localize(entry.Original)
-        else
-            table.remove(self.LocalizedLabels, i)
-        end
-    end
+function s:UpdateTranslate(aLocale)
+	if aLocale then
+		self.Locale=aLocale
+	end
+
+	for aIndex=#self.LocalizedLabels,1,-1 do
+		local aEntry=self.LocalizedLabels[aIndex]
+
+		if aEntry.Instance and aEntry.Instance.Parent then
+			aEntry.Instance.Text=Localize(aEntry.Original)
+		else
+			table.remove(self.LocalizedLabels,aIndex)
+		end
+	end
 end
 
-Library.SetLocale = Library.UpdateTranslate
+s.SetLocale=s.UpdateTranslate
 
-function Library:Translate(template, ...)
-    assert(type(template) == "string", "Library.Translate: template precisa ser string")
-    local translated = Localize(template)
-    if select("#", ...) > 0 then
-        local ok, res = pcall(string.format, translated, ...)
-        if ok then return res end
-        local ok2, res2 = pcall(string.format, template, ...)
-        return ok2 and res2 or translated
-    end
-    return translated
+-- ==========================================================
+-- Tradução de textos dinâmicos (com valores que mudam)
+-- Uso: Library:Translate("Server Time : %s", TimerModule:GetUptime(true))
+-- Cadastre a chave com "%s" no lugar do valor:
+--   Library:AddTranslations("pt", { ["Server Time : %s"]="Tempo do Servidor : %s" })
+-- ==========================================================
+function s:Translate(aTemplate,...)
+	assert(type(aTemplate)=="string","Library.Translate: template precisa ser string")
+
+	local aTranslatedTemplate=Localize(aTemplate)
+
+	if select("#",...)>0 then
+		local aOk,aResult=pcall(string.format,aTranslatedTemplate,...)
+
+		if aOk then
+			return aResult
+		end
+
+		-- fallback: a tradução tem %s divergente do original, usa o template original formatado
+		local aOk2,aResult2=pcall(string.format,aTemplate,...)
+		return aOk2 and aResult2 or aTranslatedTemplate
+	end
+
+	return aTranslatedTemplate
 end
 
-Library.Info = Library.Information
-Library.Save = Library.Default
+s.Info=s.Information
+s.Save=s.Default
 
-function Library:SetFarmStatusColor(name, hex)
-    assert(type(name) == "string", "Library.SetFarmStatusColor: 'name' precisa ser string")
-    assert(type(hex) == "string", "Library.SetFarmStatusColor: 'hex' precisa ser string")
-    self.FarmStatusColors[name] = hex
+function s:SetFarmStatusColor(aName,aHex)
+	assert(type(aName)=="string","Library.SetFarmStatusColor: 'name' precisa ser string")
+	assert(type(aHex)=="string","Library.SetFarmStatusColor: 'hex' precisa ser string (ex: '#5CB85C')")
+
+	self.FarmStatusColors[aName]=aHex
 end
 
-local ViewportSize = workspace.CurrentCamera.ViewportSize
+local t=workspace.CurrentCamera.ViewportSize local u=function(
 
-local ConnectEvent = function(inst, callback, eventName)
-    table.insert(Library.Connections, inst[eventName or "Connect"](inst, callback))
+u, v, w)
+table.insert(s.Connections,u[w or"Connect"](u,v))end
+
+
+local v={}
+v.__index=v local w=function(
+
+w, x)
+for y in x:gmatch"[^%.]+"do
+w=w[y]
 end
 
-local ThemeManager = {}
-ThemeManager.__index = ThemeManager
+return w end local x=function(
 
-local ResolveThemePath = function(themeTbl, pathStr)
-    for seg in pathStr:gmatch"[^%.]+" do
-        themeTbl = themeTbl[seg]
-    end
-    return themeTbl
+
+x, y, z, A)
+if not A then
+A=s.CurrentTheme
 end
 
-local ApplyThemeProp = function(inst, propName, themeKey, targetTheme)
-    if not targetTheme then
-        targetTheme = Library.CurrentTheme
-    end
-    inst[propName] = ResolveThemePath(targetTheme, if type(themeKey) == "function" then themeKey() else themeKey)
+x[y]=w(A,if type(z)=="function"then z()else z)end local y=function(
+
+
+y, z, A)
+for B,C in A do
+x(z,B,C,y)
+end end local z=function(
+
+
+z, A)
+if d then
+local B=z:split"/"
+B[#B]=nil
+
+local C=table.concat(B,"/")
+
+if C~=""and(isfolder==nil or not isfolder(C))then
+d(C)
+end
 end
 
-local ApplyThemeProps = function(targetTheme, inst, props)
-    for propName, themeKey in props do
-        ApplyThemeProp(inst, propName, themeKey, targetTheme)
-    end
-end
+e(z,A)end
 
-local SafeWriteFile = function(filePath, content)
-    if makefolder then
-        local parts = filePath:split"/"
-        parts[#parts] = nil
-        local dir = table.concat(parts, "/")
-        if dir ~= "" and (isfolder == nil or not isfolder(dir)) then
-            makefolder(dir)
-        end
-    end
-    writefile(filePath, content)
-end
 
-local InputBlocked = false
+local A=false
 
-local ConfigConstants = {
-    MAX_SCALE = 1.6,
-    MIN_SCALE = 0.6,
-    TEXTBOX = {
-        PLACEHOLDER_TEXT = "Input"
-    }
+local B={
+MAX_SCALE=1.6,
+MIN_SCALE=0.6,
+
+TEXTBOX={
+PLACEHOLDER_TEXT="Input"
+}
 }
 
-function ThemeManager:add(inst, props)
-    self.Descendants[props] = inst
-    if self.IS_RENDERING then
-        ApplyThemeProps(Library.CurrentTheme, inst, props)
-    end
+function v:add(C,D)
+self.Descendants[D]=C
+
+if self.IS_RENDERING then
+y(s.CurrentTheme,C,D)
+end
 end
 
-function ThemeManager:update()
-    if self.IS_RENDERING and not self.UPDATED_OBJECTS then
-        local currentTheme = Library.CurrentTheme
-        self.UPDATED_OBJECTS = true
-        for props, inst in self.Descendants do
-            if typeof(inst) == "table" then
-                inst:update()
-                continue
-            end
-            ApplyThemeProps(currentTheme, inst, props)
-        end
-    end
+function v:update()
+if self.IS_RENDERING and not self.UPDATED_OBJECTS then
+local C=s.CurrentTheme
+self.UPDATED_OBJECTS=true
+
+for D,E in self.Descendants do
+local F=typeof(E)
+if F=="table"then E:update()continue end
+
+y(C,E,D)
+end
+end
 end
 
-function ThemeManager:destroy()
-    local idx = self.Parent and table.find(self.Parent.Descendants, self)
-    if idx then
-        table.remove(self.Parent.Descendants, idx)
-    end
-    table.clear(self.Descendants)
-    setmetatable(self, nil)
+function v:destroy()
+local C=self.Parent and table.find(self.Parent.Descendants)
+
+if C then
+table.remove(self.Parent.Descendants,C)
 end
 
-function ThemeManager:changeRendering(state)
-    if self.IS_RENDERING ~= state then
-        self.IS_RENDERING = state
-        self.UPDATED_OBJECTS = false
-    end
+table.clear(self.Descendants)
+setmetatable(self,nil)
 end
 
-function ThemeManager:new()
-    local obj = setmetatable({
-        IS_RENDERING = true,
-        UPDATED_OBJECTS = false,
-        Descendants = {},
-        Parent = self.Descendants ~= nil and self or nil
-    }, ThemeManager)
-
-    if self.Descendants then
-        table.insert(self.Descendants, obj)
-    end
-    return obj
+function v:changeRendering(C)
+if self.IS_RENDERING~=C then
+self.IS_RENDERING=C
+self.UPDATED_OBJECTS=false
+end
 end
 
-local GlobalThemeManager = ThemeManager:new()
+function v:new()
+local C=setmetatable({
+IS_RENDERING=true,
+UPDATED_OBJECTS=false,
+Descendants={},
+Parent=self.Descendants~=nil and self or nil
+},v)
 
-local InstanceBuilder, CreateInstance = {}
+if self.Descendants then
+table.insert(self.Descendants,C)
+end
+
+return C
+end
+
+local C=v:new()
+
+local D,E={}do
+local F={}
+
+local G={}do
+G.ElementsTable={
+Corner=function(H)
+return E("UICorner",{
+CornerRadius=H or UDim.new(0,8)
+})
+end,
+Stroke=function(H,I)
+return E("UIStroke",{
+Color=H or Color3.fromRGB(60,60,60),
+Thickness=I or 1
+})
+end,
+Image=function(H)
+return E("ImageLabel",{
+Image=H or"",
+BackgroundTransparency=1,
+Size=UDim2.fromScale(1,1)
+})
+end,
+Button=function()
+return E("TextButton",{
+Text="",
+Size=UDim2.fromScale(1,1),
+AutoButtonColor=false
+})
+end,
+Padding=function(H,I,J,K)
+return E("UIPadding",{
+PaddingLeft=H or UDim.new(0,10),
+PaddingRight=I or UDim.new(0,10),
+PaddingTop=J or UDim.new(0,10),
+PaddingBottom=K or UDim.new(0,10)
+})
+end,
+ListLayout=function(H)
+return E("UIListLayout",{
+Padding=H or UDim.new(0,5)
+})
+end,
+Text=function(H)
+return E("TextLabel",{
+BackgroundTransparency=1,
+Text=H or""
+})
+end,
+Gradient=function(H)
+return E("UIGradient",{
+Color=H
+})
+end
+}
+
+function G:Create(H,I,...)
+local J=self.ElementsTable[I]
+
+if J then
+local K=J(...)
+K.Parent=H
+return K
+end
+end
+end
+
+local H={}
+
+function H:Childs(I)
+for J=1,#I do
+I[J].Parent=self
+end
+end
+
+function H:Elements(I)
+for J,K in pairs(I)do
+if type(K)=="table"then
+D.SetProperties(G:Create(self,J),K)
+else
+G:Create(self,J,K)
+end
+end
+end
+
+function H:ThemeTag(I)
+local J=I.OBJECTS
+I.OBJECTS=nil
+return(J or C):add(self,I)
+end
+
+function D:SetProperties(I)
+for J,K in pairs(I)do
+if H[J]then
+H[J](self,K)
+else
+self[J]=K
+end
+end
+end
+
+function D:SetValues(...)
+local I=self
+
+for J,K in{...}do
+local L=typeof(K)
+
+if L=="table"then
+D.SetProperties(I,K)
+else
+I[if L=="string"then"Name"else"Parent"]=K
+end
+end
+
+return I
+end
+
+local I
+
+function D:Draggable(J,K,L)
+local M,N,O,P
+local Q=K or 0.28
+local R=0
+local S local T=function(
+
+T)
+local U=T.Position-N
+local V
+R=tick()
+
+if L then
+V=L(
+O.X.Scale,O.X.Offset+U.X/J.Scale,
+O.Y.Scale,O.Y.Offset+U.Y/J.Scale
+)
+else
+V=UDim2.new(
+O.X.Scale,O.X.Offset+U.X/J.Scale,
+O.Y.Scale,O.Y.Offset+U.Y/J.Scale
+)
+end
+self.Position=self.Position:Lerp(V,Q)end local U=function()
+
+
+
+while I==self do
+if(tick()-R)>=1 then
+S()
+break
+end
+task.wait()
+end end
+
+
+local V={
+[Enum.UserInputType.MouseButton1]=true,
+[Enum.UserInputType.Touch]=true
+}
+
+local W={
+[Enum.UserInputType.MouseMovement]=true,
+[Enum.UserInputType.Touch]=true
+}
+
+u(self.InputBegan,function(X)
+if A==false and I==nil and V[X.UserInputType]then
+N=X.Position
+O=self.Position
+I=self
+R=tick()
+A=true
+
+local Y;
+
+function S()
+A=false
+I=nil
+Y:Disconnect()
+end
+
+task.spawn(U)
+
+Y=X.Changed:Connect(function()
+if X.UserInputState==Enum.UserInputState.End then
+S()
+end
+end)
+end
+end)
+
+u(i.InputChanged,function(X)
+if I==self and W[X.UserInputType]then
+T(X)
+end
+end)
+end
+
+function D:CreateNewTemplate(J)
+return D.CloneObject(F[self],J)
+end
+
+function D.new(J,...)
+return D.SetValues(Instance.new(J),...)
+end
+
+E=D.new
+end local F=function(
+
+F)
+if F==nil then
+return{}
+end
+
+if type(F)~="function"and type(F)~="table"then
+error(`Failed to get Callback: 'function', or 'table' expected, got {typeof(F)}`,2)
+end
+
+if type(F)~="function"then
+local G=F[1]
+local H=F[2]
+
+F=function(I)
+G[H]=I
+end
+end
+
+return table.pack(F)end local G=function(
+
+
+G, ...)
+for H=1,#G do
+task.spawn(G[H],...)
+end end
+
+
+local H="redz-library-v5"
+local I=q:FindFirstChild(H)
+
+if not I then
+I=E("ScreenGui",H,q,{
+IgnoreGuiInset=true
+})
+end local J=function(
+
+J, K, L, M, ...)
+local N=TweenInfo.new(M,EasingStyle or Enum.EasingStyle.Quint,...)
+
+return j:Create(J,N,{
+[K]=L
+})end local K=function(
+
+
+K)
+local L={}
+for M=1,#K do
+rawset(L,K[M],true)
+end
+return L end
+
+
+local L=K(string.split"\n\t,_:;()[]#&=!. \"'*^<>$")local M=function(
+
+M)
+return string.gsub(M:lower(),".",function(N)
+return L[N]and""or N
+end)end local N=function(
+
+
+N)
+local O,P,Q=tostring(N),"",0
+
+for R=#O,1,-1 do
+P=O:sub(R,R)..P
+Q+=1
+
+if R>1 and Q%3==0 then
+P=","..P
+end
+end
+
+return P end local O=function(
+
+
+O)
+local P="rbxassetid://"
+return O:sub(1,#P)==P end local P=function(
+
+
+P)
+return(t.Y/450)*P end local Q=function(
+
+
+Q)
+local R=math.floor(Q/60)
+local S=math.floor(Q/60/60)
+Q=math.floor((Q-(R*60))*10)/10
+R=R-(S*60)
+
+if S>0 then
+return`{S}h {R}m {math.floor(Q)}s`
+elseif R>0 then
+return`{R}m {math.floor(Q)}s`
+else
+return tostring(Q)
+end end
+
+
+local R={}do
+local S={}
+local T={}
+local U={}
+local V={}
+
+local W
+local X
+local Y
+local Z
+local _
+local aa
+local ab
+local ac
+local ad
+local ae
+
+local af=""
+
+local ag={SelectedTab=1,Minimized=false}
+ag.__index=ag
+
+local ah={}
+ah.__index=ah
+
+local ai={}
+ai.__index=ai
+
+local aj={}
+aj.__index=aj
+
+local ak={}do local al=function()
+
+local al={}
+al.__index=function(am,an)
+return al[an]or rawget(ai,an)
+end
+
+return al end
+
+
+local am=al()
+ak.TextBox=am
+
+local an=al()
+ak.Toggle=an
+
+local ao=al()
+ak.Slider=ao
+
+local ap=al()
+ak.Dropdown=ap
+
+local aq=al()
+ak.Keybind=aq
+
+local ar=al()
+ak.Dialog=ar local as=function()
+
+
+Z.Closed=true
+Z.Closing=false
+setmetatable(Z,nil)
+
+Z=nil
+aa.Parent=nil end local at=function()
+
+
+
+if Z~=nil then
+Z:Close()
+end end
+
+
+function ar:NewOption(au)
+local av=au[1]or au.Name or au.Title
+local aw=F(au[2]or au.Callback)
+
+table.insert(aw,at)
+
+assert(type(av)=="string",`"Dialog.NewOption.Name". 'string' expected, got {typeof(av)}`)
+
+local ax=E("TextButton",{
+AutoButtonColor=false,
+Size=UDim2.fromScale(0.2,1),
+BackgroundTransparency=1,
+TextSize=10,
+Text=av,
+Elements={
+Corner=UDim.new(1,0)
+},
+ThemeTag={
+BackgroundColor3="Colors.Buttons.Default",
+TextColor3="Colors.Text.Dark",
+Font="Font.Normal"
+}
+})
+
+local ay=J(ax,"BackgroundTransparency",0,0.3)
+local az=J(ax,"BackgroundTransparency",1,0.3)
+
+u(ax.MouseLeave,function()az:Play()end)
+u(ax.MouseEnter,function()ay:Play()end)
+u(ax.Activated,function()G(aw)end)
+
+ax.Parent=aa.Template.Options
+end
+
+function ar:Close(au)
+if self.Closed or self.Closing or Z~=self then
+return nil
+end
+
+self.Closing=true
+
+local av=J(self.TEMPLATE,"Size",self.NEW_SIZE,0.1)
+av:Play()
+
+if au then
+av.Completed:Wait()
+as()
+else
+u(av.Completed,as)
+end
+end
+
+function ar.new(au,av)
+return setmetatable({
+TITLE_LABEL=au,
+DESCRIPTION_LABEL=au,
+Content=au.Text,
+Title=av.Text,
+
+Closed=false,
+Closing=false,
+Kind="Dialog"
+},ar)
+end
+
+function ap:SetEnabled(au)
+assert(type(au)=="table",`"Dropdown.SetEnabled[param 1]". 'table' expected, got {typeof(au)}`)
+
+self.SET_ENABLED_OPTIONS(au)
+end
+
+function ap:Clear()
+self.CLEAR_DROPDOWN()
+end
+
+function ap:NewOptions(...)
+self:Clear()
+self:Add(...)
+end
+
+function ap:GetOptionsCount()
+return#self.DROPDOWN_OPTIONS
+end
+
+function ap:Remove(...)
+local au={...}
+assert(#au>0,"'Dropdown.Remove' requires one or more options.")
+
+for av,aw in au do
+self.REMOVE_DROPDOWN_OPTION(aw)
+end
+end
+
+function ap:Add(...)
+local au={...}
+assert(#au>0,"'Dropdown.Add' requires one or more options.")
+
+for av,aw in au do
+self.ADD_DROPDOWN_OPTION(aw)
+end
+end
+
+function ap.new(au,av,aw,ax,ay)
+return setmetatable({
+CALLBACKS=ay,
+
+DESTROY_ELEMENT=av,
+VISIBLE_ELEMENT=av,
+
+TITLE_LABEL=aw,
+DESCRIPTION_LABEL=ax,
+Description=ax.Text,
+Title=aw.Text,
+
+Parent=au,
+Kind="Dropdown"
+},ap)
+end
+
+function ao:SetValue(au)
+assert(type(au)=="number",`"Slider.SetValue". 'number' expected, got {typeof(au)}`)
+
+if self.Value~=au then
+self.WHEN_VALUE_CHANGED(au)
+end
+end
+
+function ao.new(au,av,aw,ax,ay)
+return setmetatable({
+CALLBACKS=ay,
+
+DESTROY_ELEMENT=av,
+VISIBLE_ELEMENT=av,
+
+TITLE_LABEL=aw,
+DESCRIPTION_LABEL=ax,
+Description=ax.Text,
+Title=aw.Text,
+
+Parent=au,
+Kind="Slider"
+},ao)
+end
+
+function an:SetValue(au)
+assert(type(au)=="boolean",`"Toggle.SetValue". 'boolean' expected, got {typeof(au)}`)
+
+if self.Value~=au then
+self.Value=au
+self.WHEN_VALUE_CHANGED(au)
+end
+end
+
+function an.new(au,av,aw,ax,ay,az)
+return setmetatable({
+CALLBACKS=az,
+WHEN_VALUE_CHANGED=ay,
+
+DESTROY_ELEMENT=av,
+VISIBLE_ELEMENT=av,
+
+TITLE_LABEL=aw,
+DESCRIPTION_LABEL=ax,
+Description=ax.Text,
+Title=aw.Text,
+
+Parent=au,
+Kind="Toggle"
+},an)
+end
+
+function am:SetText(au)
+assert(type(au)=="string",`"TextBox.SetText". 'string' expected, got {typeof(au)}`)
+
+self.TEXTBOX.Text=au
+return self
+end
+
+function am:SetPlaceholder(au)
+assert(type(au)=="string",`"TextBox.SetPlaceholder". 'string' expected, got {typeof(au)}`)
+
+self.TEXTBOX.PlaceholderText=au
+return self
+end
+
+function am:CaptureFocus()
+self.TEXTBOX:CaptureFocus()
+return self
+end
+
+function am:Clear()
+self.TEXTBOX.Text=""
+return self
+end
+
+function am:SetTextFilter(au)
+if au~=nil then
+assert(type(au)=="function",`"TextBox.SetTextFilter[param 1]". 'function', or 'nil' expected, got {typeof(au)}`)
+end
+
+self.TEXTBOX_TEXT_FILTER=au
+return self
+end
+
+function am.new(au,av,aw,ax,ay,az)
+return setmetatable({
+Title=av.Text,
+Description=aw.Text,
+DESCRIPTION_LABEL=aw,
+TITLE_LABEL=av,
+
+CALLBACKS=az,
+DESTROY_ELEMENT=ax,
+VISIBLE_ELEMENT=ax,
+
+TEXTBOX=ay,
+BUTTON=ax,
+
+Parent=au,
+Kind="TextBox"
+},am)
+end
+
+am.Set=am.SetText
+an.Set=an.SetValue
+ao.Set=ao.SetValue
+end local al=function(
+
+al, am, an)
+local ao=E("TextButton","Button",an,{
+Size=UDim2.new(1,0,0,24),
+AutoButtonColor=false,
+Text="",
+Elements={
+Corner=UDim.new(0,6)
+},
+ThemeTag={
+BackgroundColor3="Colors.Buttons.Default"
+},
+Childs={
+E("TextLabel","Title",{
+BackgroundTransparency=1,
+Font=Enum.Font.GothamMedium,
+Text=Localize(am.Title),
+TextSize=10,
+TextXAlignment=Enum.TextXAlignment.Left,
+TextTransparency=(FirstTab and 0.3)or 0,
+TextTruncate=Enum.TextTruncate.AtEnd,
+ThemeTag={
+TextColor3="Colors.Text.Default"
+}
+})
+}
+})
+
+table.insert(s.LocalizedLabels,{Instance=ao.Title,Original=am.Title})
+
+local ap=E("Frame",ao,{
+Position=UDim2.new(0,1,0.5,0),
+AnchorPoint=Vector2.new(0,0.5),
+Size=UDim2.fromOffset(4,4),
+BackgroundTransparency=1,
+ThemeTag={
+BackgroundColor3="Colors.Primary"
+},
+Elements={
+Corner=UDim.new(0.5,0)
+}
+})
+
+local aq=E("ScrollingFrame","Container",{
+Size=UDim2.new(1,0,1,0),
+Position=UDim2.new(0,0,1),
+AnchorPoint=Vector2.new(0,1),
+ScrollBarThickness=1.5,
+BackgroundTransparency=1,
+ScrollBarImageTransparency=0.2,
+AutomaticCanvasSize=Enum.AutomaticSize.Y,
+ScrollingDirection=Enum.ScrollingDirection.Y,
+BorderSizePixel=0,
+CanvasSize=UDim2.new(),
+ThemeTag={
+ScrollBarImageColor3="Colors.ScrollBar"
+},
+Elements={
+Padding={
+PaddingLeft=UDim.new(0,10),
+PaddingRight=UDim.new(0,10),
+PaddingTop=UDim.new(0,10),
+PaddingBottom=UDim.new(0,10)
+},
+ListLayout={
+SortOrder=Enum.SortOrder.LayoutOrder,
+Padding=UDim.new(0,5)
+}
+}
+})
+
+local ar=E("ImageLabel",ao,{
+Position=UDim2.new(0,8,0.5),
+Size=UDim2.new(0,13,0,13),
+AnchorPoint=Vector2.new(0,0.5),
+BackgroundTransparency=1,
+ImageTransparency=0.3,
+Image=am.Icon or""
+})local as=function()
+
+
+local as=string.sub(ar.Image,1,13)=="rbxassetid://"
+local at=ao.Title
+ar.Visible=as
+at.Size=UDim2.new(1,as and-25 or-15,1)
+at.Position=UDim2.fromOffset(as and 25 or 15)end
+
+
+u(ar:GetPropertyChangedSignal"Image",as)
+as()
+
+return ao,aq,ap,ar end local am=function(
+
+
+am, an, ao, ap)
+local aq=E("TextLabel",{
+TextXAlignment=Enum.TextXAlignment.Left,
+TextTruncate=Enum.TextTruncate.AtEnd,
+AutomaticSize=Enum.AutomaticSize.Y,
+Size=UDim2.new(1,-20),
+Position=UDim2.fromScale(0,0.5),
+AnchorPoint=Vector2.new(0,0.5),
+BackgroundTransparency=1,
+TextSize=11,
+ThemeTag={
+OBJECTS=C,
+TextColor3="Colors.Text.Default",
+Font="Font.Medium"
+}
+})
+
+local ar=V[am]
+local as=T[am].Container
+
+local at=E("TextLabel",{
+TextXAlignment=Enum.TextXAlignment.Left,
+AutomaticSize=Enum.AutomaticSize.Y,
+Size=UDim2.new(1,-20),
+Position=UDim2.new(0,12,0,15),
+BackgroundTransparency=1,
+TextWrapped=true,
+TextSize=8,
+RichText=true,
+ThemeTag={
+OBJECTS=ar,
+TextColor3="Colors.Text.Dark",
+Font="Font.Normal"
+}
+})
+
+local au={
+OBJECTS=ar,
+BackgroundColor3="Colors.Buttons.Default"
+}
+
+local av=E("TextButton","Option",{
+AutomaticSize=Enum.AutomaticSize.Y,
+Size=UDim2.new(1,0,0,25),
+AutoButtonColor=false,
+Text="",
+ThemeTag=au,
+Elements={
+Corner=UDim.new(0,6)
+},
+Childs={
+E("Frame","Holder",{
+AutomaticSize=Enum.AutomaticSize.Y,
+BackgroundTransparency=1,
+Size=ap,
+Elements={
+ListLayout={
+SortOrder=Enum.SortOrder.LayoutOrder,
+VerticalAlignment=Enum.VerticalAlignment.Center,
+Padding=UDim.new(0,2)
+},
+Padding={
+PaddingBottom=UDim.new(0,5),
+PaddingTop=UDim.new(0,5)
+}
+},
+Childs={aq,at}
+})
+}
+})
+
+local aw=av.Holder local ax=function(
+
+ax, ay)
+if ay then
+if _ then
+local az=w(s.CurrentTheme,"Colors.Buttons.Default")
+_.Theme.BackgroundColor3="Colors.Buttons.Default"
+J(_.Button,"BackgroundColor3",az,0.2):Play()
+end
+
+_={
+Button=av,
+Theme=au
+}
+end
+
+au.BackgroundColor3=ax
+J(av,"BackgroundColor3",w(s.CurrentTheme,ax),0.2):Play()end
+
+
+u(av.MouseLeave,function()ax("Colors.Buttons.Default",false)end)
+u(av.MouseEnter,function()ax("Colors.Buttons.Holding",true)end)
+
+u(at:GetPropertyChangedSignal"Text",function()
+local ay=#at.Text>0
+
+if at.Visible~=ay then
+local az=ay and 0 or 0.5
+at.Visible=ay
+aw.Position=UDim2.fromScale(0,az)
+aw.AnchorPoint=Vector2.new(0,az)
+end
+end)
+
+local aOriginalTitle=an
+local aOriginalDesc=ao or""
+
+aq.Text=Localize(aOriginalTitle)
+at.Text=Localize(aOriginalDesc)
+
+table.insert(s.LocalizedLabels,{Instance=aq,Original=aOriginalTitle})
+table.insert(s.LocalizedLabels,{Instance=at,Original=aOriginalDesc})
+
+av.Parent=as
+
+return av,aq,at end local an=function(
+
+
+an, ao)
+if type(ao)~="table"then
+error(`"Tab.Add{an}[Configs]". 'table' expected, got {typeof(ao)}`,2)
+end
+
+local ap=ao[1]or ao.Name or ao.Title
+local aq=ao.Desc or ao.Description
+
+assert(type(ap)=="string",`"Tab.Add{an}.Title". 'string' expected, got {typeof(ap)}`)
+
+if aq~=nil and type(aq)~="string"then
+error(`"Tab.Add{an}.Description". 'string', or 'nil' expected, got {typeof(aq)}`,2)
+end
+
+return ap,aq or""end local ao=function(
+
+
+ao, ap)
+if ap~=nil and type(ap)~="string"then
+error(`"Tab.Add{ao}.Flag". 'nil', or 'string' expected, got {typeof(ap)}`)
+end
+
+return ap end local ap=function()
+
+
+
+local ap=160
+
+local aq={
+Corner=UDim.new(0,6),
+Stroke={
+ThemeTag={
+Color="Colors.Stroke"
+}
+},
+Gradient={
+Rotation=45,
+ThemeTag={
+Color="Colors.Background"
+}
+}
+}
+
+local ar=E("TextButton",OutBox,{
+Size=UDim2.fromScale(1,1),
+BackgroundTransparency=1,
+Active=true,
+Text=""
+})
+
+local as=E("Frame","Dropdown",ar,{
+Size=UDim2.fromOffset(ap,100),
+Position=UDim2.fromOffset(50,50),
+Elements=aq,
+Active=true,
+ThemeTag={
+BackgroundTransparency="BackgroundTransparency"
+}
+})
+
+local at=E("TextButton","Search",as,{
+Position=UDim2.new(1,5,0,5),
+Size=UDim2.new(0,25,0,25),
+AutomaticSize=Enum.AutomaticSize.X,
+Active=true,
+Elements=aq,
+Text="",
+ThemeTag={
+BackgroundTransparency="BackgroundTransparency"
+},
+Childs={
+E("UIPadding",{
+PaddingLeft=UDim.new(0,5),
+PaddingRight=UDim.new(0,5),
+PaddingBottom=UDim.new(0,5),
+PaddingTop=UDim.new(0,5)
+}),
+E("UIListLayout",{
+Padding=UDim.new(0,5),
+FillDirection=Enum.FillDirection.Horizontal
+}),
+E("TextBox","SearchBox",{
+Size=UDim2.fromScale(0,1),
+Position=UDim2.fromScale(0.5,0.5),
+AnchorPoint=Vector2.new(0.5,0.5),
+Visible=false,
+PlaceholderText="Search...",
+ClearTextOnFocus=false,
+Text="",
+Elements={
+Corner=UDim.new(0,6)
+},
+ThemeTag={
+BackgroundColor3="Colors.Stroke",
+TextColor3="Colors.Text.Default",
+Font="Font.ExtraBold"
+}
+}),
+E("ImageLabel","SearchIcon",{
+Size=UDim2.fromScale(1,1),
+SizeConstraint=Enum.SizeConstraint.RelativeYY,
+Position=UDim2.fromScale(0.5,0.5),
+AnchorPoint=Vector2.new(0.5,0.5),
+BackgroundTransparency=1,
+ThemeTag={
+BackgroundColor3="Colors.Stroke",
+ImageColor3="Colors.Icons",
+Image="Icons.Search"
+}
+})
+}
+})
+
+local au=E("ScrollingFrame",as,{
+Size=UDim2.new(1,-6,1,-6),
+Position=UDim2.fromScale(0.5,0.5),
+AnchorPoint=Vector2.new(0.5,0.5),
+ScrollBarThickness=3,
+BackgroundTransparency=1,
+BorderSizePixel=0,
+CanvasSize=UDim2.new(),
+ScrollingDirection=Enum.ScrollingDirection.Y,
+AutomaticCanvasSize=Enum.AutomaticSize.Y,
+Active=true,
+ThemeTag={
+OBJECTS=C,
+ScrollBarImageColor3="Colors.ScrollBar"
+},
+Elements={
+Padding={
+PaddingLeft=UDim.new(0,8),
+PaddingRight=UDim.new(0,8),
+PaddingTop=UDim.new(0,5),
+PaddingBottom=UDim.new(0,5)
+},
+ListLayout={
+Padding=UDim.new(0,4)
+}
+}
+})
+
+local av=at.SearchIcon
+local aw=at.SearchBox
+
+local ax=130
+
+local ay=J(as,"Size",UDim2.fromOffset(ap,0),0.2)
+local az=J(aw,"Size",UDim2.new(0,ax-30,1,0),0.3)
+local aA=J(aw,"Size",UDim2.new(0,0,1,0),0.2)
+
+local aB={}
+local aC=false
+local aD=false
+local aE
+local aF
+local aG
+local aH
+local aI
+
+local aJ=0
+
+local aK=25
+local aL=(aK*12)+10
+local aM=5 local aN=function(
+
+aN)
+local aO=I.AbsoluteSize.Y/ad.Scale
+return math.min((aK*math.max(aN,0.5))+10,aL,aO/1.75)end local aO=function()
+
+
+
+local aO=as.AbsolutePosition
+local aP=as.AbsoluteSize
+
+local aQ=Vector2.new(p.X,p.Y)
+
+local aR=aQ.X>=aO.X and aQ.X<=(aO.X+aP.X)
+local aS=aQ.Y>=aO.Y and aQ.Y<=(aO.Y+aP.Y)
+
+return aR and aS end local aP=function(
+
+
+aP, aQ)
+local aR=aI.AbsolutePosition
+local aS=aI.AbsoluteSize
+local aT=I.AbsoluteSize
+local aU=ad.Scale
+local aV=aN(aP)
+
+local aW=aT.X/aU
+local aX=aT.Y/aU
+local aY=aR.X/aU
+local aZ=aR.Y/aU
+local a_=aS.X/aU
+local a0=aS.Y/aU
+
+local a1=aZ+(a0/2)
+local a2=a1-(aV/2)
+
+local a3=aM
+local a4=aX-aV-aM
+
+local a5=math.clamp(a2,a3,a4)
+
+local a6=Vector2.new(0,0)
+
+if a5>(aX*0.7)then
+a6=Vector2.new(0,1)
+a5=math.min(a1+(aV/2),aX-aM)
+end
+
+local a7=math.clamp(
+aY,
+aM,
+aW-as.Size.X.Offset-(aM*2)-(at.AbsoluteSize.X/aU)
+)
+
+return Vector2.new(a7,a5),a6 end local aQ=function(...)
+
+
+
+local aQ,aR=aP(...)
+
+as.AnchorPoint=aR
+as.Position=UDim2.fromOffset(aQ.X,aQ.Y)end local aR=function()
+
+
+
+if not aD then return end
+
+aD=false
+
+aw.Text=""
+aA:Play()
+aA.Completed:Wait()
+aw.Visible=false end local aS=function()
+
+
+
+if aD then return end
+
+aD=true
+
+aw.Visible=true
+az:Play()
+
+aw:CaptureFocus()
+
+local aS=as.AbsoluteSize
+local aT=I.AbsoluteSize
+local aU=ad.Scale
+local aV=as.AnchorPoint
+
+local aW=ax*aU
+
+local aX=as.AbsolutePosition.X
+
+local aY=aX+aS.X+5+aW
+
+if aY>aT.X-(aM*aU)then
+local aZ=(aT.X-aS.X-aW-5-(aM*aU))/aU
+
+aZ=math.max(aZ,aM)
+
+J(as,"Position",UDim2.fromOffset(aZ,as.Position.Y.Offset),0.3):Play()
+end end local aT=function(
+
+
+aT)
+if not aC then
+aE=aT
+ar.Parent=Y
+return true
+end end local aU=function()
+
+
+
+if aC then return end
+
+if aE then
+aE()
+aE=nil
+end
+
+task.spawn(aR)
+aC=true
+ay:Play()
+ay.Completed:Wait()
+ar.Parent=nil
+aC=false end local aV=function()
+
+
+
+for aW,aX in aB do
+aW.Parent=nil
+aB[aW]=nil
+end end local aX=function(
+
+
+aX, aY)
+aX.Selected=aY
+
+if aX.Instance then
+local aZ=aX.Instance
+local a_=aZ.TextLabel
+local a0=aZ.Frame
+
+local a1=aY and 0 or(aH and 0.8 or 1)
+local a2=aY and 0 or 0.4
+local a3=UDim2.fromOffset(4,aY and 14 or 4)
+
+if aZ.Parent then
+J(a0,"BackgroundTransparency",a1,0.35):Play()
+J(a_,"TextTransparency",a2,0.35):Play()
+J(a0,"Size",a3,0.35):Play()
+else
+a_.TextTransparency=a2
+a0.BackgroundTransparency=a1
+a0.Size=a3
+end
+end end local aY=function(
+
+
+aY)
+if aw.Visible==false or not aY then
+local aZ=aG and#aG or 0
+as.Size=UDim2.fromOffset(ap,aN(aZ))
+return nil
+end
+
+if aY then
+local aZ=aY.Instance
+local a_=M(aw.Text)
+aZ.Visible=#a_==0 or aY.SearchText:find(a_)~=nil
+
+if aZ.Visible~=false then
+SEARCH_RESULT_COUNT+=1
+as.Size=UDim2.fromOffset(ap,aN(SEARCH_RESULT_COUNT))
+end
+end end local aZ=function(
+
+
+aZ, a_, a0, a1)
+local a2=true
+
+if a_=="+"or a_=="-"then
+a2=aZ.Selected==(a_=="+")
+a0=a0:sub(2,-1)
+end
+
+return a2 and a1:find(a0,1,true)~=nil end local a_=function(
+
+
+a_, a0)
+local a1=E("TextButton",{
+Size=UDim2.new(1,0,0,21),
+AutoButtonColor=false,
+Text="",
+Elements={
+Corner=UDim.new(0,4)
+},
+ThemeTag={
+BackgroundColor3="Colors.Buttons.Default"
+},
+Childs={
+E("Frame",{
+Position=UDim2.new(0,1,0.5),
+Size=UDim2.new(0,4,0,4),
+BackgroundTransparency=1,
+AnchorPoint=Vector2.new(0,0.5),
+Elements={
+Corner=UDim.new(0.5,0)
+},
+ThemeTag={
+BackgroundColor3="Colors.Primary"
+}
+}),
+E("TextLabel",{
+Size=UDim2.fromScale(1,1),
+Position=UDim2.fromOffset(10,0),
+TextXAlignment=Enum.TextXAlignment.Left,
+BackgroundTransparency=1,
+TextTransparency=0.4,
+Text=a_.DisplayName,
+TextSize=9,
+ThemeTag={
+Font="Font.Bold",
+TextColor3="Colors.Text.Default"
+}
+})
+}
+})
+
+local a2=0
+
+u(a1.Activated,function()
+if(tick()-a2)<0 then return end
+
+if ar.Parent and not aC then
+a2=tick()+0.2
+aF(a_)
+end
+end)
+
+a_.SearchText=M(a_.DisplayName)
+a_.Instance=a1
+
+if a0 then
+local a3=aw.Text
+
+if#a3>0 then
+local a4=string.sub(a3,1,1)
+local a5=M(aw.Text)
+a1.Visible=aZ(a_,a4,a5,a_.SearchText)
+end
+
+a1.Parent=au
+aY(a_)
+end
+
+aX(a_,a_.Selected)end local a0=function(
+
+
+a0)
+aW()
+aG=a0
+
+for a1=1,#a0 do
+local a2=a0[a1]
+local a3=a2.Instance
+
+if a3==nil then
+a_(a2)
+a3=a2.Instance
+end
+
+a3.Parent=au
+aB[a3]=true
+end
+
+aQ(#a0)
+J(as,"Size",UDim2.fromOffset(ap,aN(#a0)),0.3):Play()end local a1=function()
+
+
+
+local a1=aw.Text
+local a2=string.sub(a1,1,1)
+local a3=M(a1)
+local a4=#a3==0
+local a5=0
+
+for a6=1,#aG do
+local a7=aG[a6]
+local a8=a4 or aZ(a7,a2,a3,a7.SearchText)
+a7.Instance.Visible=a8
+
+if a8 then
+a5+=1
+end
+end
+
+SEARCH_RESULT_COUNT=a5
+as.Size=UDim2.fromOffset(ap,aN(a5))end
+
+
+u(ab:GetPropertyChangedSignal"Visible",aV)
+u(ab:GetPropertyChangedSignal"Size",aV)
+u(ar.MouseButton1Down,aV)
+u(ar.Activated,aV)
+
+u(at.Activated,aS)
+u(aw:GetPropertyChangedSignal"Text",a1)
+
+return table.freeze{
+CreateOptionTemplate=a_,
+SetOptionValue=aX,
+CloseDropdown=aU,
+OpenDropdown=aT,
+SetOptions=a0,
+Clear=aW,
+SetOnClicked=function(...)
+aF=...
+end,
+SetMultiSelect=function(...)
+aH=...
+end,
+SetHolder=function(...)
+aI=...
+end
+}end
+
+
+local aq
+
+local ar={"W","A","S","D","Tab","Slash","Backspace","Escape","Unknown"}
+local as={"MouseButton1","MouseButton2","MouseButton3"}
+
+local at=K({"number","string","nil","boolean","table"},true)local au=function(
+
+au)
+if aq==nil then
+aq=K(Enum.KeyCode:GetEnumItems())
+end
+
+return typeof(au)=="EnumItem"and aq[au]end
+
+
+function ah:GetNoSelfCall(av)
+assert(type(av)=="string",`"Tab.GetNoSelfCall". 'string' expected, got {typeof(av)}`)
+local aw=self[av]
+assert(type(aw)=="function",`"Tab.GetNoSelfCall". '{aw}' is not a 'function'-{av}`)
+
+return function(...)
+return aw(self,...)
+end
+end
+
+function ah:AddSection(av)
+assert(av==nil or type(av)=="string",`"Tab.AddSection[param 1]". 'string', or 'nil' expected, got {typeof(av)}`)
+av=av or""
+
+local aw=V[self]
+
+local ax=E("Frame","Option",T[self].Container,{
+Size=UDim2.new(1,0,0,20),
+BackgroundTransparency=1
+})
+
+local ay=E("TextLabel",ax,{
+TextXAlignment=Enum.TextXAlignment.Left,
+TextTruncate=Enum.TextTruncate.AtEnd,
+Size=UDim2.new(1,-25,1,0),
+Position=UDim2.new(0,5),
+BackgroundTransparency=1,
+TextSize=17,
+Text=Localize(av),
+ThemeTag={
+OBJECTS=aw,
+TextColor3="Colors.Text.Default",
+Font="Font.Bold"
+}
+})
+
+table.insert(s.LocalizedLabels,{Instance=ay,Original=av})
+
+return setmetatable({
+Title=av,
+
+DESTROY_ELEMENT=ax,
+VISIBLE_ELEMENT=ax,
+TITLE_LABEL=ay,
+
+Kind="Section",
+Parent=self
+},ai)
+end
+
+function ah:AddToggle(av)
+local aw,ax=an("Toggle",av)
+local ay=ao("Toggle",av[4]or av.Flag)
+
+local az=av[2]or av.Default or false
+local aA=F(av[3]or av.Callback)
+
+if type(az)~="boolean"then
+error(`"Tab.AddToggle.Default". 'boolean' expected, got {typeof(az)}`,2)
+end
+
+if ay~=nil and type(ae[ay])=="number"then
+az=ae[ay]==0
+end
+
+local aB=V[self]
+local aC,aD,aE=am(self,aw,ax,UDim2.new(1,-38,0,0))
+
+local aF=E("Frame",aC,{
+Size=UDim2.new(0,35,0,18),
+Position=UDim2.new(1,-10,0.5),
+AnchorPoint=Vector2.new(1,0.5),
+Elements={
+Corner=UDim.new(0.5,0)
+},
+ThemeTag={
+OBJECTS=aB,
+BackgroundColor3="Colors.Stroke"
+}
+})
+
+local aG=E("Frame",aF,{
+BackgroundTransparency=1,
+Size=UDim2.new(0.8,0,0.8,0),
+Position=UDim2.new(0.5,0,0.5,0),
+AnchorPoint=Vector2.new(0.5,0.5)
+})
+
+local aH={
+OBJECTS=aB,
+BackgroundColor3="Colors.OnPrimary"
+}
+
+local aI=E("Frame",aG,{
+Size=UDim2.new(0,12,0,12),
+Position=UDim2.new(0,0,0.5),
+AnchorPoint=Vector2.new(0,0.5),
+Elements={
+Corner=UDim.new(0.5,0)
+},
+ThemeTag=aH
+})
+
+local aJ=tick()
+local aK=0.2
+local aL={}local aM=function(
+
+aM)
+aL={}
+for aN=1,#aM do
+aM[aN]:Play()
+aL[aN]=aM[aN]
+end end local aN=function()
+
+
+
+for aN=#aL,1,-1 do
+local aO=aL[aN]
+if aO.PlaybackState==Enum.PlaybackState.Playing then
+aO:Cancel()
+end
+aL[aN]=nil
+end end local aO=function(
+
+
+aO)
+if ay~=nil then ae[ay]=aO and 0 or 1 end
+G(aA,aO)
+
+local aP=UDim2.new(aO and 1 or 0,0,0.5,0)
+local aQ=Vector2.new(aO and 1 or 0,0.5)
+local aR=aO and"Colors.Primary"or"Colors.OnPrimary"
+local aS=w(s.CurrentTheme,aR)
+
+aH.BackgroundColor3=aR
+
+if self.Selected and(tick()-aJ)>=aK then
+aM{
+J(aI,"Position",aP,0.25),
+J(aI,"AnchorPoint",aQ,0.25),
+J(aI,"BackgroundColor3",aS,0.25)
+}
+else
+aN()
+aI.Position=aP
+aI.AnchorPoint=aQ
+aI.BackgroundColor3=aS
+end
+
+aJ=tick()end
+
+
+local aP=ak.Toggle.new(self,aC,aD,aE,aO,aA)
+aP:SetValue(az)
+
+local aQ=0
+
+u(aC.Activated,function()
+if(tick()-aQ)>=aK then
+aQ=tick()
+aP:SetValue(not aP.Value)
+end
+end)
+
+return aP
+end
+
+function ah:AddButton(av)
+local aw,ax=an("Button",av)
+local ay=F(av[2]or av.Callback)
+local az=av.Debounce or av.Cooldown
+
+local aA=V[self]
+local aB,aC,aD=am(self,aw,ax,UDim2.new(1,-20,0,0))
+
+local aE=E("ImageLabel",aB,{
+Size=UDim2.new(0,14,0,14),
+Position=UDim2.new(1,-10,0.5),
+AnchorPoint=Vector2.new(1,0.5),
+BackgroundTransparency=1,
+ThemeTag={
+OBJECTS=aA,
+Image="Icons.Button"
+}
+})
+
+local aF=0
+
+u(aB.Activated,function()
+if az~=nil and(tick()-aF)<0 then return end
+
+if az~=nil then
+aF=tick()+az
+end
+
+G(ay)
+end)
+
+return setmetatable({
+CALLBACKS=ay,
+DESTROY_ELEMENT=aB,
+VISIBLE_ELEMENT=aB,
+TITLE_LABEL=aC,
+DESCRIPTION_LABEL=aD,
+
+Title=aw,
+Description=ax,
+
+Parent=self,
+Kind="Button"
+},ai)
+end
+
+function ah:AddTextBox(av)
+local aw,ax=an("TextBox",av)
+local ay=ao("TextBox",av[4]or av.Flag)
+
+local az=av[2]or av.Default
+local aA=F(av[3]or av.Callback)
+
+local aB=av.Placeholder or av.PlaceholderText
+local aC=av.ClearOnFocus or av.ClearTextOnFocus
+
+if az~=nil and type(az)~="string"then
+error(`"Tab.AddTextBox.Default". 'string', or 'nil' expected, got {typeof(az)}`,2)
+end
+
+if ay and type(ae[ay])=="string"then
+az=ae[ay]
+end
+
+local aD=V[self]
+local aE,aF,aG=am(self,aw,ax,UDim2.new(1,-150,0,0))
+
+local aH=E("Frame",aE,{
+Size=UDim2.new(0,150,0,18),
+Position=UDim2.new(1,-10,0.5),
+AnchorPoint=Vector2.new(1,0.5),
+ThemeTag={
+OBJECTS=aD,
+BackgroundColor3="Colors.Stroke"
+},
+Elements={
+Corner=UDim.new(0,4)
+}
+})
+
+local aI=E("TextBox",aH,{
+Size=UDim2.new(0.85,0,0.85,0),
+AnchorPoint=Vector2.new(0.5,0.5),
+Position=UDim2.new(0.5,0,0.5,0),
+BackgroundTransparency=1,
+TextScaled=true,
+Active=true,
+Text="",
+PlaceholderText=B.TEXTBOX.PLACEHOLDER_TEXT,
+ThemeTag={
+OBJECTS=aD,
+TextColor3="Colors.Text.Default",
+Font="Font.Bold"
+}
+})
+
+local aJ={
+OBJECTS=aD,
+Image="Icons.TextBox",
+ImageColor3="Colors.Icons"
+}
+
+local aK=E("ImageLabel",aH,{
+Size=UDim2.new(0,12,0,12),
+Position=UDim2.new(0,-5,0.5),
+AnchorPoint=Vector2.new(1,0.5),
+BackgroundTransparency=1,
+ThemeTag=aJ
+})
+
+if az~=nil then
+aI.Text=az
+end
+
+if aC~=nil then
+aI.ClearTextOnFocus=aC
+end
+
+if aB~=nil then
+aI.PlaceholderText=aB
+end
+
+local aL=ak.TextBox.new(self,aF,aG,aE,aI,aA)local aM=function(
+
+aM)
+aJ.ImageColor3=aM
+J(aK,"ImageColor3",w(s.CurrentTheme,aM),0.5):Play()end
+
+
+if ay~=nil then
+u(aI:GetPropertyChangedSignal"Text",function()
+ae[ay]=aI.Text
+end)
+end
+
+u(aI.Focused,function()
+aM"Colors.Primary"
+end)
+
+u(aI.FocusLost,function()
+aM"Colors.Icons"
+local aN=aL.TEXTBOX_TEXT_FILTER
+
+if aN then
+local aO=aN(aI.Text)
+if type(aO)=="string"then
+aI.Text=aO
+end
+end
+
+G(aA,aI.Text)
+end)
+
+u(aE.Activated,function()
+aI:CaptureFocus()
+end)
+
+return aL
+end
+
+function ah:AddSlider(av)
+local aw,ax=an("Slider",av)
+local ay=ao("Slider",av[7]or av.Flag)
+
+local az=av[2]or av.Min
+local aA=av[3]or av.Max
+local aB=av[4]or av.Increment
+local aC=av[5]or av.Default
+local aD=F(av[6]or av.Callback)
+
+if aB~=nil and type(aB)~="number"then
+error(`"Tab.AddSlider.Increment". 'number', or 'nil' expected, got {typeof(aB)}`,2)
+end
+
+if aC~=nil and type(aC)~="number"then
+error(`"Tab.AddSlider.Default". 'number', or 'nil' expected, got {typeof(aC)}`,2)
+end
+
+assert(type(az)=="number",`"Tab.AddSlider.Min", 'number' expected, got {typeof(az)}`)
+assert(type(aA)=="number",`"Tab.AddSlider.Max", 'number' expected, got {typeof(aA)}`)
+
+local aE=V[self]
+local aF=T[self].Container
+
+local aG,aH,aI=am(self,aw,ax,UDim2.new(0.55,0,0,0))
+
+if aC==nil then
+aC=az
+end
+
+if aB==nil then
+aB=1
+end
+
+if ay~=nil and type(ae[ay])=="number"then
+aC=ae[ay]
+end
+
+local aJ=E("TextButton",aG,{
+Size=UDim2.new(0.45,0,1,0),
+Position=UDim2.new(1,0,0,0),
+AnchorPoint=Vector2.new(1,0),
+AutoButtonColor=false,
+BackgroundTransparency=1,
+Text=""
+})
+
+local aK=E("Frame",aJ,{
+Size=UDim2.new(1,-20,0,6),
+Position=UDim2.fromScale(0.5,0.5),
+AnchorPoint=Vector2.new(0.5,0.5),
+ThemeTag={
+OBJECTS=aE,
+BackgroundColor3="Colors.Stroke"
+},
+Elements={
+Corner=UDim.new(0.5,0)
+}
+})
+
+local aL=E("Frame",aK,{
+Size=UDim2.fromScale(0,1),
+BorderSizePixel=0,
+ThemeTag={
+OBJECTS=aE,
+BackgroundColor3="Colors.Primary"
+},
+Elements={
+Corner=UDim.new(0.5,0)
+}
+})
+
+local aM=E("Frame",aK,{
+Size=UDim2.new(0,6,0,12),
+BackgroundColor3=Color3.fromRGB(220,220,220),
+Position=UDim2.fromScale(0,0.5),
+AnchorPoint=Vector2.new(0.5,0.5),
+BackgroundTransparency=0.2,
+Elements={
+Corner=UDim.new(0,6)
+}
+})
+
+local aN=E("TextLabel",aJ,{
+Size=UDim2.new(0,50,0,14),
+AnchorPoint=Vector2.new(1,0.5),
+Position=UDim2.new(0,-1,0.5,0),
+BackgroundTransparency=1,
+TextSize=12,
+TextXAlignment=Enum.TextXAlignment.Right,
+ThemeTag={
+OBJECTS=aE,
+TextColor3="Colors.Text.Default",
+Font="Font.SliderValue"
+}
+})
+
+local aO=E("UIScale",aN)
+
+local aP=ak.Slider.new(self,aG,aH,aI,aD)
+
+aP.Min=az
+aP.Max=aA
+aP.Increment=aB local aQ=function(
+
+aQ)
+return(aQ-az)/(aA-az)end local aR=function(
+
+
+aR)
+return(aR*(aA-az))+az end local aS=function(
+
+
+aS)
+return math.round(aS/aB)*aB end local aT=function(
+
+
+aT, aU)
+if aT==aP.Value then return end
+
+if ay~=nil then
+ae[ay]=aT
+end
+
+task.defer(G,aD,aT)
+aP.Value=aT
+
+local aV=UDim2.fromScale(aU,0.5)
+local aW=UDim2.fromScale(aU,1)
+
+aN.Text=tostring(math.floor(aT*1000)/1000)
+
+if self.Selected then
+J(aM,"Position",aV,0.3):Play()
+J(aL,"Size",aW,0.3):Play()
+else
+aM.Position=aV
+aL.Size=aW
+end end local aU=function(
+
+
+aU)
+local aV=math.clamp(aS(aU),az,aA)
+aT(aV,aQ(aV))end
+
+
+aP.WHEN_VALUE_CHANGED=aU local aV=function(
+
+aV, aW)
+local aX=(p.X-aV.X)/aW.X
+local aY=math.clamp(aX,0,1)
+local aZ=aR(aY)
+local a_=aS(aZ)
+local a0=math.clamp(a_,az,aA)
+aT(a0,aQ(a0))end
+
+
+local aW=Random.new()
+aU(aC)
+
+u(aJ.MouseButton1Down,function()
+if A~=false then return end
+
+J(aM,"BackgroundTransparency",0,0.3):Play()
+aF.ScrollingEnabled=false
+A=true
+
+local aX=aK.AbsolutePosition
+local aY=aK.AbsoluteSize
+
+while i:IsMouseButtonPressed(Enum.UserInputType.MouseButton1)do
+aV(aX,aY)
+task.wait()
+end
+
+A=false
+J(aM,"BackgroundTransparency",0.2,0.3):Play()
+aF.ScrollingEnabled=true
+end)
+
+u(aN:GetPropertyChangedSignal"Text",function()
+if not self.Selected then return end
+
+aO.Scale=0.3
+J(aO,"Scale",1.2,0.1):Play()
+
+local aX=J(aN,"Rotation",aW:NextNumber(-7.5,7.5),0.15)
+aX:Play()
+aX.Completed:Wait()
+
+J(aO,"Scale",1,0.2):Play()
+J(aN,"Rotation",0,0.1):Play()
+end)
+
+return aP
+end
+
+function ah:AddDiscordInvite(av)
+local aw,ax=an("DiscordInvite",av)
+local ay=av.Icon or av.Image or av.Logo
+local az=av.Banner or av.BannerColor
+local aA=av.Online or av.MembersOnline
+local aB=av.Members or av.TotalMembers
+local aC=av.Invite or av.Link
+
+assert(type(aC)=="string",`"Tab.AddDiscordInvite.Invite". 'string' expected, got {typeof(aC)}`)
+
+if az~=nil and typeof(az)~="Color3"and type(az)~="string"then
+error(`"Tab.AddDiscordInvite.Banner". 'nil', 'Color3', or 'string' expected, got {typeof(az)}`,2)
+end
+
+if aA~=nil and type(aA)~="number"then
+error(`"Tab.AddDiscordInvite.Online". 'number' expected, got {typeof(aA)}`,2)
+end
+
+if aB~=nil and type(aB)~="number"then
+error(`"Tab.AddDiscordInvite.Members". 'nil', or 'number' expected, got {typeof(aB)}`,2)
+end
+
+if I.ZIndexBehavior~=Enum.ZIndexBehavior.Sibling then
+I.ZIndexBehavior=Enum.ZIndexBehavior.Sibling
+end
+
+local aD=V[self]
+local aE=T[self].Container
+
+local aF=E("Frame","Option",aE,{
+BackgroundTransparency=1,
+Size=UDim2.new(1,0,0,148)
+})
+
+local aG=E("CanvasGroup",aF,{
+Size=UDim2.new(0,178,1,-15),
+Position=UDim2.new(0,5,1,0),
+AnchorPoint=Vector2.new(0,1),
+ClipsDescendants=true,
+Elements={
+Corner=UDim.new(0,9),
+Stroke={
+ThemeTag={
+Color="Colors.Border.Default"
+}
+}
+},
+ThemeTag={
+OBJECTS=aD,
+BackgroundColor3="Colors.Buttons.Default"
+}
+})
+
+local aH=E("ImageLabel",aG,{
+BackgroundColor3=Color3.new(1,1,1),
+Size=UDim2.fromScale(1,0.28),
+BackgroundTransparency=1
+})
+
+local aI=E("TextLabel",aF,{
+Position=UDim2.fromOffset(5,0),
+Size=UDim2.new(1,0,0,15),
+TextColor3=Color3.fromRGB(40,150,255),
+TextXAlignment=Enum.TextXAlignment.Left,
+BackgroundTransparency=1,
+TextSize=9,
+Text=aC,
+ThemeTag={
+OBJECTS=aD,
+TextColor3="Colors.Link",
+Font="Font.Medium"
+}
+})
+
+local aJ=E("ImageLabel",aG,{
+Size=UDim2.fromOffset(33,33),
+Position=UDim2.new(0,10,0.28,0),
+AnchorPoint=Vector2.new(0,0.5),
+Image=ay,
+ThemeTag={
+OBJECTS=aD,
+BackgroundColor3="Colors.Buttons.Default"
+},
+Elements={
+Corner=UDim.new(0,8),
+Stroke={
+Thickness=2.2,
+ApplyStrokeMode=Enum.ApplyStrokeMode.Border,
+ThemeTag={
+OBJECTS=aD,
+Color="Colors.Buttons.Default"
+}
+}
+}
+})
+
+local aK=E("TextLabel",aG,{
+Size=UDim2.new(1,-10,0,10),
+Position=UDim2.new(0,10,0.44,0),
+TextXAlignment=Enum.TextXAlignment.Left,
+BackgroundTransparency=1,
+TextSize=11,
+Text=Localize(aw),
+ThemeTag={
+OBJECTS=aD,
+TextColor3="Colors.Text.Default",
+Font="Font.Bold"
+}
+})
+
+table.insert(s.LocalizedLabels,{Instance=aK,Original=aw})
+
+local aL
+
+if aA or aB then
+aL=E("Frame",aG,{
+Size=UDim2.new(1,-10,0,9),
+Position=UDim2.new(0,0,0.52,0),
+BackgroundTransparency=1,
+Elements={
+Padding={
+PaddingLeft=UDim.new(0,7),
+PaddingRight=UDim.new(0,10)
+},
+ListLayout={
+HorizontalAlignment=Enum.HorizontalAlignment.Left,
+VerticalAlignment=Enum.VerticalAlignment.Center,
+FillDirection=Enum.FillDirection.Horizontal,
+Padding=UDim.new(0,4),
+}
+}
+})local aM=function(
+
+aM, aN)
+return E("Frame",aL,{
+Size=UDim2.fromScale(0,1),
+AutomaticSize=Enum.AutomaticSize.X,
+BackgroundTransparency=1,
+Childs={
+E("Frame",{
+Size=UDim2.fromOffset(3,3),
+Position=UDim2.new(0,5,0.5,0),
+AnchorPoint=Vector2.new(0,0.5),
+BackgroundColor3=aM,
+Elements={
+Corner=UDim.new(1,0)
+}
+}),
+E("TextLabel",{
+Size=UDim2.new(0,0,1,0),
+Position=UDim2.new(0,12,0.5,0),
+AnchorPoint=Vector2.new(0,0.5),
+AutomaticSize=Enum.AutomaticSize.X,
+BackgroundTransparency=1,
+TextSize=7,
+Text=aN,
+ThemeTag={
+OBJECTS=aD,
+TextColor3="Colors.Text.Darker",
+Font="Font.Normal"
+}
+})
+}
+})end
+
+
+if aA~=nil then
+aM(Color3.fromRGB(67,181,129),N(aA).." Online")
+end
+if aB~=nil then
+aM(Color3.fromRGB(86,101,105),N(aB).." Members")
+end
+end
+
+local aM=E("TextLabel",aG,{
+Size=UDim2.new(1,-50,0,8),
+Position=UDim2.new(0,10,aL and 0.6 or 0.56,0),
+TextXAlignment=Enum.TextXAlignment.Left,
+AutomaticSize=Enum.AutomaticSize.Y,
+BackgroundTransparency=1,
+TextSize=8,
+Text=Localize(ax or""),
+TextWrapped=true,
+ThemeTag={
+OBJECTS=aD,
+TextColor3="Colors.Text.Darker",
+Font="Font.Medium"
+}
+})
+
+table.insert(s.LocalizedLabels,{Instance=aM,Original=ax or""})
+
+local aN=E("Frame",aG,{
+Size=UDim2.new(1,0,0.28,0),
+Position=UDim2.fromScale(0,1),
+AnchorPoint=Vector2.new(0,1),
+BorderSizePixel=0,
+ThemeTag={
+OBJECTS=aD,
+BackgroundColor3="Colors.Buttons.Default"
+}
+})
+
+if#aM.Text>0 then
+aN.Size=UDim2.new(1,0,0.42,0)
+
+E("UIGradient",aN,{
+Rotation=-90,
+Transparency=NumberSequence.new{
+NumberSequenceKeypoint.new(0.00,0.00),
+NumberSequenceKeypoint.new(0.60,0.00),
+NumberSequenceKeypoint.new(1.00,1.00)
+}
+})
+end
+
+local aO=E("TextButton",aN,{
+Position=UDim2.new(0.5,0,1,-9),
+Size=UDim2.new(1,-18,0,18),
+AnchorPoint=Vector2.new(0.5,1),
+Text="Go to Server",
+Elements={
+Corner=UDim.new(0.5,0)
+},
+ThemeTag={
+OBJECTS=aD,
+BackgroundColor3="Colors.JoinButton",
+TextColor3="Colors.Text.Default",
+Font="Font.Bold"
+}
+})
+
+local aP=0
+
+u(aO.Activated,function()
+if(tick()-aP)<0 then return end
+
+aP=tick()+5
+local aQ=aO.Text
+aO.Text="Copied to Clipboard!"
+setclipboard(aC)
+task.wait(4)
+aO.Text=aQ
+end)
+
+if type(az)=="string"then
+aH.ScaleType=Enum.ScaleType.Crop
+aH.Image=az
+elseif typeof(az)=="Color3"then
+aH.BackgroundTransparency=0
+E("UIGradient",aH,{
+Rotation=-15,
+Color=ColorSequence.new{
+ColorSequenceKeypoint.new(0,az),
+ColorSequenceKeypoint.new(1,az:Lerp(Color3.new(1,1,1),0.2))
+}
+})
+end
+
+return setmetatable({
+DESTROY_ELEMENT=aF,
+VISIBLE_ELEMENT=aF,
+
+Title=aw,
+Description=ax,
+DESCRIPTION_LABEL=aM,
+TITLE_LABEL=aK,
+
+Kind="DiscordInvite",
+Parent=self
+},ai)
+end
+
+function ah:AddParagraph(av,aw)
+assert(type(av)=="string",`"Tab.AddParagraph[param 1]". 'string' expected, got {typeof(av)}`)
+
+if aw~=nil and type(aw)~="string"then
+error(`"Tab.AddParagraph[param 2]". 'string', or 'nil' expected, got {typeof(aw)}`,2)
+end
+
+local ax=V[self]
+local ay,az,aA=am(self,av,aw,UDim2.new(1,0,0,0))
+
+return setmetatable({
+DESTROY_ELEMENT=ay,
+VISIBLE_ELEMENT=ay,
+TITLE_LABEL=az,
+DESCRIPTION_LABEL=aA,
+
+Title=av,
+Description=aw,
+
+Parent=self,
+Kind="Paragraph"
+},ai)
+end
+
+-- ==========================================================
+-- Farm Details (#Prioridade Nome -> Status/Info)
+-- ==========================================================
+function ah:SetFarmDetail(av)
+if type(av)~="table"then
+error(`"Tab.SetFarmDetail[Configs]". 'table' expected, got {typeof(av)}`,2)
+end
+
+local aw=av[1]or av.Priority or av.ID
+local ax=av[2]or av.Name or av.Title
+local ay=av[3]or av.Status
+local az=av[4]or av.Info or av.Description
+
+assert(type(aw)=="number",`"Tab.SetFarmDetail.Priority". 'number' expected, got {typeof(aw)}`)
+assert(type(ax)=="string",`"Tab.SetFarmDetail.Name". 'string' expected, got {typeof(ax)}`)
+assert(type(ay)=="string",`"Tab.SetFarmDetail.Status". 'string' expected, got {typeof(ay)}`)
+
+if az~=nil and type(az)~="string"then
+error(`"Tab.SetFarmDetail.Info". 'string', or 'nil' expected, got {typeof(az)}`,2)
+end
+
+self.FARM_DETAILS=self.FARM_DETAILS or{}
+
+local aA=`#{aw} {ax}`
+local aB=s.FarmStatusColors[ay]
+local aStatus=aB and`<font color="{aB}"><b><font size="13">{ay}</font></b></font>`or`<b><font size="13">{ay}</font></b>`
+local aC=az and`{aStatus} <font size="11">{az}</font>`or aStatus
+
+local aD=self.FARM_DETAILS[aw]
+
+if aD then
+aD:SetTitle(aA)
+aD:SetDescription(aC)
+aD.Priority=aw
+aD.Status=ay
+aD.Info=az
+else
+aD=self:AddParagraph(aA,aC)
+aD.DESTROY_ELEMENT.LayoutOrder=aw
+aD.Priority=aw
+aD.Status=ay
+aD.Info=az
+self.FARM_DETAILS[aw]=aD
+end
+
+return aD
+end
+
+function ah:RemoveFarmDetail(av)
+assert(type(av)=="number",`"Tab.RemoveFarmDetail[param 1]". 'number' expected, got {typeof(av)}`)
+
+local aw=self.FARM_DETAILS and self.FARM_DETAILS[av]
+
+if aw then
+aw:Destroy()
+self.FARM_DETAILS[av]=nil
+end
+end
+
+function ah:GetFarmDetail(av)
+assert(type(av)=="number",`"Tab.GetFarmDetail[param 1]". 'number' expected, got {typeof(av)}`)
+
+return self.FARM_DETAILS and self.FARM_DETAILS[av]
+end
+
+function ah:ClearFarmDetails()
+if not self.FARM_DETAILS then return end
+
+for aw,ax in self.FARM_DETAILS do
+ax:Destroy()
+end
+
+table.clear(self.FARM_DETAILS)
+end
+
+ah.AddFarmDetail=ah.SetFarmDetail
+
+function ah:AddDropdown(av)
+local aw,ax=an("Dropdown",av)
+local ay=ao("Dropdown",av[5]or av.Flag)
+
+local az=av[2]or av.Options
+local aA=av[3]or av.Default
+local aB=F(av[4]or av.Callback)
+local aC=av.MultiSelect
+
+if aA~=nil and type(aA)~="table"and type(aA)~="string"then
+error(`"Tab.AddDropdown.Default". 'string', 'table', or 'nil' expected, got {typeof(aA)}`,2)
+end
+
+if az~=nil and type(az)~="table"then
+error(`"Tab.AddDropdown.Options". 'table', or 'nil' expected, got {typeof(az)}`,2)
+end
+
+if aC~=nil and type(aC)~="boolean"then
+error(`"Tab.AddDropdown.MultiSelect". 'boolean', or 'nil' expected, got {typeof(aC)}`,2)
+end
+
+if ay and type(ae[ay])==(aC and"table"or"string")then
+aA=ae[ay]
+end
+
+local aD=V[self]
+local aE,aF,aG=am(self,aw,ax,UDim2.new(1,-150,0,0))
+
+local aH=E("Frame",aE,{
+Size=UDim2.new(0,150,0,18),
+Position=UDim2.new(1,-10,0.5),
+AnchorPoint=Vector2.new(1,0.5),
+Elements={
+Corner=UDim.new(0,4)
+},
+ThemeTag={
+OBJECTS=aD,
+BackgroundColor3="Colors.Stroke"
+}
+})
+
+local aI=E("TextLabel",aH,{
+Size=UDim2.new(0.85,0,0.85,0),
+AnchorPoint=Vector2.new(0.5,0.5),
+Position=UDim2.new(0.5,0,0.5,0),
+BackgroundTransparency=1,
+TextScaled=true,
+Text="...",
+ThemeTag={
+OBJECTS=aD,
+TextColor3="Colors.Text.Default",
+Font="Font.Bold"
+}
+})
+
+local aJ={
+OBJECTS=aD,
+Image="Icons.Dropdown.Open",
+ImageColor3="Colors.Icons"
+}
+
+local aK=E("ImageLabel",aH,{
+Size=UDim2.new(0,15,0,15),
+Position=UDim2.new(0,-5,0.5),
+AnchorPoint=Vector2.new(1,0.5),
+BackgroundTransparency=1,
+ThemeTag=aJ
+})
+
+local aL=ak.Dropdown.new(self,aE,aF,aG,aB)
+
+local aM
+local aN=false
+local aO=false
+
+local aP={}
+local aQ={}
+local aR={}
+local aS={}
+
+aL.DROPDOWN_OPTIONS=aR
+aL.Opened=aO local aT=function(
+
+aT, aU)
+aJ.ImageColor3=aT
+aJ.Image=aU
+
+J(aK,"ImageColor3",w(s.CurrentTheme,aT),0.35):Play()
+aK.Image=w(s.CurrentTheme,aU)end local aU=function(
+
+
+aU)
+aO=aU
+aL.Opened=aU
+
+local aV=aU and"Colors.Primary"or"Colors.Icons"
+local aW=aU and"Icons.Dropdown.Close"or"Icons.Dropdown.Open"
+aT(aV,aW)end local aV=function()
+
+
+
+aU(false)end local aW=function()
+
+
+
+local aW={}
+for aX,aY in aQ do
+if not aY then continue end
+aW[#aW+1]=aX
+end
+return aW end local aX=function(
+
+
+aX)
+local aY=type(aX)=="table"and table.concat(aX,", ")or(aX or"")
+
+if#aY>=100 then
+aY=aY:sub(1,97).."..."
+end
+
+aI.Text=#aY~=0 and aY or"..."end local aY=function()
+
+
+
+aN=false
+
+local aY=aC and aW()or aM and aM.Name
+G(aB,aC and aQ or aY)
+aX(aY)
+
+if ay~=nil then
+ae[ay]=aY
+end end local aZ=function()
+
+
+
+if not aN then
+aN=true
+task.delay(0.1,aY)
+end end local a_=function(
+
+
+a_)
+if aC then
+local a0=not a_.Selected
+X.SetOptionValue(a_,a0)
+aQ[a_.Name]=a0
+else
+if aM==a_ then
+return nil
+elseif aM~=nil then
+X.SetOptionValue(aM,false)
+end
+
+aM=a_
+X.SetOptionValue(a_,true)
+end
+
+aZ()end local a0=function(
+
+
+a0)
+a0=tostring(a0)
+if aS[a0]then return end
+
+local a1={
+Name=a0,
+DisplayName=a0,
+Selected=false
+}
+
+if aC and aQ[a0]==nil then
+aQ[a0]=false
+end
+
+aS[a0]=a1
+aR[#aR+1]=a1
+return a1 end local a1=function(
+
+
+a1)
+if aO==a1 then return end
+
+if not X then
+X=ap()
+end
+
+if a1 then
+if not X.OpenDropdown(aV)then return end
+
+X.SetHolder(aH)
+X.SetMultiSelect(aC)
+X.SetOnClicked(a_)
+X.SetOptions(aR)
+else
+X.CloseDropdown()
+end
+
+aU(a1)end local a2=function(
+
+
+a2, a3)
+if a3 and type(a2)=="boolean"then
+return a2==true and aR[a3]
+end
+
+return if type(a2)=="number"then aR[a2]else aS[tostring(a2)]end local a3=function(
+
+
+a3)
+a3.Selected=true
+
+if aC then
+aQ[a3.Name]=true
+else
+aM=a3
+end end local a4=function(...)
+
+
+
+local a4=a2(...)
+
+if a4 then
+a3(a4)
+elseif aC and type(...)=="string"then
+aP[select(1,...)]=true
+end end local a5=function()
+
+
+
+if not aA then return end
+
+for a5=1,(aC and#aA or 1)do
+a4(aA[a5],a5)
+end end local a6=function(
+
+
+a6)
+local a7=table.find(aR,a6)
+
+if a7 then
+table.remove(aR,a7)
+end
+
+if a6.Instance then
+a6.Instance:Destroy()
+end
+
+aS[a6.Name]=nil end local a7=function(
+
+
+a7)
+if aC then
+local a8=a7.Name
+return(aQ[a8]or aP[a8])==true
+else
+return aM and aM.Name==a7.Name
+end end
+
+
+aL.ADD_DROPDOWN_OPTION=function(a8)
+if type(a8)=="table"then
+for a9=1,#a8 do
+aL:Add(a8[a9])
+end
+
+return nil
+end
+
+local a9=a0(a8)
+
+if a9 then
+if aL.Opened then
+X.CreateOptionTemplate(a9,true)
+end
+
+if a7(a9)then
+a3(a9)
+
+if a9.Instance then
+X.SetOptionValue(a9,a9.Selected)
+end
+end
+
+aZ()
+end
+end
+
+aL.REMOVE_DROPDOWN_OPTION=function(a8)
+local a9=aS[tostring(a8)]
+if a9 then
+a6(a9)
+end
+end
+
+aL.CLEAR_DROPDOWN=function()
+for a8=#aR,1,-1 do
+local a9=aR[a8]
+if a9.Instance then
+a9.Instance:Destroy()
+end
+
+aS[a9.Name]=nil
+aR[a8]=nil
+end
+
+if aL.Opened then
+X.Clear()
+end
+end
+
 do
-    local Factory = {}
-    Factory.ElementsTable = {
-        Corner = function(radius)
-            return CreateInstance("UICorner", { CornerRadius = radius or UDim.new(0, 8) })
-        end,
-        Stroke = function(color, thick)
-            return CreateInstance("UIStroke", { Color = color or Color3.fromRGB(60, 60, 60), Thickness = thick or 1 })
-        end,
-        Image = function(asset)
-            return CreateInstance("ImageLabel", { Image = asset or "", BackgroundTransparency = 1, Size = UDim2.fromScale(1, 1) })
-        end,
-        Button = function()
-            return CreateInstance("TextButton", { Text = "", Size = UDim2.fromScale(1, 1), AutoButtonColor = false })
-        end,
-        Padding = function(left, right, top, bottom)
-            return CreateInstance("UIPadding", {
-                PaddingLeft = left or UDim.new(0, 10),
-                PaddingRight = right or UDim.new(0, 10),
-                PaddingTop = top or UDim.new(0, 10),
-                PaddingBottom = bottom or UDim.new(0, 10)
-            })
-        end,
-        ListLayout = function(padding)
-            return CreateInstance("UIListLayout", { Padding = padding or UDim.new(0, 5) })
-        end,
-        Text = function(str)
-            return CreateInstance("TextLabel", { BackgroundTransparency = 1, Text = str or "" })
-        end,
-        Gradient = function(colorSeq)
-            return CreateInstance("UIGradient", { Color = colorSeq })
-        end
-    }
-
-    function Factory:Create(parent, elemType, ...)
-        local creator = self.ElementsTable[elemType]
-        if creator then
-            local elem = creator(...)
-            elem.Parent = parent
-            return elem
-        end
-    end
-
-    local ElementHelper = {}
-    function ElementHelper:Childs(children)
-        for i = 1, #children do
-            children[i].Parent = self
-        end
-    end
-
-    function ElementHelper:Elements(elements)
-        for elemType, props in pairs(elements) do
-            if type(props) == "table" then
-                InstanceBuilder.SetProperties(Factory:Create(self, elemType), props)
-            else
-                Factory:Create(self, elemType, props)
-            end
-        end
-    end
-
-    function ElementHelper:ThemeTag(themeProps)
-        local target = themeProps.OBJECTS
-        themeProps.OBJECTS = nil
-        return (target or GlobalThemeManager):add(self, themeProps)
-    end
-
-    function InstanceBuilder:SetProperties(properties)
-        for key, val in pairs(properties) do
-            if ElementHelper[key] then
-                ElementHelper[key](self, val)
-            else
-                self[key] = val
-            end
-        end
-    end
-
-    function InstanceBuilder:SetValues(...)
-        local inst = self
-        for _, val in {...} do
-            local t = typeof(val)
-            if t == "table" then
-                InstanceBuilder.SetProperties(inst, val)
-            else
-                inst[if t == "string" then "Name" else "Parent"] = val
-            end
-        end
-        return inst
-    end
-
-    local CurrentDraggingObject
-    function InstanceBuilder:Draggable(uiScale, lerpSpeed, clampFunc)
-        local dragStart, startPos
-        local smoothFactor = lerpSpeed or 0.28
-        local lastTick = 0
-        local StopDrag
-
-        local UpdateDrag = function(input)
-            local delta = input.Position - dragStart
-            lastTick = tick()
-            local targetPos
-            if clampFunc then
-                targetPos = clampFunc(
-                    startPos.X.Scale, startPos.X.Offset + delta.X / uiScale.Scale,
-                    startPos.Y.Scale, startPos.Y.Offset + delta.Y / uiScale.Scale
-                )
-            else
-                targetPos = UDim2.new(
-                    startPos.X.Scale, startPos.X.Offset + delta.X / uiScale.Scale,
-                    startPos.Y.Scale, startPos.Y.Offset + delta.Y / uiScale.Scale
-                )
-            end
-            self.Position = self.Position:Lerp(targetPos, smoothFactor)
-        end
-
-        local CheckActive = function()
-            while CurrentDraggingObject == self do
-                if (tick() - lastTick) >= 1 then
-                    StopDrag()
-                    break
-                end
-                task.wait()
-            end
-        end
-
-        local ValidInputTypes = {
-            [Enum.UserInputType.MouseButton1] = true,
-            [Enum.UserInputType.Touch] = true
-        }
-
-        local ValidMoveTypes = {
-            [Enum.UserInputType.MouseMovement] = true,
-            [Enum.UserInputType.Touch] = true
-        }
-
-        ConnectEvent(self.InputBegan, function(input)
-            if InputBlocked == false and CurrentDraggingObject == nil and ValidInputTypes[input.UserInputType] then
-                dragStart = input.Position
-                startPos = self.Position
-                CurrentDraggingObject = self
-                lastTick = tick()
-                InputBlocked = true
-
-                local conn
-                function StopDrag()
-                    InputBlocked = false
-                    CurrentDraggingObject = nil
-                    if conn then conn:Disconnect() end
-                end
-
-                task.spawn(CheckActive)
-
-                conn = input.Changed:Connect(function()
-                    if input.UserInputState == Enum.UserInputState.End then
-                        StopDrag()
-                    end
-                end)
-            end
-        end)
-
-        ConnectEvent(UserInputService.InputChanged, function(input)
-            if CurrentDraggingObject == self and ValidMoveTypes[input.UserInputType] then
-                UpdateDrag(input)
-            end
-        end)
-    end
-
-    function InstanceBuilder.new(className, ...)
-        return InstanceBuilder.SetValues(Instance.new(className), ...)
-    end
-
-    CreateInstance = InstanceBuilder.new
+if az then
+for a8=1,#az do
+a0(az[a8])
+end
 end
 
-local ParseCallback = function(cb)
-    if cb == nil then return {} end
-    if type(cb) ~= "function" and type(cb) ~= "table" then
-        error(`Failed to get Callback: 'function', or 'table' expected, got {typeof(cb)}`, 2)
-    end
-    if type(cb) ~= "function" then
-        local tbl = cb[1]
-        local key = cb[2]
-        cb = function(val) tbl[key] = val end
-    end
-    return table.pack(cb)
+if type(aA)=="table"then
+a5()
+elseif type(aA)=="string"or type(aA)=="number"then
+local a8=a2(aA)
+
+if a8 then
+a3(a8)
+end
 end
 
-local ExecuteCallbacks = function(cbList, ...)
-    for i = 1, #cbList do
-        task.spawn(cbList[i], ...)
-    end
+if aC then
+local a8=aW()
+task.defer(G,aB,aQ)
+aX(a8)
+else
+local a8=aM
+local a9=a8 and a8.Name or""
+task.defer(G,aB,a9)
+aX(a9)
+end
 end
 
-local ScreenGuiTag = "redz-library-v5"
-local MainScreenGui = CoreGui:FindFirstChild(ScreenGuiTag)
-if not MainScreenGui then
-    MainScreenGui = CreateInstance("ScreenGui", ScreenGuiTag, CoreGui, {
-        IgnoreGuiInset = true
-    })
+u(aE.Activated,function()
+a1(not aO)
+end)
+
+return aL
 end
 
-local CreateTween = function(inst, propName, targetVal, duration, style, dir)
-    local info = TweenInfo.new(duration, style or Enum.EasingStyle.Quart, dir or Enum.EasingDirection.Out)
-    return TweenService:Create(inst, info, { [propName] = targetVal })
+function ah:Destroy()
+assert(type(self)=="table"and self.IS_A_TAB,`"Tab.Destroy". {tostring(self)} is not a tab`)
+if self.IS_DESTROYED then return end
+local av=table.find(S,self)
+assert(av,`"Tab.Destroy". failed to destroy '{self.Title}'`)
+
+table.remove(S,av)
+
+for aw,ax in T[self]do
+ax:Destroy()
 end
 
-local SetLookup = function(tbl)
-    local lookup = {}
-    for i = 1, #tbl do
-        rawset(lookup, tbl[i], true)
-    end
-    return lookup
+V[self]:destroy()
+
+T[self]=nil
+V[self]=nil
+
+setmetatable(self,nil)
 end
 
-local CharBlacklist = SetLookup(string.split("\n\t,_:;()[]#&=!. \"'*^<>$", ""))
-local CleanSearchString = function(str)
-    return string.gsub(str:lower(), ".", function(c)
-        return CharBlacklist[c] and "" or c
-    end)
+function ah:SetVisible(av)
+assert(type(av)=="boolean",`"Tab.SetVisible[param 1]". 'boolean' extected, got {typeof(av)}`)
+
+for aw,ax in T[self]do
+ax.Visible=av
+end
 end
 
-local FormatNumberSeparators = function(num)
-    local str, formatted, count = tostring(num), "", 0
-    for i = #str, 1, -1 do
-        formatted = str:sub(i, i) .. formatted
-        count += 1
-        if i > 1 and count % 3 == 0 then
-            formatted = "," .. formatted
-        end
-    end
-    return formatted
+function ah:SetTitle(av)
+assert(type(av)=="string",`"Tab.SetTitle". 'string' expected, got {typeof(av)}`)
+
+if self.TITLE_LABEL then
+self.TITLE_LABEL.Text=Localize(av)
+
+for aIndex=1,#s.LocalizedLabels do
+local aEntry=s.LocalizedLabels[aIndex]
+
+if aEntry.Instance==self.TITLE_LABEL then
+aEntry.Original=av
+self.Title=av
+return self
+end
 end
 
-local IsAssetId = function(str)
-    return str:sub(1, 13) == "rbxassetid://"
+table.insert(s.LocalizedLabels,{Instance=self.TITLE_LABEL,Original=av})
 end
 
-local CalculateUIScale = function(val)
-    return (ViewportSize.Y / 450) * val
+self.Title=av
+return self
 end
 
-local FormatTimeDisplay = function(seconds)
-    local mins = math.floor(seconds / 60)
-    local hours = math.floor(seconds / 3600)
-    seconds = math.floor((seconds - (mins * 60)) * 10) / 10
-    mins = mins - (hours * 60)
-
-    if hours > 0 then
-        return `{hours}h {mins}m {math.floor(seconds)}s`
-    elseif mins > 0 then
-        return `{mins}m {math.floor(seconds)}s`
-    else
-        return tostring(seconds)
-    end
+function ah:Select()
+if ac==self then
+return nil
 end
+
+if ac then
+U[ac].Unselect()
+end
+
+ac=self
+U[ac].Select()
+end
+
+local function UpdateLocalizedLabel(aInstance,aOriginal)
+for aIndex=1,#s.LocalizedLabels do
+local aEntry=s.LocalizedLabels[aIndex]
+
+if aEntry.Instance==aInstance then
+aEntry.Original=aOriginal
+return nil
+end
+end
+
+table.insert(s.LocalizedLabels,{Instance=aInstance,Original=aOriginal})
+end
+
+function ai:SetTitle(av)
+assert(type(av)=="string",`"Option.SetTitle". 'string' expected, got {typeof(av)}`)
+assert(self.TITLE_LABEL,`"Option.SetTitle". cannot change this option name {self.KIND}:{self.Title}`)
+
+self.TITLE_LABEL.Text=Localize(av)
+self.Title=av
+
+UpdateLocalizedLabel(self.TITLE_LABEL,av)
+return self
+end
+
+function ai:SetDescription(av)
+assert(av==nil or type(av)=="string",`"Option.SetDescription". 'string', or 'nil' expected, got {typeof(av)}`)
+assert(self.DESCRIPTION_LABEL,`"Option.SetDescription". cannot change this option description {self.KIND}:{self.Title}`)
+
+self.DESCRIPTION_LABEL.Text=Localize(av)
+self.Description=av
+
+if av then
+UpdateLocalizedLabel(self.DESCRIPTION_LABEL,av)
+end
+
+return self
+end
+
+function ai:SetVisible(av)
+assert(typeof(self.VISIBLE_ELEMENT)=="Instance",`"Option.SetVisible". cannot change this option visibility {self.KIND}:{self.Title}`)
+assert(type(av)=="boolean",`"Option.SetVisible". 'boolean' expected, got {typeof(av)}`)
+
+self.VISIBLE_ELEMENT.Visible=av
+end
+
+function ai:Destroy()
+assert(typeof(self.DESTROY_ELEMENT)=="Instance",`"Option.Destroy". cannot destroy this option {self.KIND}:{self.Title}`)
+
+self.DESTROY_ELEMENT:Destroy()
+setmetatable(self,nil)
+
+self.Destroyed=true
+end
+
+function ai:AddCallback(av)
+assert(self.CALLBACKS,"\"Option.AddCallback\". cannot add callback to this option.")
+assert(type(av)=="function",`"Option.AddCallback[param 1]". 'function' expected, got {typeof(av)}`)
+
+table.insert(self.CALLBACKS,av)
+return self
+end
+
+ai.NewCallback=ai.AddCallback
+ai.SetContent=ai.SetDescription
+ai.SetDesc=ai.SetDescription
+
+function aj:CreateMobileMinimizer(av)
+local aw=E("ImageButton",I,{
+Size=UDim2.fromOffset(35,35),
+Position=UDim2.fromScale(0.17,0.28),
+AnchorPoint=Vector2.new(0.5,0.5),
+AutoButtonColor=false,
+ThemeTag={
+BackgroundColor3="Colors.Buttons.Default"
+}
+})
+
+u(aw.Activated,function()
+ag:Minimize()
+end)
+
+av.Elements={}
+
+if av.Corner then
+av.Elements.Corner=av.Corner
+av.Corner=nil
+end
+
+if av.Stroke then
+av.Elements.Stroke=av.Stroke
+av.Stroke=nil
+end
+
+D.Draggable(aw,ad,0.5)
+D.SetProperties(aw,av)
+
+return aw
+end
+
+function aj:SetKeyCode(av)
+assert(au(av),`"Minimizer.SetKeyCode[param 1]". 'KeyCode' expected, got {typeof(av)}`)
+
+self.KeyCode=av
+end
+
+function ag:SelectTab(av)
+local aw=type(av)=="number"and S[av]
+
+if type(av)=="table"and av.IS_A_TAB then
+aw=av
+end
+
+if aw then
+aw:Select()
+elseif not aw then
+assert(type(av)=="number",`"Window.SelectTab" number or tab expected, got {typeof(av)}`)
+assert(av>0,`"Window.SelectTab" the number must be greater than 0, value: {av}`)
+assert(av==math.floor(av),`"Winow.SelectTab" floor number expected, got {av}`)
+
+self.SelectedTab=av
+end
+end
+
+function ag:Minimize()
+ab.Visible=not ab.Visible
+end
+
+function ag:MakeTab(av)
+local aw=av[1]or av.Name or av.Title
+local ax=av[2]or av.Icon or av.Image
+
+assert(type(aw)=="string",`"Tab.Title" 'string' expected, got {typeof(aw)}`)
+assert(ax==nil or type(ax)=="string",`"Tab.Icon" 'string' expected, got {typeof(ax)}`)
+
+local ay=setmetatable({
+Selected=self.SelectedTab==#S+1,
+Icon=s:GetIconByName(ax),
+Title=aw,
+
+Parent=self,
+IS_A_TAB=true
+},ah)
+
+local az=self:GetElements()
+local aA=az.TabsContainer
+local aB=az.ContainerHolder
+
+local aC,aD,aE=al(self,ay,aA)
+
+ay.TITLE_LABEL=aC.Title
+
+local aF=J(aD,"Size",UDim2.new(1,0,1,0),0.3)
+local aG=UDim2.new(1,0,1,150)
+
+local aH=0.45
+
+local aI={
+J(aE,"BackgroundTransparency",0,aH),
+J(aE,"Size",UDim2.fromOffset(4,13),aH)
+}
+
+local aJ={
+J(aE,"BackgroundTransparency",1,aH),
+J(aE,"Size",UDim2.fromOffset(4,4),aH)
+}
+
+local aK=C:new()
+V[ay]=aK local aL=function(
+
+aL)
+for aM=1,#aL do
+aL[aM]:Play()
+end end local aM=function()
+
+
+
+aL(aI)
+ay.Selected=true
+aK:changeRendering(true)
+aK:update()
+aD.Parent=aB
+aD.Size=aG
+aF:Play()end local aN=function()
+
+
+
+aL(aJ)
+ay.Selected=false
+aD.Parent=nil
+aK:changeRendering(false)end
+
+
+U[ay]=table.freeze{
+Unselect=aN,
+Select=aM
+}
+
+T[ay]=table.freeze{
+SelectTabButton=aC,
+Container=aD
+}
+
+table.insert(S,ay)
+
+u(aC.Activated,function()
+ay:Select()
+end)
+
+if ay.Selected then
+ay:Select()
+end
+
+return ay
+end
+
+function ag:StartWindow(av)
+local aw=av.MinimizeButton
+local ax=av.MainFrame
+local ay=av.Resizers
+local az=av.TopBar
+
+local aA=av.SubTitle
+local aB=av.Title
+
+Y=av.Dropdowns
+ab=av.MainFrame
+ad=av.UIScale
+ae=av.Flags
+
+local aC=ax.Size
+local aD=0
+
+function ag:MinimizeButton()
+if(tick()-aD)<0 then
+return false
+end
+
+if self.Minimized then
+aw.Image="rbxassetid://10734896206"
+J(ax,"Size",aC,0.25):Play()
+else
+aC=ax.Size
+aw.Image="rbxassetid://10734924532"
+J(ax,"Size",UDim2.fromOffset(ax.Size.X.Offset,az.Size.Y.Offset),0.25):Play()
+end
+
+for aE,aF in ay do
+aF.Visible=self.Minimized
+end
+
+self.Minimized=not self.Minimized
+aD=tick()+0.5
+
+return true
+end
+
+function ag:GetTitle()
+return aB.Text
+end
+
+function ag:GetSubTitle()
+return aA.Text
+end
+
+function ag:SetTitle(aE)
+assert(type(aE)=="string",`"Window.SetTitle". 'string' expected, got {typeof(aE)}`)
+assert(#aE>0,"\"Window.SetTitle\". the new 'Title' is too short.")
+
+aB.Text=aE
+end
+
+function ag:SetSubTitle(aE)
+assert(type(aE)=="string",`"Window.SetSubTitle". 'string' expected, got {typeof(aE)}`)
+assert(#aE>0,"\"Window.SetSubTitle\". the new 'SubTitle' is too short.")
+
+aA.Text=aE
+end
+
+W=E("Frame",I,{
+Size=UDim2.new(0,280,1,0),
+Position=UDim2.fromScale(1,0),
+AnchorPoint=Vector2.new(1,0),
+BackgroundTransparency=1,
+Elements={
+Padding={
+PaddingBottom=UDim.new(0,20)
+},
+ListLayout={
+HorizontalAlignment=Enum.HorizontalAlignment.Center,
+VerticalAlignment=Enum.VerticalAlignment.Bottom,
+SortOrder=Enum.SortOrder.LayoutOrder,
+Padding=UDim.new(0,20)
+}
+}
+})
+
+aa=E("TextButton","OutBox",{
+Size=UDim2.fromScale(1,1),
+BackgroundTransparency=0.3,
+AutoButtonColor=false,
+Text="",
+ThemeTag={
+BackgroundColor3="Colors.Buttons.Default"
+},
+Childs={
+ax:FindFirstChildOfClass"UICorner":Clone(),
+E("Frame","Template",{
+Size=UDim2.new(0.35,60,0.20,80),
+Position=UDim2.fromScale(0.5,0.5),
+AnchorPoint=Vector2.new(0.5,0.5),
+Active=true,
+Elements={
+Corner=UDim.new(0,6),
+Gradient={
+Rotation=45,
+ThemeTag={
+Color="Colors.Background"
+}
+}
+},
+Childs={
+E("TextLabel","Title",{
+Size=UDim2.new(1,-20,0,20),
+TextTruncate=Enum.TextTruncate.AtEnd,
+TextSize=15,
+Position=UDim2.new(0.5,0,0,28),
+AnchorPoint=Vector2.new(0.5,0),
+BackgroundTransparency=1,
+ThemeTag={
+Font="Font.ExtraBold",
+TextColor3="Colors.Text.Default"
+}
+}),
+E("TextLabel","Description",{
+Position=UDim2.new(0.5,0,0,46),
+Size=UDim2.new(1,-20,0,0),
+AnchorPoint=Vector2.new(0.5,0),
+TextWrapped=true,
+TextSize=11,
+AutomaticSize=Enum.AutomaticSize.Y,
+BackgroundTransparency=1,
+ThemeTag={
+TextColor3="Colors.Text.Darker",
+Font="Font.Medium"
+}
+}),
+E("Frame","Options",{
+Size=UDim2.new(1,-20,0.15,18),
+Position=UDim2.new(0.5,0,1,-10),
+AnchorPoint=Vector2.new(0.5,1),
+BackgroundTransparency=1,
+Elements={
+Padding={
+PaddingLeft=UDim.new(0,10),
+PaddingRight=UDim.new(0,10),
+PaddingBottom=UDim.new(0,30),
+PaddingTop=UDim.new(0,30)
+},
+ListLayout={
+HorizontalAlignment=Enum.HorizontalAlignment.Right,
+VerticalAlignment=Enum.VerticalAlignment.Center,
+FillDirection=Enum.FillDirection.Horizontal
+}
+}
+})
+}
+})
+}
+})
+
+aa.Template:SetAttribute("OriginalSize",aa.Template.Size)
+
+u(aa.Activated,function()
+if Z~=nil and not Z.Closing and not Z.Closed then
+Z:Close()
+end
+end)
+
+ag.StartWindow=nil
+end
+
+function ag:DeleteFlags()
+return ae()
+end
+
+function ag:SetFlag(av,aw)
+assert(type(av)=="string",`"Window.SetFlag[param 1]". 'string' expected, got {typeof(av)}`)
+
+if at[typeof(aw)]~=true then
+local ax={}
+
+for ay,az in at do
+table.insert(ax,ay)
+end
+
+return error(`"Window.SetFlag[param 2]". '{table.concat(ax,"', '")}' expected, got {typeof(aw)}`,2)
+end
+
+ae[av]=aw
+end
+
+function ag:GetFlag(av)
+return ae[av]
+end
+
+function ag:ReadFile(av)
+assert(type(av)=="string",`"Window.ReadFile[param 1]". 'string' expected, got {typeof(av)}`)
+av=`{self.ScriptFolder}/{av}`
+
+if f~=nil and(isfile==nil or not isfile(av))then
+return f(av)
+end
+end
+
+function ag:WriteFile(av,aw)
+assert(type(av)=="string",`"Window.WriteFile[param 1]". 'string' expected, got {typeof(av)}`)
+av=`{self.ScriptFolder}/{av}`
+
+if aw~=nil and type(aw)~="string"then
+error(`"Window.WriteFile[param 2]". 'string', or 'nil' expected, got {typeof(aw)}`,2)
+end
+
+if aw==nil then
+if c~=nil then
+c(`{self.ScriptFolder}/{av}`)
+return true
+end
+else
+if e~=nil then
+z(`{self.ScriptFolder}/{av}`)
+return true
+end
+end
+
+return false
+end
+
+function ag:NewMinimizer(av)
+local aw=type(av)=="table"and(av[1]or av.KeyCode)or av
+
+if not au(aw)then
+error(`"Window.NewMinimizer.KeyCode". 'KeyCode' expected, got {typeof(aw)}`,2)
+end
+
+local ax=setmetatable({
+KeyCode=aw
+},aj)
+
+u(i.InputBegan,function(ay)
+if ay.KeyCode==ax.KeyCode then
+ag:Minimize()
+end
+end)
+
+return ax
+end
+
+function ag:Dialog(av)
+if self.Minimized then
+while not self:MinimizeButton()do task.wait()end
+end
+
+if Z then
+Z:Close(true)
+end
+
+local aw=av.Title or av.Name
+local ax=av.Content or av.Description
+local ay=av.Options
+
+assert(type(aw)=="string",`"Window.Dialog.Title". 'string' expected, got {typeof(aw)}`)
+assert(type(ax)=="string",`"Window.Dialog.Content". 'string' expected, got {typeof(ax)}`)
+assert(type(ay)=="table",`"Window.Dialog.Options". 'table' expected, got {typeof(ay)}`)
+assert(#ay>0,"\"Window.Dialog.Options\". requires one or more options.")local az=function()
+
+
+local az=aa.Template
+local aA=az.Description
+local aB=az.Title
+
+local aC=az:GetAttribute"OriginalSize"
+local aD=UDim2.new(aC.X.Scale*1.2,aC.X.Offset,aC.Y.Scale*1.2,aC.Y.Offset)
+
+az.Size=aD
+aa.Parent=ab
+aA.Text=ax
+aB.Text=aw
+
+J(az,"Size",aC,0.3):Play()
+
+local aE=ak.Dialog.new(aA,aB)
+aE.NEW_SIZE=aD
+aE.TEMPLATE=az
+
+for aF,aG in az.Options:GetChildren()do
+if aG:IsA"GuiObject"then
+aG:Destroy()
+end
+end
+
+for aF=#ay,1,-1 do
+aE:NewOption(ay[aF])
+end
+
+return aE end
+
+
+Z=az()
+return Z
+end
+
+function ag:SetNotifyDefaultIcon(av)
+assert(type(av)=="string",`"Window.SetNotifyDefaultIcon[param 1]". 'string' expected, got {typeof(av)}`)
+
+af=av
+end
+
+function ag:Notify(av)
+if type(av)~="table"then
+av={}
+end
+
+local aw=av[1]or av.Name or av.Title
+local ax=av[2]or av.Content
+local ay=av[3]or av.Icon or av.Image
+local az=av[4]or av.Duration or av.Countdown or av.Time
+
+if self.NOTIFICATION_GROUP then
+if az==nil then az=self.Duration end
+if ax==nil then ax=self.Content end
+if aw==nil then aw=self.Title end
+if ay==nil then ay=self.Icon end
+end
+
+assert(type(aw)=="string",`"Window.Notify.Title". 'string' expected, got {typeof(aw)}`)
+assert(type(ax)=="string",`"Window.Notify.Content". 'string' expected, got {typeof(aw)}`)
+assert(ay==nil or type(ay)=="string",`"Window.Notify.Icon". 'nil' or 'string' expected, got {typeof(ay)}`)
+
+if az~=nil and type(az)~="number"then
+error(`"Window.Notify.Time". 'number', or 'nil' expected, got {typeof(az)}`,2)
+elseif az==nil then
+az=5
+end
+
+local aA=E("Frame","Notification",W,{
+Size=UDim2.new(0.85,0,0,60),
+BackgroundTransparency=1,
+AutomaticSize=Enum.AutomaticSize.Y
+})
+
+local aB=E("TextButton",aA,{
+AutomaticSize=Enum.AutomaticSize.Y,
+Size=UDim2.fromScale(1,1),
+AutoButtonColor=false,
+Text="",
+ThemeTag={
+BackgroundTransparency="BackgroundTransparency"
+},
+Elements={
+Corner=UDim.new(0,9),
+Gradient={
+Rotation=45,
+ThemeTag={
+Color="Colors.Background"
+}
+}
+}
+})
+
+local aC=E("UIScale",aA)
+
+local aD=E("Frame","Holder",aB,{
+AutomaticSize=Enum.AutomaticSize.Y,
+BackgroundTransparency=1,
+Size=UDim2.fromScale(1,1),
+Elements={
+ListLayout={
+SortOrder=Enum.SortOrder.LayoutOrder,
+VerticalAlignment=Enum.VerticalAlignment.Center,
+Padding=UDim.new(0,4)
+},
+Padding={
+PaddingBottom=UDim.new(0,8),
+PaddingTop=UDim.new(0,8),
+PaddingLeft=UDim.new(0,40)
+}
+}
+})
+
+local aE=E("TextLabel",aD,{
+Size=UDim2.new(1,0,0,20),
+TextTruncate=Enum.TextTruncate.AtEnd,
+TextXAlignment=Enum.TextXAlignment.Left,
+TextYAlignment=Enum.TextYAlignment.Bottom,
+BackgroundTransparency=1,
+TextSize=14,
+ThemeTag={
+TextColor3="Colors.Text.Default",
+Font="Font.Bold"
+}
+})
+
+local aF=E("TextLabel",aD,{
+Size=UDim2.new(1,0,0,20),
+TextXAlignment=Enum.TextXAlignment.Left,
+TextYAlignment=Enum.TextYAlignment.Top,
+AutomaticSize=Enum.AutomaticSize.Y,
+BackgroundTransparency=1,
+TextWrapped=true,
+TextSize=12,
+ThemeTag={
+TextColor3="Colors.Text.Dark",
+Font="Font.Normal"
+}
+})
+
+local aG=E("ImageLabel",aB,{
+Size=UDim2.fromOffset(24,24),
+Position=UDim2.new(0,8,0.5,0),
+AnchorPoint=Vector2.new(0,0.5),
+BackgroundTransparency=1,
+ThemeTag={
+ImageColor3="Colors.Icons"
+}
+})
+
+local aH=E("TextLabel",aB,{
+Size=UDim2.new(0,40,0,16),
+Position=UDim2.new(1,-10,0,8),
+AnchorPoint=Vector2.new(1,0),
+BackgroundTransparency=1,
+TextSize=10,
+ThemeTag={
+TextColor3="Colors.Text.Darker",
+Font="Font.Normal"
+}
+})
+
+local aI=false
+
+local aJ=J(aC,"Scale",1.22,0.35)
+local aK=J(aC,"Scale",1.00,0.35)
+
+local aL=setmetatable({
+TITLE_LABEL=aE,
+DESCRIPTION_LABEL=aF,
+VISIBLE_ELEMENT=aA,
+DESTROY_ELEMENT=aA,
+NOTIFICATION=aB,
+
+Kind="Notification",
+Closed=false,
+Parent=self
+},ai)
+
+function aL:Close()
+if self.Closed==true then return end
+
+self:Destroy()
+self.Closed=true
+
+local aM=J(aB,"Position",UDim2.fromScale(3,0),0.8)
+aM:Play()
+aM.Completed:Wait()
+aA:Destroy()
+end local aM=function()
+
+
+ay=s:GetIconByName(ay or af)
+aG.Image=ay
+
+if not O(ay)then
+aG.Visible=false
+aD.UIPadding.PaddingLeft=UDim.new(0,15)
+end
+
+aB.Position=UDim2.fromScale(3,0)
+J(aB,"Position",UDim2.fromScale(0,0),0.35):Play()
+
+aE.Text=aw
+aF.Text=ax
+
+local aM=aB.MouseLeave
+
+while az>0 do
+aH.Text=Q(az)
+if aI==true then aM:Wait()end
+az-=task.wait()
+end
+
+aL:Close()end
+
+
+u(aB.MouseButton1Down,function()aJ:Play()aI=true end)
+u(aB.MouseLeave,function()aK:Play()aI=false end)
+
+task.defer(aM)
+
+return aL
+end
+
+function ag:NewNotifyGroup(av)
+local aw=av[1]or av.Name or av.Title
+local ax=av[2]or av.Content
+local ay=av[3]or av.Icon or av.Image
+local az=av[4]or av.Duration or av.Countdown or av.Time
+
+if aw~=nil and type(aw)~="string"then
+error(`"Window.NewNotifyGroup.Title". 'string', or 'nil' expected, got {typeof(aw)}`,2)
+end
+
+if ax~=nil and type(ax)~="string"then
+error(`"Window.NewNotifyGroup.Content". 'string', or 'nil' expected, got {typeof(ax)}`,2)
+end
+
+if ay~=nil and type(ay)~="string"then
+error(`"Window.NewNotifyGroup.Icon". 'string', or 'nil' expected, got {typeof(ay)}`,2)
+end
+
+if az~=nil and type(az)~="number"then
+error(`"Window.NewNotifyGroup.Time". 'number', or 'nil' expected, got {typeof(az)}`,2)
+end
+
+return{
+NOTIFICATION_GROUP=true,
+Notify=ag.Notify,
+
+Duration=az,
+Content=ax,
+Title=aw,
+Icon=ay,
+}
+end
+
+function ag:GetTabByTitle(av)
+assert(type(av)=="string",`"Window.GetTabByTitle[param 1]". 'string' expected, got {typeof(av)}`)
+
+for aw=1,#S do
+if S[aw].Title==av then
+return S[aw]
+end
+end
+end
+
+ag.NewNotificationGroup=ag.NewNotifyGroup
+ag.SetDefaultNotifyIcon=SetNotifyDefaultIcon
+ag.GetTabByName=ag.GetTabByTitle
+ag.Notificafion=ag.Notify
+
+R.Window=ag
+end local aa=function(
+
+aa, ab)
+local ac=ab.Size.Y.Offset
+local ad=UDim2.new(0,aa.TabSize or s.Default.TabSize,1,-ac)
+local ae=UDim2.new(1,-ad.X.Offset,1,-ac)
+
+local af=E("ScrollingFrame","TabsScroll",{
+AutomaticCanvasSize=Enum.AutomaticSize.Y,
+ScrollingDirection=Enum.ScrollingDirection.Y,
+Position=UDim2.new(0,0,1,0),
+AnchorPoint=Vector2.new(0,1),
+ScrollBarThickness=2.2,
+BackgroundTransparency=1,
+ScrollBarImageTransparency=0.2,
+CanvasSize=UDim2.new(),
+BorderSizePixel=0,
+Size=ad,
+ThemeTag={
+ScrollBarImageColor3="Colors.ScrollBar"
+},
+Elements={
+Padding={
+PaddingLeft=UDim.new(0,10),
+PaddingRight=UDim.new(0,10),
+PaddingTop=UDim.new(0,10),
+PaddingBottom=UDim.new(0,10)
+},
+ListLayout={
+Padding=UDim.new(0,5)
+}
+}
+})
+
+local ag=E("Frame","Containers",{
+Size=ae,
+AnchorPoint=Vector2.new(1,1),
+Position=UDim2.new(1,0,1,0),
+BackgroundTransparency=1,
+ClipsDescendants=true
+})
+
+return af,ag end
+
+
+function s:GetIconByName(ab)
+if ab==nil then return end
+assert(ab,`"Library.GetIconByName". 'string' expected, got {typeof(ab)}`)
+
+if O(ab)or#ab==0 then
+return ab
+end
+
+local ac=M(ab)
+
+if self.Icons[ac]then
+return"rbxassetid://"..self.Icons[ac]
+end
+
+for ad,ae in self.Icons do
+if ad:find(ac,1,true)then
+return"rbxassetid://"..ae
+end
+end
+end
+
+function s:IsValidTheme(ab)
+assert(type(ab)=="string",`"Library.IsValidTheme". string extected, got {typeof(ab)}`)
+
+return self.Themes[ab]~=nil
+end
+
+function s:GetThemes()
+local ab={}
+for ac,ad in self.Themes do
+table.insert(ab,ac)
+end
+return ab
+end
+
+function s:GetTheme(ab)
+assert(ab==nil or type(ab)=="string",`"Library.GetTheme". 'string' expected, got {typeof(ab)}`)
+
+if ab==nil then
+return self.CurrentTheme
+end
+
+local ac=self.Themes[ab]
+assert(ac~=nil,`"Library.GetTheme". theme not found: {ab}`)
+return ac
+end
+
+function s:SetTheme(ab)
+assert(type(ab)=="string",`"Library.SetTheme". string extected, got {typeof(ab)}`)
+local ac=self.Themes[ab]
+assert(ac,`"Library.SetTheme". theme not found: {ab}`)
+
+self.CurrentTheme=ac
+self.WindowSettings.SelectedTheme=ac.Name
+
+C:update()
+end
+
+function s:SetUIScale(ab)
+local ac=B.MIN_SCALE
+local ad=B.MAX_SCALE
+
+assert(type(ab)=="number",`"Library.SetUIScale". 'number' expected, got {typeof(ab)}`)
+assert(ab>=ac and ab<=ad,`"Library.SetUIScale". Min Scale: {ac}, Max Scale: {ad}`)
+
+I.Scale.Scale=P(ab)
+end
+
+function s:GetMaxScale()
+return B.MAX_SCALE
+end
+
+function s:GetMinScale()
+return B.MIN_SCALE
+end
+
+function s:GetCurrentTheme()
+if not self.LOADED_UI_LIBRARY then
+return error("failed to get current theme: UI is not loaded",2)
+end
+return self.CurrentTheme
+end
+
+function s:Destroy()
+for ab,ac in self.Connections do
+ac:Disconnect()
+end
+
+if I and I:GetAttribute"UID"==self.SCREENGUI_UID then
+pcall(I.Destroy,I)
+end
+end
+
+function s:MakeWindow(ab)
+if self.LOADED_UI_LIBRARY then
+return error("you can create only 1 Window",2)
+end
+
+local ac=math.random()
+I:SetAttribute("UID",ac)
+self.SCREENGUI_UID=ac
+I:ClearAllChildren()
+
+local ad=E("UIScale","Scale",I,{
+Scale=P(1)
+})
+
+local ae={
+Title=ab[1]or ab.Name or ab.Title,
+SubTitle=ab[2]or ab.SubName or ab.SubTitle,
+ScriptFolder=ab[3]or ab.ScriptFolder or ab.FolderName
+}
+
+assert(type(ae.Title)=="string",`"Window.Title". 'string' expected, got {typeof(ae.Title)}`)
+assert(type(ae.SubTitle)=="string",`"Window.SubTitle". 'string' expected, got {typeof(ae.SubTitle)}`)
+
+if ae.ScriptFolder~=nil and type(ae.ScriptFolder)~="string"then
+return error(`"Window.ScriptFolder". 'string', or nil expected, got {typeof(ae.ScriptFolder)}`,2)
+end
+
+if ae.ScriptFolder~=nil and string.find(ae.ScriptFolder,"/")then
+return error("\"Window.ScriptFolder\" is not valid, unexpected char \"/\"",2)
+end
+
+local af=(function()
+local af=ae.ScriptFolder
+local ag=false
+
+local ah,ai=pcall(function()
+return af and k:JSONDecode(f(`{af}/LibrarySettings.json`))
+end)
+
+if type(ai)~="table"then
+ai={}
+end local aj=function()
+
+
+ag=false
+
+return pcall(function()
+return z(`{af}/LibrarySettings.json`,k:JSONEncode(ai))
+end)end local ak=function(
+
+
+ak, al, am)
+rawset(ai,al,am)
+
+if af and not ag then
+ag=true
+task.delay(0.5,aj)
+end end
+
+
+return setmetatable({},{
+__newindex=ak,
+__index=ai
+})
+end)()
+
+local ag=(function()
+local ag=ae.ScriptFolder
+local ah=false
+
+local ai,aj=pcall(function()
+return ag and k:JSONDecode(f(`{ag}/ScriptFlags.json`))
+end)
+
+if type(aj)~="table"then
+aj={}
+end local ak=function()
+
+
+ah=false
+
+return pcall(function()
+z(`{ag}/ScriptFlags.json`,k:JSONEncode(aj))
+end)end local al=function(
+
+
+al, am, an)
+rawset(aj,am,an)
+
+if ag and not ah then
+ah=true
+task.delay(0.5,ak)
+end end local am=function()
+
+
+
+table.clear(aj)
+return pcall(function()
+return ag and c(`{ag}/ScriptFlags.json`)
+end)end
+
+
+return setmetatable({},{
+__newindex=al,
+__call=am,
+__index=aj
+})
+end)()
+
+self.ThemesObjects=C
+self.WindowSettings=af
+self.Flags=ag
+
+self.Icons=(function()
+local ah=ae.ScriptFolder
+
+local ai,aj=pcall(function()
+return loadstring(f(`{ah}/Icons.lua`))()
+end)
+
+if ai and type(aj)=="table"then
+return aj
+end
+
+local ak=`https://raw.githubusercontent.com/{self.Information.GitHubOwner}`
+local al=`{ak}/Library/refs/heads/main/redz-V5-remake/Utils/Icons.lua`
+local am local an=function()
+
+
+return z(`{ah}/Icons.lua`,am)end
+
+
+local ao,ap=pcall(function()
+am=game:HttpGet(al)
+return loadstring(am)()
+end)
+
+if ao and type(ap)=="table"then
+if type(am)=="string"then
+pcall(an)
+end
+
+return ap
+end
+
+return{}
+end)()
+
+if type(af.SelectedTheme)=="string"and self:IsValidTheme(af.SelectedTheme)then
+self:SetTheme(af.SelectedTheme)
+else
+self:SetTheme(self.Default.Theme)
+end
+
+self.LOADED_UI_LIBRARY=true
+
+local ah=self.Default.UISize
+
+if af and type(af.UISize)=="table"then
+local ak,al=unpack(af.UISize)
+
+if type(ak)=="number"and type(al)=="number"then
+local am=I.AbsoluteSize
+ak=math.clamp(ak,430,1000)
+al=math.clamp(al,200,500)
+ah=UDim2.fromOffset(ak,al)
+end
+end
+
+local ak=E("Frame","Window",I,{
+Position=UDim2.new(0.5,-ah.X.Offset/2,0.5,-ah.Y.Offset/2),
+Active=true,
+Size=ah,
+ClipsDescendants=true,
+ThemeTag={
+BackgroundTransparency="BackgroundTransparency"
+},
+Elements={
+Corner=UDim.new(0,8),
+Gradient={
+Rotation=45,
+ThemeTag={
+Color="Colors.Background"
+}
+}
+}
+})
 
 -- ==========================================================
--- ESTRUTURA DOS COMPONENTES VISUAIS
+-- Particulas de fundo (background particles/animação)
 -- ==========================================================
-local WindowEngine = {}
-do
-    local TabsRegistry = {}
-    local TabContainers = {}
-    local TabSelectionHooks = {}
-    local TabThemes = {}
-
-    local NotificationFrame, GlobalDropdownMenu, DialogOverlay, ActiveDialog
-    local CurrentActiveButton, DropdownSearchContext, RootMainFrame, RootUIScale, StoredScriptFlags
-    local DefaultNotifyIcon = ""
-
-    local WindowClass = { SelectedTab = 1, Minimized = false }
-    WindowClass.__index = WindowClass
-
-    local TabClass = {}
-    TabClass.__index = TabClass
-
-    local OptionClass = {}
-    OptionClass.__index = OptionClass
-
-    local MinimizerClass = {}
-    MinimizerClass.__index = MinimizerClass
-
-    local WidgetRegistry = {}
-    do
-        local CreateInheritedClass = function()
-            local cls = {}
-            cls.__index = function(tbl, key)
-                return cls[key] or rawget(OptionClass, key)
-            end
-            return cls
-        end
-
-        WidgetRegistry.TextBox  = CreateInheritedClass()
-        WidgetRegistry.Toggle   = CreateInheritedClass()
-        WidgetRegistry.Slider   = CreateInheritedClass()
-        WidgetRegistry.Dropdown = CreateInheritedClass()
-        WidgetRegistry.Keybind  = CreateInheritedClass()
-        WidgetRegistry.Dialog   = CreateInheritedClass()
-
-        local CleanupActiveDialog = function()
-            ActiveDialog.Closed = true
-            ActiveDialog.Closing = false
-            setmetatable(ActiveDialog, nil)
-            ActiveDialog = nil
-            DialogOverlay.Parent = nil
-        end
-
-        local CloseDialogInstant = function()
-            if ActiveDialog ~= nil then
-                ActiveDialog:Close()
-            end
-        end
-
-        function WidgetRegistry.Dialog:NewOption(optData)
-            local title = optData[1] or optData.Name or optData.Title
-            local callbacks = ParseCallback(optData[2] or optData.Callback)
-            table.insert(callbacks, CloseDialogInstant)
-
-            assert(type(title) == "string", `"Dialog.NewOption.Name". 'string' expected, got {typeof(title)}`)
-
-            local btn = CreateInstance("TextButton", {
-                AutoButtonColor = false,
-                Size = UDim2.fromScale(0.24, 1),
-                BackgroundTransparency = 1,
-                TextSize = 11,
-                Text = title,
-                Elements = { Corner = UDim.new(1, 0) },
-                ThemeTag = {
-                    BackgroundColor3 = "Colors.Buttons.Default",
-                    TextColor3 = "Colors.Text.Dark",
-                    Font = "Font.Bold"
-                }
-            })
-
-            local hoverIn = CreateTween(btn, "BackgroundTransparency", 0, 0.25)
-            local hoverOut = CreateTween(btn, "BackgroundTransparency", 1, 0.25)
-
-            ConnectEvent(btn.MouseLeave, function() hoverOut:Play() end)
-            ConnectEvent(btn.MouseEnter, function() hoverIn:Play() end)
-            ConnectEvent(btn.Activated, function() ExecuteCallbacks(callbacks) end)
-
-            btn.Parent = DialogOverlay.Template.Options
-        end
-
-        function WidgetRegistry.Dialog:Close(immediate)
-            if self.Closed or self.Closing or ActiveDialog ~= self then
-                return nil
-            end
-            self.Closing = true
-            local tw = CreateTween(self.TEMPLATE, "Size", self.NEW_SIZE, 0.22, Enum.EasingStyle.Back, Enum.EasingDirection.In)
-            tw:Play()
-
-            if immediate then
-                tw.Completed:Wait()
-                CleanupActiveDialog()
-            else
-                ConnectEvent(tw.Completed, CleanupActiveDialog)
-            end
-        end
-
-        function WidgetRegistry.Dialog.new(descLabel, titleLabel)
-            return setmetatable({
-                TITLE_LABEL = descLabel,
-                DESCRIPTION_LABEL = descLabel,
-                Content = descLabel.Text,
-                Title = titleLabel.Text,
-                Closed = false,
-                Closing = false,
-                Kind = "Dialog"
-            }, WidgetRegistry.Dialog)
-        end
-
-        function WidgetRegistry.Dropdown:SetEnabled(tbl)
-            assert(type(tbl) == "table", `"Dropdown.SetEnabled[param 1]". 'table' expected, got {typeof(tbl)}`)
-            self.SET_ENABLED_OPTIONS(tbl)
-        end
-
-        function WidgetRegistry.Dropdown:Clear()
-            self.CLEAR_DROPDOWN()
-        end
-
-        function WidgetRegistry.Dropdown:NewOptions(...)
-            self:Clear()
-            self:Add(...)
-        end
-
-        function WidgetRegistry.Dropdown:GetOptionsCount()
-            return #self.DROPDOWN_OPTIONS
-        end
-
-        function WidgetRegistry.Dropdown:Remove(...)
-            local args = {...}
-            assert(#args > 0, "'Dropdown.Remove' requires one or more options.")
-            for _, opt in args do
-                self.REMOVE_DROPDOWN_OPTION(opt)
-            end
-        end
-
-        function WidgetRegistry.Dropdown:Add(...)
-            local args = {...}
-            assert(#args > 0, "'Dropdown.Add' requires one or more options.")
-            for _, opt in args do
-                self.ADD_DROPDOWN_OPTION(opt)
-            end
-        end
-
-        function WidgetRegistry.Dropdown.new(parent, element, titleLabel, descLabel, callbacks)
-            return setmetatable({
-                CALLBACKS = callbacks,
-                DESTROY_ELEMENT = element,
-                VISIBLE_ELEMENT = element,
-                TITLE_LABEL = titleLabel,
-                DESCRIPTION_LABEL = descLabel,
-                Description = descLabel.Text,
-                Title = titleLabel.Text,
-                Parent = parent,
-                Kind = "Dropdown"
-            }, WidgetRegistry.Dropdown)
-        end
-
-        function WidgetRegistry.Slider:SetValue(val)
-            assert(type(val) == "number", `"Slider.SetValue". 'number' expected, got {typeof(val)}`)
-            if self.Value ~= val then
-                self.WHEN_VALUE_CHANGED(val)
-            end
-        end
-
-        function WidgetRegistry.Slider.new(parent, element, titleLabel, descLabel, callbacks)
-            return setmetatable({
-                CALLBACKS = callbacks,
-                DESTROY_ELEMENT = element,
-                VISIBLE_ELEMENT = element,
-                TITLE_LABEL = titleLabel,
-                DESCRIPTION_LABEL = descLabel,
-                Description = descLabel.Text,
-                Title = titleLabel.Text,
-                Parent = parent,
-                Kind = "Slider"
-            }, WidgetRegistry.Slider)
-        end
-
-        function WidgetRegistry.Toggle:SetValue(val)
-            assert(type(val) == "boolean", `"Toggle.SetValue". 'boolean' expected, got {typeof(val)}`)
-            if self.Value ~= val then
-                self.Value = val
-                self.WHEN_VALUE_CHANGED(val)
-            end
-        end
-
-        function WidgetRegistry.Toggle.new(parent, element, titleLabel, descLabel, onValChanged, callbacks)
-            return setmetatable({
-                CALLBACKS = callbacks,
-                WHEN_VALUE_CHANGED = onValChanged,
-                DESTROY_ELEMENT = element,
-                VISIBLE_ELEMENT = element,
-                TITLE_LABEL = titleLabel,
-                DESCRIPTION_LABEL = descLabel,
-                Description = descLabel.Text,
-                Title = titleLabel.Text,
-                Parent = parent,
-                Kind = "Toggle"
-            }, WidgetRegistry.Toggle)
-        end
-
-        function WidgetRegistry.TextBox:SetText(val)
-            assert(type(val) == "string", `"TextBox.SetText". 'string' expected, got {typeof(val)}`)
-            self.TEXTBOX.Text = val
-            return self
-        end
-
-        function WidgetRegistry.TextBox:SetPlaceholder(val)
-            assert(type(val) == "string", `"TextBox.SetPlaceholder". 'string' expected, got {typeof(val)}`)
-            self.TEXTBOX.PlaceholderText = val
-            return self
-        end
-
-        function WidgetRegistry.TextBox:CaptureFocus()
-            self.TEXTBOX:CaptureFocus()
-            return self
-        end
-
-        function WidgetRegistry.TextBox:Clear()
-            self.TEXTBOX.Text = ""
-            return self
-        end
-
-        function WidgetRegistry.TextBox:SetTextFilter(filterFunc)
-            if filterFunc ~= nil then
-                assert(type(filterFunc) == "function", `"TextBox.SetTextFilter". 'function' or 'nil' expected, got {typeof(filterFunc)}`)
-            end
-            self.TEXTBOX_TEXT_FILTER = filterFunc
-            return self
-        end
-
-        function WidgetRegistry.TextBox.new(parent, titleLabel, descLabel, element, textBoxInst, callbacks)
-            return setmetatable({
-                Title = titleLabel.Text,
-                Description = descLabel.Text,
-                DESCRIPTION_LABEL = descLabel,
-                TITLE_LABEL = titleLabel,
-                CALLBACKS = callbacks,
-                DESTROY_ELEMENT = element,
-                VISIBLE_ELEMENT = element,
-                TEXTBOX = textBoxInst,
-                BUTTON = element,
-                Parent = parent,
-                Kind = "TextBox"
-            }, WidgetRegistry.TextBox)
-        end
-
-        WidgetRegistry.TextBox.Set = WidgetRegistry.TextBox.SetText
-        WidgetRegistry.Toggle.Set  = WidgetRegistry.Toggle.SetValue
-        WidgetRegistry.Slider.Set  = WidgetRegistry.Slider.SetValue
-    end
-
-    local ConstructTabUI = function(window, tabData, tabsContainer)
-        local btn = CreateInstance("TextButton", "Button", tabsContainer, {
-            Size = UDim2.new(1, 0, 0, 28),
-            AutoButtonColor = false,
-            Text = "",
-            Elements = { Corner = UDim.new(0, 6) },
-            ThemeTag = { BackgroundColor3 = "Colors.Buttons.Default" },
-            Childs = {
-                CreateInstance("TextLabel", "Title", {
-                    BackgroundTransparency = 1,
-                    Font = Enum.Font.GothamMedium,
-                    Text = Localize(tabData.Title),
-                    TextSize = 11,
-                    TextXAlignment = Enum.TextXAlignment.Left,
-                    TextTransparency = 0.35,
-                    TextTruncate = Enum.TextTruncate.AtEnd,
-                    ThemeTag = { TextColor3 = "Colors.Text.Default" }
-                })
-            }
-        })
-
-        table.insert(Library.LocalizedLabels, { Instance = btn.Title, Original = tabData.Title })
-
-        local indicator = CreateInstance("Frame", btn, {
-            Position = UDim2.new(0, 2, 0.5, 0),
-            AnchorPoint = Vector2.new(0, 0.5),
-            Size = UDim2.fromOffset(4, 4),
-            BackgroundTransparency = 1,
-            ThemeTag = { BackgroundColor3 = "Colors.Primary" },
-            Elements = { Corner = UDim.new(1, 0) }
-        })
-
-        local container = CreateInstance("ScrollingFrame", "Container", {
-            Size = UDim2.new(1, 0, 1, 0),
-            Position = UDim2.new(0, 0, 1),
-            AnchorPoint = Vector2.new(0, 1),
-            ScrollBarThickness = 2,
-            BackgroundTransparency = 1,
-            ScrollBarImageTransparency = 0.2,
-            AutomaticCanvasSize = Enum.AutomaticSize.Y,
-            ScrollingDirection = Enum.ScrollingDirection.Y,
-            BorderSizePixel = 0,
-            CanvasSize = UDim2.new(),
-            ThemeTag = { ScrollBarImageColor3 = "Colors.ScrollBar" },
-            Elements = {
-                Padding = {
-                    PaddingLeft = UDim.new(0, 12),
-                    PaddingRight = UDim.new(0, 12),
-                    PaddingTop = UDim.new(0, 12),
-                    PaddingBottom = UDim.new(0, 12)
-                },
-                ListLayout = {
-                    SortOrder = Enum.SortOrder.LayoutOrder,
-                    Padding = UDim.new(0, 6)
-                }
-            }
-        })
-
-        local icon = CreateInstance("ImageLabel", btn, {
-            Position = UDim2.new(0, 10, 0.5),
-            Size = UDim2.new(0, 14, 0, 14),
-            AnchorPoint = Vector2.new(0, 0.5),
-            BackgroundTransparency = 1,
-            ImageTransparency = 0.35,
-            Image = tabData.Icon or ""
-        })
-
-        local AdjustLayout = function()
-            local hasIcon = string.sub(icon.Image, 1, 13) == "rbxassetid://"
-            icon.Visible = hasIcon
-            btn.Title.Size = UDim2.new(1, hasIcon and -30 or -15, 1)
-            btn.Title.Position = UDim2.fromOffset(hasIcon and 30 or 12)
-        end
-
-        ConnectEvent(icon:GetPropertyChangedSignal"Image", AdjustLayout)
-        AdjustLayout()
-
-        return btn, container, indicator, icon
-    end
-
-    local ConstructOptionBase = function(tab, title, desc, holderSize)
-        local titleLabel = CreateInstance("TextLabel", {
-            TextXAlignment = Enum.TextXAlignment.Left,
-            TextTruncate = Enum.TextTruncate.AtEnd,
-            AutomaticSize = Enum.AutomaticSize.Y,
-            Size = UDim2.new(1, -20),
-            Position = UDim2.fromScale(0, 0.5),
-            AnchorPoint = Vector2.new(0, 0.5),
-            BackgroundTransparency = 1,
-            TextSize = 12,
-            ThemeTag = { OBJECTS = GlobalThemeManager, TextColor3 = "Colors.Text.Default", Font = "Font.Medium" }
-        })
-
-        local tabTheme = TabThemes[tab]
-        local container = TabContainers[tab].Container
-
-        local descLabel = CreateInstance("TextLabel", {
-            TextXAlignment = Enum.TextXAlignment.Left,
-            AutomaticSize = Enum.AutomaticSize.Y,
-            Size = UDim2.new(1, -20),
-            Position = UDim2.new(0, 12, 0, 15),
-            BackgroundTransparency = 1,
-            TextWrapped = true,
-            TextSize = 9,
-            RichText = true,
-            ThemeTag = { OBJECTS = tabTheme, TextColor3 = "Colors.Text.Dark", Font = "Font.Normal" }
-        })
-
-        local tagData = { OBJECTS = tabTheme, BackgroundColor3 = "Colors.Buttons.Default" }
-
-        local optionBtn = CreateInstance("TextButton", "Option", {
-            AutomaticSize = Enum.AutomaticSize.Y,
-            Size = UDim2.new(1, 0, 0, 30),
-            AutoButtonColor = false,
-            Text = "",
-            ThemeTag = tagData,
-            Elements = { Corner = UDim.new(0, 6) },
-            Childs = {
-                CreateInstance("Frame", "Holder", {
-                    AutomaticSize = Enum.AutomaticSize.Y,
-                    BackgroundTransparency = 1,
-                    Size = holderSize,
-                    Elements = {
-                        ListLayout = {
-                            SortOrder = Enum.SortOrder.LayoutOrder,
-                            VerticalAlignment = Enum.VerticalAlignment.Center,
-                            Padding = UDim.new(0, 2)
-                        },
-                        Padding = { PaddingBottom = UDim.new(0, 6), PaddingTop = UDim.new(0, 6) }
-                    },
-                    Childs = { titleLabel, descLabel }
-                })
-            }
-        })
-
-        local holder = optionBtn.Holder
-        local UpdateHover = function(colorKey, isHovering)
-            if isHovering then
-                if CurrentActiveButton then
-                    local defaultCol = ResolveThemePath(Library.CurrentTheme, "Colors.Buttons.Default")
-                    CurrentActiveButton.Theme.BackgroundColor3 = "Colors.Buttons.Default"
-                    CreateTween(CurrentActiveButton.Button, "BackgroundColor3", defaultCol, 0.2):Play()
-                end
-                CurrentActiveButton = { Button = optionBtn, Theme = tagData }
-            end
-            tagData.BackgroundColor3 = colorKey
-            CreateTween(optionBtn, "BackgroundColor3", ResolveThemePath(Library.CurrentTheme, colorKey), 0.2):Play()
-        end
-
-        ConnectEvent(optionBtn.MouseLeave, function() UpdateHover("Colors.Buttons.Default", false) end)
-        ConnectEvent(optionBtn.MouseEnter, function() UpdateHover("Colors.Buttons.Holding", true) end)
-
-        ConnectEvent(descLabel:GetPropertyChangedSignal"Text", function()
-            local hasText = #descLabel.Text > 0
-            if descLabel.Visible ~= hasText then
-                local yAnchor = hasText and 0 or 0.5
-                descLabel.Visible = hasText
-                holder.Position = UDim2.fromScale(0, yAnchor)
-                holder.AnchorPoint = Vector2.new(0, yAnchor)
-            end
-        end)
-
-        titleLabel.Text = Localize(title)
-        descLabel.Text = Localize(desc or "")
-
-        table.insert(Library.LocalizedLabels, { Instance = titleLabel, Original = title })
-        table.insert(Library.LocalizedLabels, { Instance = descLabel, Original = desc or "" })
-
-        optionBtn.Parent = container
-        return optionBtn, titleLabel, descLabel
-    end
-
-    local ParseConfigTuple = function(widgetName, cfg)
-        if type(cfg) ~= "table" then
-            error(`"Tab.Add{widgetName}[Configs]". 'table' expected, got {typeof(cfg)}`, 2)
-        end
-        local title = cfg[1] or cfg.Name or cfg.Title
-        local desc = cfg.Desc or cfg.Description
-        assert(type(title) == "string", `"Tab.Add{widgetName}.Title". 'string' expected, got {typeof(title)}`)
-        return title, desc or ""
-    end
-
-    local ValidateFlag = function(widgetName, flag)
-        return flag
-    end
-
-    -- ==========================================================
-    -- SISTEMA DE DROPDOWN FLUTUANTE
-    -- ==========================================================
-    local CreateFloatingDropdownEngine = function()
-        local width = 160
-        local baseStyle = {
-            Corner = UDim.new(0, 6),
-            Stroke = { ThemeTag = { Color = "Colors.Stroke" } },
-            Gradient = { Rotation = 45, ThemeTag = { Color = "Colors.Background" } }
-        }
-
-        local overlayBtn = CreateInstance("TextButton", OutBox, {
-            Size = UDim2.fromScale(1, 1),
-            BackgroundTransparency = 1,
-            Active = true,
-            Text = ""
-        })
-
-        local dropdownFrame = CreateInstance("Frame", "Dropdown", overlayBtn, {
-            Size = UDim2.fromOffset(width, 100),
-            Position = UDim2.fromOffset(50, 50),
-            Elements = baseStyle,
-            Active = true,
-            ThemeTag = { BackgroundTransparency = "BackgroundTransparency" }
-        })
-
-        local searchBtn = CreateInstance("TextButton", "Search", dropdownFrame, {
-            Position = UDim2.new(1, 5, 0, 5),
-            Size = UDim2.new(0, 25, 0, 25),
-            AutomaticSize = Enum.AutomaticSize.X,
-            Active = true,
-            Elements = baseStyle,
-            Text = "",
-            ThemeTag = { BackgroundTransparency = "BackgroundTransparency" },
-            Childs = {
-                CreateInstance("UIPadding", { PaddingLeft = UDim.new(0, 5), PaddingRight = UDim.new(0, 5), PaddingBottom = UDim.new(0, 5), PaddingTop = UDim.new(0, 5) }),
-                CreateInstance("UIListLayout", { Padding = UDim.new(0, 5), FillDirection = Enum.FillDirection.Horizontal }),
-                CreateInstance("TextBox", "SearchBox", {
-                    Size = UDim2.fromScale(0, 1),
-                    Position = UDim2.fromScale(0.5, 0.5),
-                    AnchorPoint = Vector2.new(0.5, 0.5),
-                    Visible = false,
-                    PlaceholderText = "Search...",
-                    ClearTextOnFocus = false,
-                    Text = "",
-                    Elements = { Corner = UDim.new(0, 6) },
-                    ThemeTag = { BackgroundColor3 = "Colors.Stroke", TextColor3 = "Colors.Text.Default", Font = "Font.ExtraBold" }
-                }),
-                CreateInstance("ImageLabel", "SearchIcon", {
-                    Size = UDim2.fromScale(1, 1),
-                    SizeConstraint = Enum.SizeConstraint.RelativeYY,
-                    Position = UDim2.fromScale(0.5, 0.5),
-                    AnchorPoint = Vector2.new(0.5, 0.5),
-                    BackgroundTransparency = 1,
-                    ThemeTag = { BackgroundColor3 = "Colors.Stroke", ImageColor3 = "Colors.Icons", Image = "Icons.Search" }
-                })
-            }
-        })
-
-        local optionsScroll = CreateInstance("ScrollingFrame", dropdownFrame, {
-            Size = UDim2.new(1, -6, 1, -6),
-            Position = UDim2.fromScale(0.5, 0.5),
-            AnchorPoint = Vector2.new(0.5, 0.5),
-            ScrollBarThickness = 3,
-            BackgroundTransparency = 1,
-            BorderSizePixel = 0,
-            CanvasSize = UDim2.new(),
-            ScrollingDirection = Enum.ScrollingDirection.Y,
-            AutomaticCanvasSize = Enum.AutomaticSize.Y,
-            Active = true,
-            ThemeTag = { OBJECTS = GlobalThemeManager, ScrollBarImageColor3 = "Colors.ScrollBar" },
-            Elements = {
-                Padding = { PaddingLeft = UDim.new(0, 8), PaddingRight = UDim.new(0, 8), PaddingTop = UDim.new(0, 5), PaddingBottom = UDim.new(0, 5) },
-                ListLayout = { Padding = UDim.new(0, 4) }
-            }
-        })
-
-        local searchBox = searchBtn.SearchBox
-        local searchExpandWidth = 130
-
-        local closeTween = CreateTween(dropdownFrame, "Size", UDim2.fromOffset(width, 0), 0.2)
-        local expandSearchTween = CreateTween(searchBox, "Size", UDim2.new(0, searchExpandWidth - 30, 1, 0), 0.25)
-        local shrinkSearchTween = CreateTween(searchBox, "Size", UDim2.new(0, 0, 1, 0), 0.2)
-
-        local activeInstanceMap = {}
-        local isClosing = false
-        local isSearchOpen = false
-        local onDropdownClosedCallback, onOptionClickedCallback, activeOptionList, isMultiSelectMode, holderFrameInstance
-        local lastFocusTick = 0
-        local itemHeight = 25
-        local maxHeight = (itemHeight * 12) + 10
-        local paddingOffset = 5
-
-        local CalculateHeight = function(count)
-            local viewportLimit = MainScreenGui.AbsoluteSize.Y / RootUIScale.Scale
-            return math.min((itemHeight * math.max(count, 0.5)) + 10, maxHeight, viewportLimit / 1.75)
-        end
-
-        local IsMouseOverDropdown = function()
-            local pos = dropdownFrame.AbsolutePosition
-            local size = dropdownFrame.AbsoluteSize
-            local mPos = Vector2.new(Mouse.X, Mouse.Y)
-            return mPos.X >= pos.X and mPos.X <= (pos.X + size.X) and mPos.Y >= pos.Y and mPos.Y <= (pos.Y + size.Y)
-        end
-
-        local CalculatePosition = function(count)
-            local hPos = holderFrameInstance.AbsolutePosition
-            local hSize = holderFrameInstance.AbsoluteSize
-            local scrSize = MainScreenGui.AbsoluteSize
-            local scale = RootUIScale.Scale
-            local dynHeight = CalculateHeight(count)
-
-            local screenW = scrSize.X / scale
-            local screenH = scrSize.Y / scale
-            local targetX = hPos.X / scale
-            local targetY = hPos.Y / scale
-            local hSizeY = hSize.Y / scale
-
-            local centerY = targetY + (hSizeY / 2)
-            local startY = centerY - (dynHeight / 2)
-            local clampedY = math.clamp(startY, paddingOffset, screenH - dynHeight - paddingOffset)
-            local anchor = Vector2.new(0, 0)
-
-            if clampedY > (screenH * 0.7) then
-                anchor = Vector2.new(0, 1)
-                clampedY = math.min(centerY + (dynHeight / 2), screenH - paddingOffset)
-            end
-
-            local clampedX = math.clamp(targetX, paddingOffset, screenW - dropdownFrame.Size.X.Offset - (paddingOffset * 2) - (searchBtn.AbsoluteSize.X / scale))
-            return Vector2.new(clampedX, clampedY), anchor
-        end
-
-        local ApplyDropdownPlacement = function(...)
-            local pos, anchor = CalculatePosition(...)
-            dropdownFrame.AnchorPoint = anchor
-            dropdownFrame.Position = UDim2.fromOffset(pos.X, pos.Y)
-        end
-
-        local CloseSearch = function()
-            if not isSearchOpen then return end
-            isSearchOpen = false
-            searchBox.Text = ""
-            shrinkSearchTween:Play()
-            shrinkSearchTween.Completed:Wait()
-            searchBox.Visible = false
-        end
-
-        local OpenSearch = function()
-            if isSearchOpen then return end
-            isSearchOpen = true
-            searchBox.Visible = true
-            expandSearchTween:Play()
-            searchBox:CaptureFocus()
-
-            local dSize = dropdownFrame.AbsoluteSize
-            local scrSize = MainScreenGui.AbsoluteSize
-            local scale = RootUIScale.Scale
-            local expandedW = searchExpandWidth * scale
-            local posX = dropdownFrame.AbsolutePosition.X
-            local rightEdge = posX + dSize.X + 5 + expandedW
-
-            if rightEdge > scrSize.X - (paddingOffset * scale) then
-                local adjX = (scrSize.X - dSize.X - expandedW - 5 - (paddingOffset * scale)) / scale
-                adjX = math.max(adjX, paddingOffset)
-                CreateTween(dropdownFrame, "Position", UDim2.fromOffset(adjX, dropdownFrame.Position.Y.Offset), 0.3):Play()
-            end
-        end
-
-        local OpenMenu = function(closeCb)
-            if not isClosing then
-                onDropdownClosedCallback = closeCb
-                overlayBtn.Parent = DropdownSearchContext
-                return true
-            end
-        end
-
-        local CloseMenu = function()
-            if isClosing then return end
-            if onDropdownClosedCallback then
-                onDropdownClosedCallback()
-                onDropdownClosedCallback = nil
-            end
-            task.spawn(CloseSearch)
-            isClosing = true
-            closeTween:Play()
-            closeTween.Completed:Wait()
-            overlayBtn.Parent = nil
-            isClosing = false
-        end
-
-        local CheckFocusLoss = function()
-            if searchBox:IsFocused() then
-                lastFocusTick = tick()
-                return nil
-            end
-            if (tick() - lastFocusTick) >= 0.3 and not IsMouseOverDropdown() then
-                CloseMenu()
-            end
-        end
-
-        local ClearOptions = function()
-            for optInst in activeInstanceMap do
-                optInst.Parent = nil
-                activeInstanceMap[optInst] = nil
-            end
-        end
-
-        local SetOptionVisualState = function(optData, isSelected)
-            optData.Selected = isSelected
-            if optData.Instance then
-                local inst = optData.Instance
-                local label = inst.TextLabel
-                local ind = inst.Frame
-                local bgTrans = isSelected and 0 or (isMultiSelectMode and 0.8 or 1)
-                local txtTrans = isSelected and 0 or 0.4
-                local indSize = UDim2.fromOffset(4, isSelected and 14 or 4)
-
-                if inst.Parent then
-                    CreateTween(ind, "BackgroundTransparency", bgTrans, 0.3):Play()
-                    CreateTween(label, "TextTransparency", txtTrans, 0.3):Play()
-                    CreateTween(ind, "Size", indSize, 0.3):Play()
-                else
-                    label.TextTransparency = txtTrans
-                    ind.BackgroundTransparency = bgTrans
-                    ind.Size = indSize
-                end
-            end
-        end
-
-        local FilterOptionVisibility = function(optData)
-            if searchBox.Visible == false or not optData then
-                local total = activeOptionList and #activeOptionList or 0
-                dropdownFrame.Size = UDim2.fromOffset(width, CalculateHeight(total))
-                return nil
-            end
-            if optData then
-                local inst = optData.Instance
-                local filterText = CleanSearchString(searchBox.Text)
-                inst.Visible = #filterText == 0 or optData.SearchText:find(filterText) ~= nil
-                if inst.Visible then
-                    SEARCH_RESULT_COUNT += 1
-                    dropdownFrame.Size = UDim2.fromOffset(width, CalculateHeight(SEARCH_RESULT_COUNT))
-                end
-            end
-        end
-
-        local MatchesFilter = function(optData, prefix, query, searchSource)
-            local matches = true
-            if prefix == "+" or prefix == "-" then
-                matches = optData.Selected == (prefix == "+")
-                query = query:sub(2, -1)
-            end
-            return matches and searchSource:find(query, 1, true) ~= nil
-        end
-
-        local BuildOptionItem = function(optData, autoAttach)
-            local itemBtn = CreateInstance("TextButton", {
-                Size = UDim2.new(1, 0, 0, 22),
-                AutoButtonColor = false,
-                Text = "",
-                Elements = { Corner = UDim.new(0, 4) },
-                ThemeTag = { BackgroundColor3 = "Colors.Buttons.Default" },
-                Childs = {
-                    CreateInstance("Frame", {
-                        Position = UDim2.new(0, 1, 0.5),
-                        Size = UDim2.new(0, 4, 0, 4),
-                        BackgroundTransparency = 1,
-                        AnchorPoint = Vector2.new(0, 0.5),
-                        Elements = { Corner = UDim.new(0.5, 0) },
-                        ThemeTag = { BackgroundColor3 = "Colors.Primary" }
-                    }),
-                    CreateInstance("TextLabel", {
-                        Size = UDim2.fromScale(1, 1),
-                        Position = UDim2.fromOffset(12, 0),
-                        TextXAlignment = Enum.TextXAlignment.Left,
-                        BackgroundTransparency = 1,
-                        TextTransparency = 0.4,
-                        Text = optData.DisplayName,
-                        TextSize = 10,
-                        ThemeTag = { Font = "Font.Bold", TextColor3 = "Colors.Text.Default" }
-                    })
-                }
-            })
-
-            local debounceTick = 0
-            ConnectEvent(itemBtn.Activated, function()
-                if (tick() - debounceTick) < 0 then return end
-                if overlayBtn.Parent and not isClosing then
-                    debounceTick = tick() + 0.2
-                    onOptionClickedCallback(optData)
-                end
-            end)
-
-            optData.SearchText = CleanSearchString(optData.DisplayName)
-            optData.Instance = itemBtn
-
-            if autoAttach then
-                local txt = searchBox.Text
-                if #txt > 0 then
-                    local pfx = string.sub(txt, 1, 1)
-                    local clean = CleanSearchString(txt)
-                    itemBtn.Visible = MatchesFilter(optData, pfx, clean, optData.SearchText)
-                end
-                itemBtn.Parent = optionsScroll
-                FilterOptionVisibility(optData)
-            end
-            SetOptionVisualState(optData, optData.Selected)
-        end
-
-        local PopulateOptions = function(list)
-            ClearOptions()
-            activeOptionList = list
-            for i = 1, #list do
-                local opt = list[i]
-                if opt.Instance == nil then
-                    BuildOptionItem(opt)
-                end
-                opt.Instance.Parent = optionsScroll
-                activeInstanceMap[opt.Instance] = true
-            end
-            ApplyDropdownPlacement(#list)
-            CreateTween(dropdownFrame, "Size", UDim2.fromOffset(width, CalculateHeight(#list)), 0.3):Play()
-        end
-
-        local UpdateSearchFilter = function()
-            local txt = searchBox.Text
-            local pfx = string.sub(txt, 1, 1)
-            local clean = CleanSearchString(txt)
-            local isEmpty = #clean == 0
-            local count = 0
-
-            for i = 1, #activeOptionList do
-                local opt = activeOptionList[i]
-                local isVisible = isEmpty or MatchesFilter(opt, pfx, clean, opt.SearchText)
-                opt.Instance.Visible = isVisible
-                if isVisible then count += 1 end
-            end
-            SEARCH_RESULT_COUNT = count
-            dropdownFrame.Size = UDim2.fromOffset(width, CalculateHeight(count))
-        end
-
-        ConnectEvent(RootMainFrame:GetPropertyChangedSignal"Visible", CheckFocusLoss)
-        ConnectEvent(RootMainFrame:GetPropertyChangedSignal"Size", CheckFocusLoss)
-        ConnectEvent(overlayBtn.MouseButton1Down, CheckFocusLoss)
-        ConnectEvent(overlayBtn.Activated, CheckFocusLoss)
-        ConnectEvent(searchBtn.Activated, OpenSearch)
-        ConnectEvent(searchBox:GetPropertyChangedSignal"Text", UpdateSearchFilter)
-
-        return table.freeze{
-            CreateOptionTemplate = BuildOptionItem,
-            SetOptionValue = SetOptionVisualState,
-            CloseDropdown = CloseMenu,
-            OpenDropdown = OpenMenu,
-            SetOptions = PopulateOptions,
-            Clear = ClearOptions,
-            SetOnClicked = function(cb) onOptionClickedCallback = cb end,
-            SetMultiSelect = function(mode) isMultiSelectMode = mode end,
-            SetHolder = function(holder) holderFrameInstance = holder end
-        }
-    end
-
-    -- ==========================================================
-    -- MÉTODOS DA ABA (TAB)
-    -- ==========================================================
-    function TabClass:AddSection(title)
-        title = title or ""
-        local tabTheme = TabThemes[self]
-        local sectionFrame = CreateInstance("Frame", "Option", TabContainers[self].Container, {
-            Size = UDim2.new(1, 0, 0, 22),
-            BackgroundTransparency = 1
-        })
-
-        local sectionLabel = CreateInstance("TextLabel", sectionFrame, {
-            TextXAlignment = Enum.TextXAlignment.Left,
-            TextTruncate = Enum.TextTruncate.AtEnd,
-            Size = UDim2.new(1, -25, 1, 0),
-            Position = UDim2.new(0, 5),
-            BackgroundTransparency = 1,
-            TextSize = 13,
-            Text = Localize(title),
-            ThemeTag = { OBJECTS = tabTheme, TextColor3 = "Colors.Primary", Font = "Font.Bold" }
-        })
-
-        table.insert(Library.LocalizedLabels, { Instance = sectionLabel, Original = title })
-
-        return setmetatable({
-            Title = title,
-            DESTROY_ELEMENT = sectionFrame,
-            VISIBLE_ELEMENT = sectionFrame,
-            TITLE_LABEL = sectionLabel,
-            Kind = "Section",
-            Parent = self
-        }, OptionClass)
-    end
-
-    function TabClass:AddToggle(cfg)
-        local title, desc = ParseConfigTuple("Toggle", cfg)
-        local flag = ValidateFlag("Toggle", cfg[4] or cfg.Flag)
-        local defaultVal = cfg[2] or cfg.Default or false
-        local callbacks = ParseCallback(cfg[3] or cfg.Callback)
-
-        if flag ~= nil and type(StoredScriptFlags[flag]) == "number" then
-            defaultVal = StoredScriptFlags[flag] == 0
-        end
-
-        local tabTheme = TabThemes[self]
-        local optionBtn, titleLabel, descLabel = ConstructOptionBase(self, title, desc, UDim2.new(1, -45, 0, 0))
-
-        local toggleFrame = CreateInstance("Frame", optionBtn, {
-            Size = UDim2.new(0, 38, 0, 20),
-            Position = UDim2.new(1, -10, 0.5),
-            AnchorPoint = Vector2.new(1, 0.5),
-            Elements = { Corner = UDim.new(0.5, 0) },
-            ThemeTag = { OBJECTS = tabTheme, BackgroundColor3 = "Colors.Stroke" }
-        })
-
-        local innerHolder = CreateInstance("Frame", toggleFrame, {
-            BackgroundTransparency = 1,
-            Size = UDim2.new(0.82, 0, 0.82, 0),
-            Position = UDim2.fromScale(0.5, 0.5),
-            AnchorPoint = Vector2.new(0.5, 0.5)
-        })
-
-        local indicatorTheme = { OBJECTS = tabTheme, BackgroundColor3 = "Colors.OnPrimary" }
-        local toggleCircle = CreateInstance("Frame", innerHolder, {
-            Size = UDim2.new(0, 14, 0, 14),
-            Position = UDim2.new(0, 0, 0.5),
-            AnchorPoint = Vector2.new(0, 0.5),
-            Elements = { Corner = UDim.new(1, 0) },
-            ThemeTag = indicatorTheme
-        })
-
-        local SetState = function(state)
-            if flag ~= nil then StoredScriptFlags[flag] = state and 0 or 1 end
-            ExecuteCallbacks(callbacks, state)
-
-            local targetPos = UDim2.new(state and 1 or 0, 0, 0.5, 0)
-            local targetAnchor = Vector2.new(state and 1 or 0, 0.5)
-            local colorKey = state and "Colors.Primary" or "Colors.OnPrimary"
-            local targetCol = ResolveThemePath(Library.CurrentTheme, colorKey)
-
-            indicatorTheme.BackgroundColor3 = colorKey
-
-            if self.Selected then
-                TweenService:Create(toggleCircle, TweenInfo.new(0.25, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {
-                    Position = targetPos,
-                    AnchorPoint = targetAnchor,
-                    BackgroundColor3 = targetCol
-                }):Play()
-            else
-                toggleCircle.Position = targetPos
-                toggleCircle.AnchorPoint = targetAnchor
-                toggleCircle.BackgroundColor3 = targetCol
-            end
-        end
-
-        local toggleWidget = WidgetRegistry.Toggle.new(self, optionBtn, titleLabel, descLabel, SetState, callbacks)
-        toggleWidget:SetValue(defaultVal)
-
-        local debounce = 0
-        ConnectEvent(optionBtn.Activated, function()
-            if (tick() - debounce) >= 0.2 then
-                debounce = tick()
-                toggleWidget:SetValue(not toggleWidget.Value)
-            end
-        end)
-
-        return toggleWidget
-    end
-
-    function TabClass:AddButton(cfg)
-        local title, desc = ParseConfigTuple("Button", cfg)
-        local callbacks = ParseCallback(cfg[2] or cfg.Callback)
-        local cooldown = cfg.Debounce or cfg.Cooldown
-
-        local tabTheme = TabThemes[self]
-        local optionBtn, titleLabel, descLabel = ConstructOptionBase(self, title, desc, UDim2.new(1, -25, 0, 0))
-
-        local btnIcon = CreateInstance("ImageLabel", optionBtn, {
-            Size = UDim2.new(0, 15, 0, 15),
-            Position = UDim2.new(1, -10, 0.5),
-            AnchorPoint = Vector2.new(1, 0.5),
-            BackgroundTransparency = 1,
-            ThemeTag = { OBJECTS = tabTheme, Image = "Icons.Button" }
-        })
-
-        local nextClick = 0
-        ConnectEvent(optionBtn.Activated, function()
-            if cooldown ~= nil and (tick() - nextClick) < 0 then return end
-            if cooldown ~= nil then nextClick = tick() + cooldown end
-
-            local pulse = CreateTween(btnIcon, "Size", UDim2.new(0, 18, 0, 18), 0.1)
-            pulse:Play()
-            pulse.Completed:Connect(function()
-                CreateTween(btnIcon, "Size", UDim2.new(0, 15, 0, 15), 0.15):Play()
-            end)
-
-            ExecuteCallbacks(callbacks)
-        end)
-
-        return setmetatable({
-            CALLBACKS = callbacks,
-            DESTROY_ELEMENT = optionBtn,
-            VISIBLE_ELEMENT = optionBtn,
-            TITLE_LABEL = titleLabel,
-            DESCRIPTION_LABEL = descLabel,
-            Title = title,
-            Description = desc,
-            Parent = self,
-            Kind = "Button"
-        }, OptionClass)
-    end
-
-    function TabClass:AddTextBox(cfg)
-        local title, desc = ParseConfigTuple("TextBox", cfg)
-        local flag = ValidateFlag("TextBox", cfg[4] or cfg.Flag)
-        local defaultText = cfg[2] or cfg.Default
-        local callbacks = ParseCallback(cfg[3] or cfg.Callback)
-        local placeholder = cfg.Placeholder or cfg.PlaceholderText
-        local clearFocus = cfg.ClearOnFocus or cfg.ClearTextOnFocus
-
-        if flag and type(StoredScriptFlags[flag]) == "string" then
-            defaultText = StoredScriptFlags[flag]
-        end
-
-        local tabTheme = TabThemes[self]
-        local optionBtn, titleLabel, descLabel = ConstructOptionBase(self, title, desc, UDim2.new(1, -150, 0, 0))
-
-        local boxFrame = CreateInstance("Frame", optionBtn, {
-            Size = UDim2.new(0, 140, 0, 20),
-            Position = UDim2.new(1, -10, 0.5),
-            AnchorPoint = Vector2.new(1, 0.5),
-            ThemeTag = { OBJECTS = tabTheme, BackgroundColor3 = "Colors.Stroke" },
-            Elements = { Corner = UDim.new(0, 5) }
-        })
-
-        local textBoxInst = CreateInstance("TextBox", boxFrame, {
-            Size = UDim2.new(0.85, 0, 0.85, 0),
-            AnchorPoint = Vector2.new(0.5, 0.5),
-            Position = UDim2.new(0.5, 0, 0.5, 0),
-            BackgroundTransparency = 1,
-            TextScaled = true,
-            Active = true,
-            Text = "",
-            PlaceholderText = ConfigConstants.TEXTBOX.PLACEHOLDER_TEXT,
-            ThemeTag = { OBJECTS = tabTheme, TextColor3 = "Colors.Text.Default", Font = "Font.Bold" }
-        })
-
-        local iconTheme = { OBJECTS = tabTheme, Image = "Icons.TextBox", ImageColor3 = "Colors.Icons" }
-        local inputIcon = CreateInstance("ImageLabel", boxFrame, {
-            Size = UDim2.new(0, 12, 0, 12),
-            Position = UDim2.new(0, -5, 0.5),
-            AnchorPoint = Vector2.new(1, 0.5),
-            BackgroundTransparency = 1,
-            ThemeTag = iconTheme
-        })
-
-        if defaultText ~= nil then textBoxInst.Text = defaultText end
-        if clearFocus ~= nil then textBoxInst.ClearTextOnFocus = clearFocus end
-        if placeholder ~= nil then textBoxInst.PlaceholderText = placeholder end
-
-        local textBoxWidget = WidgetRegistry.TextBox.new(self, titleLabel, descLabel, optionBtn, textBoxInst, callbacks)
-        local SetIconTint = function(colKey)
-            iconTheme.ImageColor3 = colKey
-            CreateTween(inputIcon, "ImageColor3", ResolveThemePath(Library.CurrentTheme, colKey), 0.3):Play()
-        end
-
-        if flag ~= nil then
-            ConnectEvent(textBoxInst:GetPropertyChangedSignal"Text", function()
-                StoredScriptFlags[flag] = textBoxInst.Text
-            end)
-        end
-
-        ConnectEvent(textBoxInst.Focused, function() SetIconTint("Colors.Primary") end)
-        ConnectEvent(textBoxInst.FocusLost, function()
-            SetIconTint("Colors.Icons")
-            local filter = textBoxWidget.TEXTBOX_TEXT_FILTER
-            if filter then
-                local filtered = filter(textBoxInst.Text)
-                if type(filtered) == "string" then textBoxInst.Text = filtered end
-            end
-            ExecuteCallbacks(callbacks, textBoxInst.Text)
-        end)
-
-        ConnectEvent(optionBtn.Activated, function() textBoxInst:CaptureFocus() end)
-        return textBoxWidget
-    end
-
-    function TabClass:AddSlider(cfg)
-        local title, desc = ParseConfigTuple("Slider", cfg)
-        local flag = ValidateFlag("Slider", cfg[7] or cfg.Flag)
-        local minVal = cfg[2] or cfg.Min
-        local maxVal = cfg[3] or cfg.Max
-        local step = cfg[4] or cfg.Increment or 1
-        local defaultVal = cfg[5] or cfg.Default or minVal
-        local callbacks = ParseCallback(cfg[6] or cfg.Callback)
-
-        if flag ~= nil and type(StoredScriptFlags[flag]) == "number" then
-            defaultVal = StoredScriptFlags[flag]
-        end
-
-        local tabTheme = TabThemes[self]
-        local container = TabContainers[self].Container
-        local optionBtn, titleLabel, descLabel = ConstructOptionBase(self, title, desc, UDim2.new(0.55, 0, 0, 0))
-
-        local sliderInteractive = CreateInstance("TextButton", optionBtn, {
-            Size = UDim2.new(0.45, 0, 1, 0),
-            Position = UDim2.new(1, 0, 0, 0),
-            AnchorPoint = Vector2.new(1, 0),
-            AutoButtonColor = false,
-            BackgroundTransparency = 1,
-            Text = ""
-        })
-
-        local barBg = CreateInstance("Frame", sliderInteractive, {
-            Size = UDim2.new(1, -20, 0, 6),
-            Position = UDim2.fromScale(0.5, 0.5),
-            AnchorPoint = Vector2.new(0.5, 0.5),
-            ThemeTag = { OBJECTS = tabTheme, BackgroundColor3 = "Colors.Stroke" },
-            Elements = { Corner = UDim.new(0.5, 0) }
-        })
-
-        local barFill = CreateInstance("Frame", barBg, {
-            Size = UDim2.fromScale(0, 1),
-            BorderSizePixel = 0,
-            ThemeTag = { OBJECTS = tabTheme, BackgroundColor3 = "Colors.Primary" },
-            Elements = { Corner = UDim.new(0.5, 0) }
-        })
-
-        local sliderHandle = CreateInstance("Frame", barBg, {
-            Size = UDim2.new(0, 8, 0, 14),
-            BackgroundColor3 = Color3.fromRGB(240, 240, 240),
-            Position = UDim2.fromScale(0, 0.5),
-            AnchorPoint = Vector2.new(0.5, 0.5),
-            BackgroundTransparency = 0.1,
-            Elements = { Corner = UDim.new(0, 4) }
-        })
-
-        local valLabel = CreateInstance("TextLabel", sliderInteractive, {
-            Size = UDim2.new(0, 50, 0, 14),
-            AnchorPoint = Vector2.new(1, 0.5),
-            Position = UDim2.new(0, -1, 0.5, 0),
-            BackgroundTransparency = 1,
-            TextSize = 12,
-            TextXAlignment = Enum.TextXAlignment.Right,
-            ThemeTag = { OBJECTS = tabTheme, TextColor3 = "Colors.Text.Default", Font = "Font.SliderValue" }
-        })
-
-        local sliderWidget = WidgetRegistry.Slider.new(self, optionBtn, titleLabel, descLabel, callbacks)
-        sliderWidget.Min = minVal
-        sliderWidget.Max = maxVal
-        sliderWidget.Increment = step
-
-        local ScaleToAlpha = function(val) return (val - minVal) / (maxVal - minVal) end
-        local AlphaToValue = function(alpha) return (alpha * (maxVal - minVal)) + minVal end
-        local RoundStep    = function(val) return math.round(val / step) * step end
-
-        local UpdateSliderValues = function(rawVal, alpha)
-            if rawVal == sliderWidget.Value then return end
-            if flag ~= nil then StoredScriptFlags[flag] = rawVal end
-
-            task.defer(ExecuteCallbacks, callbacks, rawVal)
-            sliderWidget.Value = rawVal
-
-            local posTarget = UDim2.fromScale(alpha, 0.5)
-            local sizeTarget = UDim2.fromScale(alpha, 1)
-
-            valLabel.Text = tostring(math.floor(rawVal * 1000) / 1000)
-
-            if self.Selected then
-                CreateTween(sliderHandle, "Position", posTarget, 0.2):Play()
-                CreateTween(barFill, "Size", sizeTarget, 0.2):Play()
-            else
-                sliderHandle.Position = posTarget
-                barFill.Size = sizeTarget
-            end
-        end
-
-        local ApplyNewValue = function(v)
-            local clamped = math.clamp(RoundStep(v), minVal, maxVal)
-            UpdateSliderValues(clamped, ScaleToAlpha(clamped))
-        end
-
-        sliderWidget.WHEN_VALUE_CHANGED = ApplyNewValue
-
-        local CalculateDragAlpha = function(pos, size)
-            local relX = (Mouse.X - pos.X) / size.X
-            local alpha = math.clamp(relX, 0, 1)
-            local calcVal = AlphaToValue(alpha)
-            local stepped = math.clamp(RoundStep(calcVal), minVal, maxVal)
-            UpdateSliderValues(stepped, ScaleToAlpha(stepped))
-        end
-
-        ApplyNewValue(defaultVal)
-
-        ConnectEvent(sliderInteractive.MouseButton1Down, function()
-            if InputBlocked ~= false then return end
-            CreateTween(sliderHandle, "BackgroundTransparency", 0, 0.2):Play()
-            container.ScrollingEnabled = false
-            InputBlocked = true
-
-            local bPos = barBg.AbsolutePosition
-            local bSize = barBg.AbsoluteSize
-
-            while UserInputService:IsMouseButtonPressed(Enum.UserInputType.MouseButton1) do
-                CalculateDragAlpha(bPos, bSize)
-                task.wait()
-            end
-
-            InputBlocked = false
-            CreateTween(sliderHandle, "BackgroundTransparency", 0.1, 0.2):Play()
-            container.ScrollingEnabled = true
-        end)
-
-        return sliderWidget
-    end
-
-    function TabClass:AddDropdown(cfg)
-        local title, desc = ParseConfigTuple("Dropdown", cfg)
-        local flag = ValidateFlag("Dropdown", cfg[5] or cfg.Flag)
-        local options = cfg[2] or cfg.Options
-        local defaultOpt = cfg[3] or cfg.Default
-        local callbacks = ParseCallback(cfg[4] or cfg.Callback)
-        local isMulti = cfg.MultiSelect
-
-        if flag and type(StoredScriptFlags[flag]) == (isMulti and "table" or "string") then
-            defaultOpt = StoredScriptFlags[flag]
-        end
-
-        local tabTheme = TabThemes[self]
-        local optionBtn, titleLabel, descLabel = ConstructOptionBase(self, title, desc, UDim2.new(1, -150, 0, 0))
-
-        local dropFrame = CreateInstance("Frame", optionBtn, {
-            Size = UDim2.new(0, 140, 0, 20),
-            Position = UDim2.new(1, -10, 0.5),
-            AnchorPoint = Vector2.new(1, 0.5),
-            Elements = { Corner = UDim.new(0, 4) },
-            ThemeTag = { OBJECTS = tabTheme, BackgroundColor3 = "Colors.Stroke" }
-        })
-
-        local displayLabel = CreateInstance("TextLabel", dropFrame, {
-            Size = UDim2.new(0.85, 0, 0.85, 0),
-            AnchorPoint = Vector2.new(0.5, 0.5),
-            Position = UDim2.new(0.5, 0, 0.5, 0),
-            BackgroundTransparency = 1,
-            TextScaled = true,
-            Text = "...",
-            ThemeTag = { OBJECTS = tabTheme, TextColor3 = "Colors.Text.Default", Font = "Font.Bold" }
-        })
-
-        local iconTheme = { OBJECTS = tabTheme, Image = "Icons.Dropdown.Open", ImageColor3 = "Colors.Icons" }
-        local arrowIcon = CreateInstance("ImageLabel", dropFrame, {
-            Size = UDim2.new(0, 15, 0, 15),
-            Position = UDim2.new(0, -5, 0.5),
-            AnchorPoint = Vector2.new(1, 0.5),
-            BackgroundTransparency = 1,
-            ThemeTag = iconTheme
-        })
-
-        local dropWidget = WidgetRegistry.Dropdown.new(self, optionBtn, titleLabel, descLabel, callbacks)
-        local selectedSingle, isQueued, isMenuOpen = nil, false, false
-        local rawOptList, multiSelectedMap, stringCache = {}, {}, {}
-
-        dropWidget.DROPDOWN_OPTIONS = rawOptList
-        dropWidget.Opened = isMenuOpen
-
-        local SetVisualState = function(colKey, iconKey)
-            iconTheme.ImageColor3 = colKey
-            iconTheme.Image = iconKey
-            CreateTween(arrowIcon, "ImageColor3", ResolveThemePath(Library.CurrentTheme, colKey), 0.3):Play()
-            arrowIcon.Image = ResolveThemePath(Library.CurrentTheme, iconKey)
-        end
-
-        local ToggleOpenVisuals = function(opened)
-            isMenuOpen = opened
-            dropWidget.Opened = opened
-            local col = opened and "Colors.Primary" or "Colors.Icons"
-            local icn = opened and "Icons.Dropdown.Close" or "Icons.Dropdown.Open"
-            SetVisualState(col, icn)
-        end
-
-        local GetSelectedMultiKeys = function()
-            local res = {}
-            for k, v in multiSelectedMap do
-                if v then res[#res + 1] = k end
-            end
-            return res
-        end
-
-        local UpdateDisplayText = function(val)
-            local str = type(val) == "table" and table.concat(val, ", ") or (val or "")
-            if #str >= 100 then str = str:sub(1, 97) .. "..." end
-            displayLabel.Text = #str ~= 0 and str or "..."
-        end
-
-        local DispatchDropdownChange = function()
-            isQueued = false
-            local result = isMulti and GetSelectedMultiKeys() or (selectedSingle and selectedSingle.Name)
-            ExecuteCallbacks(callbacks, isMulti and multiSelectedMap or result)
-            UpdateDisplayText(result)
-            if flag ~= nil then StoredScriptFlags[flag] = result end
-        end
-
-        local QueueDispatch = function()
-            if not isQueued then
-                isQueued = true
-                task.delay(0.1, DispatchDropdownChange)
-            end
-        end
-
-        local OnOptionSelected = function(optData)
-            if isMulti then
-                local nextState = not optData.Selected
-                GlobalDropdownMenu.SetOptionValue(optData, nextState)
-                multiSelectedMap[optData.Name] = nextState
-            else
-                if selectedSingle == optData then return nil end
-                if selectedSingle ~= nil then
-                    GlobalDropdownMenu.SetOptionValue(selectedSingle, false)
-                end
-                selectedSingle = optData
-                GlobalDropdownMenu.SetOptionValue(optData, true)
-            end
-            QueueDispatch()
-        end
-
-        local RegisterRawOption = function(rawName)
-            rawName = tostring(rawName)
-            if stringCache[rawName] then return end
-            local optData = { Name = rawName, DisplayName = rawName, Selected = false }
-            if isMulti and multiSelectedMap[rawName] == nil then
-                multiSelectedMap[rawName] = false
-            end
-            stringCache[rawName] = optData
-            rawOptList[#rawOptList + 1] = optData
-            return optData
-        end
-
-        local TriggerDropdownMenu = function(targetState)
-            if isMenuOpen == targetState then return end
-            if not GlobalDropdownMenu then
-                GlobalDropdownMenu = CreateFloatingDropdownEngine()
-            end
-            if targetState then
-                if not GlobalDropdownMenu.OpenDropdown(function() ToggleOpenVisuals(false) end) then return end
-                GlobalDropdownMenu.SetHolder(dropFrame)
-                GlobalDropdownMenu.SetMultiSelect(isMulti)
-                GlobalDropdownMenu.SetOnClicked(OnOptionSelected)
-                GlobalDropdownMenu.SetOptions(rawOptList)
-            else
-                GlobalDropdownMenu.CloseDropdown()
-            end
-            ToggleOpenVisuals(targetState)
-        end
-
-        dropWidget.ADD_DROPDOWN_OPTION = function(entry)
-            if type(entry) == "table" then
-                for i = 1, #entry do dropWidget:Add(entry[i]) end
-                return nil
-            end
-            local opt = RegisterRawOption(entry)
-            if opt then
-                if dropWidget.Opened then GlobalDropdownMenu.CreateOptionTemplate(opt, true) end
-                QueueDispatch()
-            end
-        end
-
-        dropWidget.CLEAR_DROPDOWN = function()
-            for i = #rawOptList, 1, -1 do
-                local opt = rawOptList[i]
-                if opt.Instance then opt.Instance:Destroy() end
-                stringCache[opt.Name] = nil
-                rawOptList[i] = nil
-            end
-            if dropWidget.Opened then GlobalDropdownMenu.Clear() end
-        end
-
-        if options then
-            for i = 1, #options do RegisterRawOption(options[i]) end
-        end
-
-        ConnectEvent(optionBtn.Activated, function() TriggerDropdownMenu(not isMenuOpen) end)
-        return dropWidget
-    end
-
-    function TabClass:AddParagraph(title, desc)
-        local tabTheme = TabThemes[self]
-        local optionBtn, titleLabel, descLabel = ConstructOptionBase(self, title, desc, UDim2.new(1, 0, 0, 0))
-        return setmetatable({
-            DESTROY_ELEMENT = optionBtn,
-            VISIBLE_ELEMENT = optionBtn,
-            TITLE_LABEL = titleLabel,
-            DESCRIPTION_LABEL = descLabel,
-            Title = title,
-            Description = desc,
-            Parent = self,
-            Kind = "Paragraph"
-        }, OptionClass)
-    end
-
-    function TabClass:SetFarmDetail(cfg)
-        local priority = cfg[1] or cfg.Priority or cfg.ID
-        local name = cfg[2] or cfg.Name or cfg.Title
-        local status = cfg[3] or cfg.Status
-        local info = cfg[4] or cfg.Info or cfg.Description
-
-        self.FARM_DETAILS = self.FARM_DETAILS or {}
-        local tag = `#{priority} {name}`
-        local colHex = Library.FarmStatusColors[status]
-        local statusTag = colHex and `<font color="{colHex}"><b><font size="13">{status}</font></b></font>` or `<b><font size="13">{status}</font></b>`
-        local finalDesc = info and `{statusTag} <font size="11">{info}</font>` or statusTag
-
-        local existing = self.FARM_DETAILS[priority]
-        if existing then
-            existing:SetTitle(tag)
-            existing:SetDescription(finalDesc)
-            existing.Priority = priority
-            existing.Status = status
-            existing.Info = info
-        else
-            existing = self:AddParagraph(tag, finalDesc)
-            existing.DESTROY_ELEMENT.LayoutOrder = priority
-            existing.Priority = priority
-            existing.Status = status
-            existing.Info = info
-            self.FARM_DETAILS[priority] = existing
-        end
-        return existing
-    end
-
-    function TabClass:RemoveFarmDetail(priority)
-        local target = self.FARM_DETAILS and self.FARM_DETAILS[priority]
-        if target then
-            target:Destroy()
-            self.FARM_DETAILS[priority] = nil
-        end
-    end
-
-    function TabClass:ClearFarmDetails()
-        if not self.FARM_DETAILS then return end
-        for _, item in self.FARM_DETAILS do item:Destroy() end
-        table.clear(self.FARM_DETAILS)
-    end
-
-    TabClass.AddFarmDetail = TabClass.SetFarmDetail
-
-    function TabClass:Select()
-        if DropdownSearchContext == self then return nil end
-        if DropdownSearchContext then
-            TabSelectionHooks[DropdownSearchContext].Unselect()
-        end
-        DropdownSearchContext = self
-        TabSelectionHooks[DropdownSearchContext].Select()
-    end
-
-    function OptionClass:SetTitle(str)
-        self.TITLE_LABEL.Text = Localize(str)
-        self.Title = str
-        return self
-    end
-
-    function OptionClass:SetDescription(str)
-        self.DESCRIPTION_LABEL.Text = Localize(str)
-        self.Description = str
-        return self
-    end
-
-    function OptionClass:Destroy()
-        if self.DESTROY_ELEMENT then self.DESTROY_ELEMENT:Destroy() end
-        setmetatable(self, nil)
-        self.Destroyed = true
-    end
-
-    function WindowClass:Minimize()
-        RootMainFrame.Visible = not RootMainFrame.Visible
-    end
-
-    function WindowClass:MakeTab(tabConfig)
-        local title = tabConfig[1] or tabConfig.Name or tabConfig.Title
-        local icon = tabConfig[2] or tabConfig.Icon or tabConfig.Image
-
-        local tabObj = setmetatable({
-            Selected = self.SelectedTab == #TabsRegistry + 1,
-            Icon = Library:GetIconByName(icon),
-            Title = title,
-            Parent = self,
-            IS_A_TAB = true
-        }, TabClass)
-
-        local elements = self:GetElements()
-        local tabBtn, container, indicator = ConstructTabUI(self, tabObj, elements.TabsContainer)
-        tabObj.TITLE_LABEL = tabBtn.Title
-
-        local animDuration = 0.35
-        local selectTweens = {
-            CreateTween(indicator, "BackgroundTransparency", 0, animDuration),
-            CreateTween(indicator, "Size", UDim2.fromOffset(4, 15), animDuration)
-        }
-        local unselectTweens = {
-            CreateTween(indicator, "BackgroundTransparency", 1, animDuration),
-            CreateTween(indicator, "Size", UDim2.fromOffset(4, 4), animDuration)
-        }
-
-        local localThemeManager = GlobalThemeManager:new()
-        TabThemes[tabObj] = localThemeManager
-
-        local RunTweens = function(tbl)
-            for i = 1, #tbl do tbl[i]:Play() end
-        end
-
-        local OnSelect = function()
-            RunTweens(selectTweens)
-            tabObj.Selected = true
-            localThemeManager:changeRendering(true)
-            localThemeManager:update()
-            container.Parent = elements.ContainerHolder
-            container.Position = UDim2.new(0, 20, 1, 0)
-            container.Size = UDim2.new(1, 0, 1, 0)
-            CreateTween(container, "Position", UDim2.new(0, 0, 1, 0), 0.3, Enum.EasingStyle.Quart, Enum.EasingDirection.Out):Play()
-        end
-
-        local OnUnselect = function()
-            RunTweens(unselectTweens)
-            tabObj.Selected = false
-            container.Parent = nil
-            localThemeManager:changeRendering(false)
-        end
-
-        TabSelectionHooks[tabObj] = table.freeze{ Unselect = OnUnselect, Select = OnSelect }
-        TabContainers[tabObj] = table.freeze{ SelectTabButton = tabBtn, Container = container }
-
-        table.insert(TabsRegistry, tabObj)
-
-        ConnectEvent(tabBtn.Activated, function() tabObj:Select() end)
-        if tabObj.Selected then tabObj:Select() end
-
-        return tabObj
-    end
-
-    function WindowClass:StartWindow(cfg)
-        local minBtn = cfg.MinimizeButton
-        local mainFrame = cfg.MainFrame
-        local resizers = cfg.Resizers
-        local topBar = cfg.TopBar
-        local subTitleLabel = cfg.SubTitle
-        local titleLabel = cfg.Title
-
-        GlobalDropdownMenu = cfg.Dropdowns
-        RootMainFrame = cfg.MainFrame
-        RootUIScale = cfg.UIScale
-        StoredScriptFlags = cfg.Flags
-
-        local originalSize = mainFrame.Size
-        local minDebounce = 0
-
-        function WindowClass:MinimizeButton()
-            if (tick() - minDebounce) < 0 then return false end
-            if self.Minimized then
-                minBtn.Image = "rbxassetid://10734896206"
-                CreateTween(mainFrame, "Size", originalSize, 0.3, Enum.EasingStyle.Back, Enum.EasingDirection.Out):Play()
-            else
-                originalSize = mainFrame.Size
-                minBtn.Image = "rbxassetid://10734924532"
-                CreateTween(mainFrame, "Size", UDim2.fromOffset(mainFrame.Size.X.Offset, topBar.Size.Y.Offset), 0.25):Play()
-            end
-            for _, r in resizers do r.Visible = self.Minimized end
-            self.Minimized = not self.Minimized
-            minDebounce = tick() + 0.5
-            return true
-        end
-
-        NotificationFrame = CreateInstance("Frame", MainScreenGui, {
-            Size = UDim2.new(0, 280, 1, 0),
-            Position = UDim2.fromScale(1, 0),
-            AnchorPoint = Vector2.new(1, 0),
-            BackgroundTransparency = 1,
-            Elements = {
-                Padding = { PaddingBottom = UDim.new(0, 20) },
-                ListLayout = {
-                    HorizontalAlignment = Enum.HorizontalAlignment.Center,
-                    VerticalAlignment = Enum.VerticalAlignment.Bottom,
-                    SortOrder = Enum.SortOrder.LayoutOrder,
-                    Padding = UDim.new(0, 10)
-                }
-            }
-        })
-
-        DialogOverlay = CreateInstance("TextButton", "OutBox", {
-            Size = UDim2.fromScale(1, 1),
-            BackgroundTransparency = 0.3,
-            AutoButtonColor = false,
-            Text = "",
-            ThemeTag = { BackgroundColor3 = "Colors.Buttons.Default" },
-            Childs = {
-                mainFrame:FindFirstChildOfClass"UICorner":Clone(),
-                CreateInstance("Frame", "Template", {
-                    Size = UDim2.new(0.35, 60, 0.20, 80),
-                    Position = UDim2.fromScale(0.5, 0.5),
-                    AnchorPoint = Vector2.new(0.5, 0.5),
-                    Active = true,
-                    Elements = {
-                        Corner = UDim.new(0, 8),
-                        Gradient = { Rotation = 45, ThemeTag = { Color = "Colors.Background" } }
-                    },
-                    Childs = {
-                        CreateInstance("TextLabel", "Title", {
-                            Size = UDim2.new(1, -20, 0, 20),
-                            TextTruncate = Enum.TextTruncate.AtEnd,
-                            TextSize = 15,
-                            Position = UDim2.new(0.5, 0, 0, 25),
-                            AnchorPoint = Vector2.new(0.5, 0),
-                            BackgroundTransparency = 1,
-                            ThemeTag = { Font = "Font.ExtraBold", TextColor3 = "Colors.Text.Default" }
-                        }),
-                        CreateInstance("TextLabel", "Description", {
-                            Position = UDim2.new(0.5, 0, 0, 48),
-                            Size = UDim2.new(1, -20, 0, 0),
-                            AnchorPoint = Vector2.new(0.5, 0),
-                            TextWrapped = true,
-                            TextSize = 11,
-                            AutomaticSize = Enum.AutomaticSize.Y,
-                            BackgroundTransparency = 1,
-                            ThemeTag = { TextColor3 = "Colors.Text.Darker", Font = "Font.Medium" }
-                        }),
-                        CreateInstance("Frame", "Options", {
-                            Size = UDim2.new(1, -20, 0.2, 20),
-                            Position = UDim2.new(0.5, 0, 1, -10),
-                            AnchorPoint = Vector2.new(0.5, 1),
-                            BackgroundTransparency = 1,
-                            Elements = {
-                                Padding = { PaddingLeft = UDim.new(0, 10), PaddingRight = UDim.new(0, 10), PaddingBottom = UDim.new(0, 10), PaddingTop = UDim.new(0, 10) },
-                                ListLayout = { HorizontalAlignment = Enum.HorizontalAlignment.Right, VerticalAlignment = Enum.VerticalAlignment.Center, FillDirection = Enum.FillDirection.Horizontal, Padding = UDim.new(0, 8) }
-                            }
-                        })
-                    }
-                })
-            }
-        })
-
-        DialogOverlay.Template:SetAttribute("OriginalSize", DialogOverlay.Template.Size)
-        ConnectEvent(DialogOverlay.Activated, function()
-            if ActiveDialog ~= nil and not ActiveDialog.Closing and not ActiveDialog.Closed then
-                ActiveDialog:Close()
-            end
-        end)
-    end
-
-    function WindowClass:Dialog(dialogConfig)
-        if self.Minimized then
-            while not self:MinimizeButton() do task.wait() end
-        end
-        if ActiveDialog then ActiveDialog:Close(true) end
-
-        local title = dialogConfig.Title or dialogConfig.Name
-        local desc = dialogConfig.Content or dialogConfig.Description
-        local options = dialogConfig.Options
-
-        local tmpl = DialogOverlay.Template
-        local descLabel = tmpl.Description
-        local titleLabel = tmpl.Title
-        local origSize = tmpl:GetAttribute"OriginalSize"
-        local animStartSize = UDim2.new(origSize.X.Scale * 1.15, origSize.X.Offset, origSize.Y.Scale * 1.15, origSize.Y.Offset)
-
-        tmpl.Size = animStartSize
-        DialogOverlay.Parent = RootMainFrame
-        descLabel.Text = desc
-        titleLabel.Text = title
-
-        CreateTween(tmpl, "Size", origSize, 0.3, Enum.EasingStyle.Back, Enum.EasingDirection.Out):Play()
-
-        local dialogObj = WidgetRegistry.Dialog.new(descLabel, titleLabel)
-        dialogObj.NEW_SIZE = animStartSize
-        dialogObj.TEMPLATE = tmpl
-
-        for _, item in tmpl.Options:GetChildren() do
-            if item:IsA"GuiObject" then item:Destroy() end
-        end
-
-        for i = #options, 1, -1 do
-            dialogObj:NewOption(options[i])
-        end
-
-        ActiveDialog = dialogObj
-        return ActiveDialog
-    end
-
-    function WindowClass:Notify(notifyConfig)
-        if type(notifyConfig) ~= "table" then notifyConfig = {} end
-        local title = notifyConfig[1] or notifyConfig.Name or notifyConfig.Title or "Notification"
-        local content = notifyConfig[2] or notifyConfig.Content or ""
-        local duration = notifyConfig[4] or notifyConfig.Duration or 5
-
-        local notifHolder = CreateInstance("Frame", "Notification", NotificationFrame, {
-            Size = UDim2.new(0.9, 0, 0, 55),
-            BackgroundTransparency = 1,
-            AutomaticSize = Enum.AutomaticSize.Y
-        })
-
-        local notifBtn = CreateInstance("TextButton", notifHolder, {
-            AutomaticSize = Enum.AutomaticSize.Y,
-            Size = UDim2.fromScale(1, 1),
-            AutoButtonColor = false,
-            Text = "",
-            Position = UDim2.fromScale(2, 0),
-            ThemeTag = { BackgroundTransparency = "BackgroundTransparency" },
-            Elements = {
-                Corner = UDim.new(0, 8),
-                Stroke = { ThemeTag = { Color = "Colors.Primary" }, Thickness = 1.2 },
-                Gradient = { Rotation = 45, ThemeTag = { Color = "Colors.Background" } }
-            }
-        })
-
-        local contentContainer = CreateInstance("Frame", "Holder", notifBtn, {
-            AutomaticSize = Enum.AutomaticSize.Y,
-            BackgroundTransparency = 1,
-            Size = UDim2.fromScale(1, 1),
-            Elements = {
-                ListLayout = { SortOrder = Enum.SortOrder.LayoutOrder, VerticalAlignment = Enum.VerticalAlignment.Center, Padding = UDim.new(0, 2) },
-                Padding = { PaddingBottom = UDim.new(0, 8), PaddingTop = UDim.new(0, 8), PaddingLeft = UDim.new(0, 35), PaddingRight = UDim.new(0, 10) }
-            }
-        })
-
-        CreateInstance("TextLabel", contentContainer, {
-            Size = UDim2.new(1, 0, 0, 18),
-            TextTruncate = Enum.TextTruncate.AtEnd,
-            TextXAlignment = Enum.TextXAlignment.Left,
-            BackgroundTransparency = 1,
-            TextSize = 13,
-            Text = title,
-            ThemeTag = { TextColor3 = "Colors.Text.Default", Font = "Font.Bold" }
-        })
-
-        CreateInstance("TextLabel", contentContainer, {
-            Size = UDim2.new(1, 0, 0, 16),
-            TextXAlignment = Enum.TextXAlignment.Left,
-            AutomaticSize = Enum.AutomaticSize.Y,
-            BackgroundTransparency = 1,
-            TextWrapped = true,
-            TextSize = 11,
-            Text = content,
-            ThemeTag = { TextColor3 = "Colors.Text.Dark", Font = "Font.Normal" }
-        })
-
-        local notifHandle = { Closed = false }
-        function notifHandle:Close()
-            if self.Closed then return end
-            self.Closed = true
-            local tw = CreateTween(notifBtn, "Position", UDim2.fromScale(2, 0), 0.35, Enum.EasingStyle.Quart, Enum.EasingDirection.In)
-            tw:Play()
-            tw.Completed:Wait()
-            notifHolder:Destroy()
-        end
-
-        CreateTween(notifBtn, "Position", UDim2.fromScale(0, 0), 0.4, Enum.EasingStyle.Back, Enum.EasingDirection.Out):Play()
-        task.delay(duration, function() notifHandle:Close() end)
-
-        return notifHandle
-    end
-
-    WindowEngine.Window = WindowClass
+local particlesEnabled=ab.Particles~=false
+local particlesColor=ab.ParticlesColor or Color3.fromRGB(255,0,40)
+local linesColor=ab.ParticlesLineColor or Color3.fromRGB(200,0,30)
+
+local particleContainer=E("Frame","Particles",ak,{
+Size=UDim2.fromScale(1,1),
+BackgroundTransparency=1,
+ZIndex=0,
+ClipsDescendants=true,
+Visible=particlesEnabled
+})
+
+local particlesActive=particlesEnabled
+local particleAccum=0
+local particleInterval=0.3
+local lineAccum=0
+local lineInterval=1.5
+
+local function createParticle()
+local size=math.random(2,5)
+local particle=E("Frame",particleContainer,{
+Size=UDim2.new(0,size,0,size),
+Position=UDim2.new(math.random(0,100)/100,0,1.1,0),
+BackgroundColor3=particlesColor,
+BackgroundTransparency=0.3,
+BorderSizePixel=0,
+ZIndex=0,
+Elements={
+Corner=UDim.new(1,0)
+}
+})
+
+local duration=math.random(3,7)
+local tween=j:Create(particle,TweenInfo.new(duration,Enum.EasingStyle.Linear),{
+Position=UDim2.new(particle.Position.X.Scale,0,-0.1,0),
+BackgroundTransparency=1
+})
+tween:Play()
+tween.Completed:Connect(function()
+if particle then particle:Destroy() end
+end)
 end
 
-local ConstructBaseTabsFrame = function(cfg, topBar)
-    local topOffset = topBar.Size.Y.Offset
-    local scrollSize = UDim2.new(0, cfg.TabSize or Library.Default.TabSize, 1, -topOffset)
-    local containerSize = UDim2.new(1, -scrollSize.X.Offset, 1, -topOffset)
+local function createDataLine()
+local line=E("Frame",particleContainer,{
+Size=UDim2.new(0,1,math.random(5,15)/100,0),
+Position=UDim2.new(math.random(0,100)/100,0,-0.2,0),
+BackgroundColor3=linesColor,
+BackgroundTransparency=0.5,
+BorderSizePixel=0,
+ZIndex=0
+})
 
-    local tabsScroll = CreateInstance("ScrollingFrame", "TabsScroll", {
-        AutomaticCanvasSize = Enum.AutomaticSize.Y,
-        ScrollingDirection = Enum.ScrollingDirection.Y,
-        Position = UDim2.new(0, 0, 1, 0),
-        AnchorPoint = Vector2.new(0, 1),
-        ScrollBarThickness = 2,
-        BackgroundTransparency = 1,
-        ScrollBarImageTransparency = 0.2,
-        CanvasSize = UDim2.new(),
-        BorderSizePixel = 0,
-        Size = scrollSize,
-        ThemeTag = { ScrollBarImageColor3 = "Colors.ScrollBar" },
-        Elements = {
-            Padding = { PaddingLeft = UDim.new(0, 8), PaddingRight = UDim.new(0, 8), PaddingTop = UDim.new(0, 10), PaddingBottom = UDim.new(0, 10) },
-            ListLayout = { Padding = UDim.new(0, 4) }
-        }
-    })
-
-    local containersHolder = CreateInstance("Frame", "Containers", {
-        Size = containerSize,
-        AnchorPoint = Vector2.new(1, 1),
-        Position = UDim2.new(1, 0, 1, 0),
-        BackgroundTransparency = 1,
-        ClipsDescendants = true
-    })
-
-    return tabsScroll, containersHolder
+local duration=math.random(2,4)
+local tween=j:Create(line,TweenInfo.new(duration,Enum.EasingStyle.Linear),{
+Position=UDim2.new(line.Position.X.Scale,0,1.3,0)
+})
+tween:Play()
+tween.Completed:Connect(function()
+if line then line:Destroy() end
+end)
 end
 
-function Library:GetIconByName(name)
-    if name == nil then return end
-    if IsAssetId(name) or #name == 0 then return name end
-    local clean = CleanSearchString(name)
-    if self.Icons and self.Icons[clean] then
-        return "rbxassetid://" .. self.Icons[clean]
-    end
-    return name
+u(n,function(dt)
+if not particlesActive then return end
+
+particleAccum+=dt
+if particleAccum>=particleInterval then
+particleAccum=0
+createParticle()
 end
 
-function Library:IsValidTheme(themeName)
-    return self.Themes[themeName] ~= nil
+lineAccum+=dt
+if lineAccum>=lineInterval then
+lineAccum=0
+createDataLine()
+end
+end)
+
+u(ak.Destroying,function()
+self:Destroy()
+end)
+
+u(I:GetAttributeChangedSignal"UID",function()
+self:Destroy()
+ak:Destroy()
+end)
+
+D.Draggable(ak,ad,0.5)
+
+local al=E("Folder","Components",ak)
+local am=E("Folder","Dropdowns",I)
+
+local an=E("Frame","TopBar",al,{
+Size=UDim2.new(1,0,0,28),
+BackgroundTransparency=1
+})
+
+local ao=E("TextLabel","Title",an,{
+TextXAlignment=Enum.TextXAlignment.Left,
+AutomaticSize=Enum.AutomaticSize.XY,
+Position=UDim2.new(0,15,0.5,0),
+AnchorPoint=Vector2.new(0,0.5),
+Text=Localize(ae.Title),
+TextSize=12,
+BackgroundTransparency=1,
+ThemeTag={
+TextColor3="Colors.Text.Default",
+Font="Font.Bold"
+},
+Childs={
+E("TextLabel","SubTitle",{
+Size=UDim2.fromScale(0,1),
+AutomaticSize="X",
+AnchorPoint=Vector2.new(0,1),
+Position=UDim2.new(1,5,0.9),
+Text=Localize(ae.SubTitle),
+BackgroundTransparency=1,
+TextXAlignment="Left",
+TextYAlignment="Bottom",
+TextSize=8,
+ThemeTag={
+TextColor3="Colors.Text.Dark",
+Font="Font.Normal"
+}
+})
+}
+})
+
+table.insert(s.LocalizedLabels,{Instance=ao,Original=ae.Title})
+table.insert(s.LocalizedLabels,{Instance=ao.SubTitle,Original=ae.SubTitle})
+
+local ap=E("Folder","Buttons",an,{
+Childs={
+E("ImageButton","Close",{
+Size=UDim2.new(0,18,0,18),
+Position=UDim2.new(1,-10,0.5),
+AnchorPoint=Vector2.new(1,0.5),
+BackgroundTransparency=1,
+BackgroundColor3=Color3.fromRGB(255,35,35),
+AutoButtonColor=false,
+ThemeTag={
+Image="Icons.Close"
+},
+Elements={
+Corner=UDim.new(0.2,0)
+}
+}),
+E("ImageButton","Minimize",{
+Size=UDim2.new(0,18,0,18),
+Position=UDim2.new(1,-35,0.5),
+AnchorPoint=Vector2.new(1,0.5),
+BackgroundTransparency=1,
+BackgroundColor3=Color3.new(1,1,1),
+Image="rbxassetid://10734896206",
+AutoButtonColor=false,
+Elements={
+Corner=UDim.new(0.2,0)
+}
+})
+}
+})
+
+local aq=ap.Minimize
+local ar=ap.Close
+
+local as=setmetatable(ae,{
+__index=R.Window
+})
+
+function as:SetParticlesEnabled(aParticlesEnabled)
+assert(type(aParticlesEnabled)=="boolean",`"Window.SetParticlesEnabled[param 1]". 'boolean' expected, got {typeof(aParticlesEnabled)}`)
+
+particlesActive=aParticlesEnabled
+particleContainer.Visible=aParticlesEnabled
 end
 
-function Library:SetTheme(themeName)
-    local theme = self.Themes[themeName]
-    if theme then
-        self.CurrentTheme = theme
-        GlobalThemeManager:update()
-    end
+function as:GetParticlesEnabled()
+return particlesActive
 end
 
-function Library:SetUIScale(scaleVal)
-    MainScreenGui.Scale.Scale = CalculateUIScale(scaleVal)
+local at,au=aa(af,an)
+
+at.Parent=al
+au.Parent=al
+
+local av=table.freeze{
+ContainerHolder=au,
+TabsContainer=at,
+Components=al,
+MainFrame=ak
+}
+
+function as:GetElements()
+return av
 end
 
-function Library:Destroy()
-    for _, conn in self.Connections do conn:Disconnect() end
-    if MainScreenGui then pcall(MainScreenGui.Destroy, MainScreenGui) end
+local aw=E("Frame","ControlWindowSize",ak,{
+Size=UDim2.new(0,35,0,35),
+Position=ak.Size,
+AnchorPoint=Vector2.new(0.8,0.8),
+BackgroundTransparency=1,
+Active=true,
+Elements={
+Corner=UDim.new(0,6)
+},
+ThemeTag={
+BackgroundColor3="Colors.OnPrimary"
+}
+})
+
+local ax=E("Frame","ControlTabsSize",ak,{
+Size=UDim2.new(0,16,0.75,-30),
+Position=UDim2.new(0,at.Size.X.Offset,0.5,15),
+AnchorPoint=Vector2.new(0.5,0.5),
+BackgroundTransparency=1,
+Active=true,
+Elements={
+Corner=UDim.new(0,6)
+},
+ThemeTag={
+BackgroundColor3="Colors.OnPrimary"
+}
+})local ay=function(
+
+ay)
+local az=ay:GetAttribute"Resizing"
+ay:SetAttribute("Resizing",tick())
+
+if az and(tick()-az)<=0.1 then
+return nil
 end
 
--- ==========================================================
--- INICIALIZAÇÃO DA JANELA COM MOTOR DE PARTÍCULAS
--- ==========================================================
-function Library:MakeWindow(windowConfig)
-    if self.LOADED_UI_LIBRARY then
-        return error("you can create only 1 Window", 2)
-    end
+J(ay,"BackgroundTransparency",0.5,0.3):Play()
+while tick()-ay:GetAttribute"Resizing"<=0.1 do task.wait()end
+J(ay,"BackgroundTransparency",1,0.4):Play()end
 
-    local uid = math.random()
-    MainScreenGui:SetAttribute("UID", uid)
-    self.SCREENGUI_UID = uid
-    MainScreenGui:ClearAllChildren()
 
-    local uiScale = CreateInstance("UIScale", "Scale", MainScreenGui, { Scale = CalculateUIScale(1) })
-    local config = {
-        Title = windowConfig[1] or windowConfig.Name or windowConfig.Title or "Redz Hub",
-        SubTitle = windowConfig[2] or windowConfig.SubName or windowConfig.SubTitle or "Car Dealership Tycoon",
-        ScriptFolder = windowConfig[3] or windowConfig.ScriptFolder or windowConfig.FolderName
-    }
+u(aw:GetPropertyChangedSignal"Position",function()
+ay(aw)
+local az=aw.Position
+ak.Size=az
+af.UISize={az.X.Offset,az.Y.Offset}
+end)
 
-    self.CurrentTheme = self.Themes[self.Default.Theme]
-    self.LOADED_UI_LIBRARY = true
+u(ax:GetPropertyChangedSignal"Position",function()
+ay(ax)
+local az=ax.Position
+at.Size=UDim2.new(0,az.X.Offset,1,-an.Size.Y.Offset)
+au.Size=UDim2.new(1,-at.Size.X.Offset,1,-an.Size.Y.Offset)
+af.TabSize=az.X.Offset
+end)
 
-    local defaultSize = self.Default.UISize
-    local mainWindow = CreateInstance("Frame", "Window", MainScreenGui, {
-        Position = UDim2.new(0.5, -defaultSize.X.Offset / 2, 0.5, -defaultSize.Y.Offset / 2),
-        Active = true,
-        Size = UDim2.fromOffset(0, 0),
-        ClipsDescendants = true,
-        ThemeTag = { BackgroundTransparency = "BackgroundTransparency" },
-        Elements = {
-            Corner = UDim.new(0, 10),
-            Stroke = { ThemeTag = { Color = "Colors.Stroke" }, Thickness = 1.2 },
-            Gradient = { Rotation = 45, ThemeTag = { Color = "Colors.Background" } }
-        }
-    })
+D.Draggable(aw,ad,0.68,function(az,aA,aB,aC)
+return UDim2.fromOffset(math.clamp(aA,430,1000),math.clamp(aC,200,500))
+end)
 
-    -- Animação Suave de Entrada (Scale Back Out)
-    CreateTween(mainWindow, "Size", defaultSize, 0.45, Enum.EasingStyle.Back, Enum.EasingDirection.Out):Play()
+D.Draggable(ax,ad,0.68,function(aA,aB)
+return UDim2.new(0,math.clamp(aB,135,210),0.5,15)
+end)
 
-    -- ==========================================================
-    -- SISTEMA DE PARTÍCULAS E LINHAS DE DADOS NO FUNDO
-    -- ==========================================================
-    local particleContainer = CreateInstance("Frame", "ParticleContainer", mainWindow, {
-        Size = UDim2.fromScale(1, 1),
-        BackgroundTransparency = 1,
-        ClipsDescendants = true,
-        ZIndex = 0
-    })
+local aA={
+Title="Close Window?",
+Content="You Want Close UI?",
+Options={
+{
+Title="Yes",
+Callback=function()self:Destroy()end
+},
+{
+Title="No"
+}
+}
+}
 
-    local particlesActive = true
+u(aq.MouseEnter,function()aq.BackgroundTransparency=0.65 end)
+u(aq.MouseLeave,function()aq.BackgroundTransparency=1.00 end)
 
-    local function SpawnParticle()
-        if not mainWindow or not mainWindow.Parent or not particlesActive then return end
-        local pSize = math.random(2, 5)
-        local p = Instance.new("Frame")
-        p.Size = UDim2.new(0, pSize, 0, pSize)
-        p.Position = UDim2.new(math.random(0, 100) / 100, 0, 1.05, 0)
-        p.BackgroundColor3 = ResolveThemePath(Library.CurrentTheme, "Colors.Primary") or Color3.fromRGB(255, 35, 65)
-        p.BackgroundTransparency = 0.3
-        p.BorderSizePixel = 0
-        p.ZIndex = 0
-        p.Parent = particleContainer
+u(ar.MouseEnter,function()ar.BackgroundTransparency=0.65 end)
+u(ar.MouseLeave,function()ar.BackgroundTransparency=1.00 end)
 
-        local c = Instance.new("UICorner")
-        c.CornerRadius = UDim.new(1, 0)
-        c.Parent = p
+as.SetUIScale=self.SetUIScale
+as.SUBTITLE_LABEL=ao.SubTitle
+as.TITLE_LABEL=ao
 
-        local duration = math.random(3, 6)
-        local tw = TweenService:Create(p, TweenInfo.new(duration, Enum.EasingStyle.Linear), {
-            Position = UDim2.new(p.Position.X.Scale + (math.random(-5, 5) / 100), 0, -0.1, 0),
-            BackgroundTransparency = 1
-        })
-        tw:Play()
-        tw.Completed:Connect(function()
-            if p then p:Destroy() end
-        end)
-    end
+local aB=as:StartWindow{
+Resizers={aw,ax},
+MinimizeButton=aq,
+Dropdowns=am,
+MainFrame=ak,
+TopBar=an,
 
-    local function SpawnDataLine()
-        if not mainWindow or not mainWindow.Parent or not particlesActive then return end
-        local line = Instance.new("Frame")
-        line.Size = UDim2.new(0, 1, math.random(6, 14) / 100, 0)
-        line.Position = UDim2.new(math.random(0, 100) / 100, 0, -0.15, 0)
-        line.BackgroundColor3 = ResolveThemePath(Library.CurrentTheme, "Colors.Primary") or Color3.fromRGB(200, 0, 30)
-        line.BackgroundTransparency = 0.6
-        line.BorderSizePixel = 0
-        line.ZIndex = 0
-        line.Parent = particleContainer
+SubTitle=ao.SubTitle,
+Title=ao,
 
-        local duration = math.random(2, 4)
-        local tw = TweenService:Create(line, TweenInfo.new(duration, Enum.EasingStyle.Linear), {
-            Position = UDim2.new(line.Position.X.Scale, 0, 1.15, 0)
-        })
-        tw:Play()
-        tw.Completed:Connect(function()
-            if line then line:Destroy() end
-        end)
-    end
+UIScale=ad,
+Flags=ag
+}
 
-    task.spawn(function()
-        while particlesActive and mainWindow and mainWindow.Parent do
-            if mainWindow.Visible then
-                if math.random(1, 2) == 1 then
-                    SpawnParticle()
-                else
-                    SpawnDataLine()
-                end
-            end
-            task.wait(math.random(15, 30) / 100)
-        end
-    end)
+u(aq.Activated,function()
+as:MinimizeButton()
+end)
 
-    ConnectEvent(mainWindow.Destroying, function()
-        particlesActive = false
-        self:Destroy()
-    end)
+u(ar.Activated,function()
+as:Dialog(aA)
+end)
 
-    InstanceBuilder.Draggable(mainWindow, uiScale, 0.5)
-
-    local components = CreateInstance("Folder", "Components", mainWindow)
-    local dropdownsFolder = CreateInstance("Folder", "Dropdowns", MainScreenGui)
-
-    local topBar = CreateInstance("Frame", "TopBar", components, {
-        Size = UDim2.new(1, 0, 0, 32),
-        BackgroundTransparency = 1,
-        ZIndex = 2
-    })
-
-    local titleLabel = CreateInstance("TextLabel", "Title", topBar, {
-        TextXAlignment = Enum.TextXAlignment.Left,
-        AutomaticSize = Enum.AutomaticSize.XY,
-        Position = UDim2.new(0, 15, 0.5, 0),
-        AnchorPoint = Vector2.new(0, 0.5),
-        Text = Localize(config.Title),
-        TextSize = 13,
-        BackgroundTransparency = 1,
-        ThemeTag = { TextColor3 = "Colors.Text.Default", Font = "Font.Bold" },
-        Childs = {
-            CreateInstance("TextLabel", "SubTitle", {
-                Size = UDim2.fromScale(0, 1),
-                AutomaticSize = "X",
-                AnchorPoint = Vector2.new(0, 1),
-                Position = UDim2.new(1, 6, 0.85),
-                Text = Localize(config.SubTitle),
-                BackgroundTransparency = 1,
-                TextXAlignment = "Left",
-                TextYAlignment = "Bottom",
-                TextSize = 9,
-                ThemeTag = { TextColor3 = "Colors.Text.Dark", Font = "Font.Normal" }
-            })
-        }
-    })
-
-    table.insert(Library.LocalizedLabels, { Instance = titleLabel, Original = config.Title })
-    table.insert(Library.LocalizedLabels, { Instance = titleLabel.SubTitle, Original = config.SubTitle })
-
-    local topButtons = CreateInstance("Folder", "Buttons", topBar, {
-        Childs = {
-            CreateInstance("ImageButton", "Close", {
-                Size = UDim2.new(0, 20, 0, 20),
-                Position = UDim2.new(1, -10, 0.5),
-                AnchorPoint = Vector2.new(1, 0.5),
-                BackgroundTransparency = 1,
-                BackgroundColor3 = Color3.fromRGB(255, 45, 45),
-                AutoButtonColor = false,
-                ThemeTag = { Image = "Icons.Close" },
-                Elements = { Corner = UDim.new(0.3, 0) }
-            }),
-            CreateInstance("ImageButton", "Minimize", {
-                Size = UDim2.new(0, 20, 0, 20),
-                Position = UDim2.new(1, -35, 0.5),
-                AnchorPoint = Vector2.new(1, 0.5),
-                BackgroundTransparency = 1,
-                BackgroundColor3 = Color3.fromRGB(45, 45, 55),
-                Image = "rbxassetid://10734896206",
-                AutoButtonColor = false,
-                Elements = { Corner = UDim.new(0.3, 0) }
-            })
-        }
-    })
-
-    local minBtn = topButtons.Minimize
-    local closeBtn = topButtons.Close
-
-    local windowObj = setmetatable(config, { __index = WindowEngine.Window })
-    local tabsContainer, containerHolder = ConstructBaseTabsFrame({ TabSize = Library.Default.TabSize }, topBar)
-
-    tabsContainer.Parent = components
-    containerHolder.Parent = components
-
-    local elements = table.freeze{
-        ContainerHolder = containerHolder,
-        TabsContainer = tabsContainer,
-        Components = components,
-        MainFrame = mainWindow
-    }
-
-    function windowObj:GetElements() return elements end
-
-    local resizeWindow = CreateInstance("Frame", "ControlWindowSize", mainWindow, {
-        Size = UDim2.new(0, 30, 0, 30),
-        Position = mainWindow.Size,
-        AnchorPoint = Vector2.new(0.8, 0.8),
-        BackgroundTransparency = 1,
-        Active = true,
-        Elements = { Corner = UDim.new(0, 6) },
-        ThemeTag = { BackgroundColor3 = "Colors.OnPrimary" }
-    })
-
-    local resizeTabs = CreateInstance("Frame", "ControlTabsSize", mainWindow, {
-        Size = UDim2.new(0, 14, 0.75, -30),
-        Position = UDim2.new(0, tabsContainer.Size.X.Offset, 0.5, 15),
-        AnchorPoint = Vector2.new(0.5, 0.5),
-        BackgroundTransparency = 1,
-        Active = true,
-        Elements = { Corner = UDim.new(0, 6) },
-        ThemeTag = { BackgroundColor3 = "Colors.OnPrimary" }
-    })
-
-    InstanceBuilder.Draggable(resizeWindow, uiScale, 0.68, function(sx, ox, sy, oy)
-        return UDim2.fromOffset(math.clamp(ox, 430, 1000), math.clamp(oy, 200, 500))
-    end)
-
-    InstanceBuilder.Draggable(resizeTabs, uiScale, 0.68, function(sx, ox)
-        return UDim2.new(0, math.clamp(ox, 135, 210), 0.5, 15)
-    end)
-
-    ConnectEvent(minBtn.MouseEnter, function() CreateTween(minBtn, "BackgroundTransparency", 0.5, 0.2):Play() end)
-    ConnectEvent(minBtn.MouseLeave, function() CreateTween(minBtn, "BackgroundTransparency", 1.0, 0.2):Play() end)
-    ConnectEvent(closeBtn.MouseEnter, function() CreateTween(closeBtn, "BackgroundTransparency", 0.5, 0.2):Play() end)
-    ConnectEvent(closeBtn.MouseLeave, function() CreateTween(closeBtn, "BackgroundTransparency", 1.0, 0.2):Play() end)
-
-    windowObj.SetUIScale = self.SetUIScale
-    windowObj.SUBTITLE_LABEL = titleLabel.SubTitle
-    windowObj.TITLE_LABEL = titleLabel
-
-    windowObj:StartWindow{
-        Resizers = { resizeWindow, resizeTabs },
-        MinimizeButton = minBtn,
-        Dropdowns = dropdownsFolder,
-        MainFrame = mainWindow,
-        TopBar = topBar,
-        SubTitle = titleLabel.SubTitle,
-        Title = titleLabel,
-        UIScale = uiScale,
-        Flags = {}
-    }
-
-    ConnectEvent(minBtn.Activated, function() windowObj:MinimizeButton() end)
-    ConnectEvent(closeBtn.Activated, function()
-        windowObj:Dialog{
-            Title = "Fechar Interface",
-            Content = "Deseja realmente fechar o menu?",
-            Options = {
-                { Title = "Sim", Callback = function() self:Destroy() end },
-                { Title = "Não" }
-            }
-        }
-    end)
-
-    return windowObj
+return as
 end
 
-return Library
+return s
