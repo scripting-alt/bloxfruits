@@ -1,40 +1,66 @@
--- 1. Aguarda o jogo carregar completamente
 repeat task.wait() until game:IsLoaded()
 
--- 2. Aguarda o Jogador Local, Personagem e Físicas carregarem
 local Players = game:GetService("Players")
 local LocalPlayer = Players.LocalPlayer or Players.PlayerAdded:Wait()
 LocalPlayer:WaitForChild("PlayerGui")
 task.wait(3)
+
+local function safeLoad(url)
+    local success, content = pcall(game.HttpGet, game, url)
+    if success and content then
+        local fn, err = loadstring(content)
+        if fn then
+            return fn()
+        else
+            warn("[REDZ HUB] Erro ao compilar: " .. url .. " -> " .. tostring(err))
+        end
+    else
+        warn("[REDZ HUB] Erro ao baixar: " .. url)
+    end
+    return nil
+end
+
 task.spawn(function()
-    pcall(function()
-        loadstring(game:HttpGet("https://raw.githubusercontent.com/scripting-alt/bloxfruits/refs/heads/main/utils/Loading.lua"))()
-    end)
+    safeLoad("https://raw.githubusercontent.com/scripting-alt/bloxfruits/refs/heads/main/utils/Loading.lua")
 end)
 
 task.wait(6)
 
--- 4. Fila para teleporte automático
 local url = "https://raw.githubusercontent.com/scripting-alt/bloxfruits/refs/heads/main/Main.lua"
 local queue = queue_on_teleport or (syn and syn.queue_on_teleport)
 
 if queue then
     task.spawn(function()
-        queue("repeat task.wait() until game:IsLoaded() loadstring(game:HttpGet('" .. url .. "'))()")
+        local scriptQueue = string.format([[
+            repeat task.wait() until game:IsLoaded()
+            local s, c = pcall(game.HttpGet, game, "%s")
+            if s and c then
+                local f = loadstring(c)
+                if f then f() end
+            end
+        ]], url)
+        queue(scriptQueue)
     end)
 end
 
--- 5. Verificação de instância única
 if _G.RedzHub then
     warn("[REDZ HUB] RedzHub is already running. Stopping execution.")
     return
 end
 
--- 6. Carregamento dos módulos principais
-local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/scripting-alt/bloxfruits/refs/heads/main/library.luau"))()
-local pt_br = loadstring(game:HttpGet("https://raw.githubusercontent.com/scripting-alt/bloxfruits/refs/heads/main/translate/pt_br.lua"))()
+local Library = safeLoad("https://raw.githubusercontent.com/scripting-alt/bloxfruits/refs/heads/main/library.luau")
+local pt_br = safeLoad("https://raw.githubusercontent.com/scripting-alt/bloxfruits/refs/heads/main/translate/pt_br.lua")
+
+if not Library then
+    warn("[REDZ HUB] Falha crítica ao carregar a interface (Library). Execução interrompida.")
+    return
+end
+
 _G.RedzHub = true
-Library:AddTranslations("pt", pt_br)
+
+if pt_br then
+    Library:AddTranslations("pt", pt_br)
+end
 Library:AddTranslations("en", {})
 Library:UpdateTranslate("pt")
 
