@@ -1533,7 +1533,7 @@ end)
 function stopTeleport()
     TweenON = false
     local _LocalPlayer = game.Players.LocalPlayer
-    if _LocalPlayer.Character:FindFirstChild('PartTele') then
+    if _LocalPlayer.Character and _LocalPlayer.Character:FindFirstChild('PartTele') then
         _LocalPlayer.Character.PartTele:Destroy()
     end
 end
@@ -3547,7 +3547,9 @@ Tab_Misc:AddSlider({
   Increment = 1,
   Default = 3,
   Callback = function(Value)
+    if game.Players.LocalPlayer.Character then
     game.Players.LocalPlayer.Character:SetAttribute("SpeedMultiplier",_G.Speed)
+    end
     _G.Speed = Value
   end
 })
@@ -3559,7 +3561,9 @@ Tab_Misc:AddSlider({
   Increment = 10,
   Default = game.Players.LocalPlayer.Character:GetAttribute("DashLength") or 10,
   Callback = function(Value)
+    if game.Players.LocalPlayer.Character then
     game.Players.LocalPlayer.Character:SetAttribute("DashLength",Value)
+    end
     _G.DashDistance = Value
   end
 })
