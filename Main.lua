@@ -24,7 +24,7 @@ task.spawn(function()
     safeLoad("https://raw.githubusercontent.com/scripting-alt/bloxfruits/refs/heads/main/utils/Loading.lua")
 end)
 
-task.wait(6)
+task.wait(10)
 
 local url = "https://raw.githubusercontent.com/scripting-alt/bloxfruits/refs/heads/main/Main.lua"
 local queue = queue_on_teleport or (syn and syn.queue_on_teleport)
