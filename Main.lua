@@ -1,10 +1,22 @@
-if not game:IsLoaded() then game.Loaded:Wait() end
+repeat task.wait() until game:IsLoaded()
+
+local url = "https://raw.githubusercontent.com/scripting-alt/bloxfruits/refs/heads/main/Main.lua"
+local queue = queue_on_teleport or (syn and syn.queue_on_teleport)
+
+game:GetService("GuiService").ErrorMessageChanged:Connect(function()
+    if queue then
+        queue("repeat task.wait() until game:IsLoaded() loadstring(game:HttpGet('" .. url .. "'))()")
+    end
+    task.wait(2)
+    game.ReplicatedStorage:WaitForChild("__ServerBrowser"):InvokeServer("teleport", game.JobId)
+end)
+
 spawn(function()
     pcall(function()
         loadstring(game:HttpGet("https://raw.githubusercontent.com/scripting-alt/bloxfruits/refs/heads/main/utils/Loading.lua"))()
     end)
 end)
-task.wait(15)
+task.wait(6)
 
 if _G.RedzHub then
     warn("[REDZ HUB] RedzHub is already running. Stopping execution.")
@@ -19,8 +31,8 @@ Library:AddTranslations("en", {})
 Library:UpdateTranslate("pt")
 
 ScriptVersion = {
-    Version = "v5.9.8",
-    Date = "2026-08-31"
+    Version = "v7.9.8",
+    Date = "2026-09-13"
 }
 
 _G.SelectTool = "Melee"
