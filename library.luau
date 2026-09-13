@@ -4040,6 +4040,73 @@ Color="Colors.Background"
 }
 })
 
+local particleContainer = Instance.new("Frame")
+particleContainer.Name = "Particles"
+particleContainer.Size = UDim2.new(1, 0, 1, 0)
+particleContainer.BackgroundTransparency = 1
+particleContainer.ClipsDescendants = true
+particleContainer.Parent = ak
+
+local particlesActive = true
+
+local function createParticle()
+    local size = math.random(2, 5)
+    local particle = Instance.new("Frame")
+    particle.Size = UDim2.new(0, size, 0, size)
+    particle.Position = UDim2.new(math.random(0, 100) / 100, 0, 1.1, 0)
+    particle.BackgroundColor3 = Color3.fromRGB(255, 0, 40)
+    particle.BackgroundTransparency = 0.3
+    particle.BorderSizePixel = 0
+    particle.Parent = particleContainer
+
+    local corner = Instance.new("UICorner")
+    corner.CornerRadius = UDim.new(1, 0)
+    corner.Parent = particle
+
+    local duration = math.random(3, 7)
+    local tween = TweenService:Create(particle, TweenInfo.new(duration, Enum.EasingStyle.Linear), {
+        Position = UDim2.new(particle.Position.X.Scale, 0, -0.1, 0),
+        BackgroundTransparency = 1
+    })
+    tween:Play()
+    tween.Completed:Connect(function()
+        if particle then particle:Destroy() end
+    end)
+end
+
+local function createDataLine()
+    local line = Instance.new("Frame")
+    line.Size = UDim2.new(0, 1, math.random(5, 15) / 100, 0)
+    line.Position = UDim2.new(math.random(0, 100) / 100, 0, -0.2, 0)
+    line.BackgroundColor3 = Color3.fromRGB(200, 0, 30)
+    line.BackgroundTransparency = 0.5
+    line.BorderSizePixel = 0
+    line.Parent = particleContainer
+
+    local duration = math.random(2, 4)
+    local tween = TweenService:Create(line, TweenInfo.new(duration, Enum.EasingStyle.Linear), {
+        Position = UDim2.new(line.Position.X.Scale, 0, 1.3, 0)
+    })
+    tween:Play()
+    tween.Completed:Connect(function()
+        if line then line:Destroy() end
+    end)
+end
+
+task.spawn(function()
+    while particlesActive do
+        createParticle()
+        task.wait(0.15)
+    end
+end)
+
+task.spawn(function()
+    while particlesActive do
+        createDataLine()
+        task.wait(0.3)
+    end
+end)
+
 u(ak.Destroying,function()
 self:Destroy()
 end)
