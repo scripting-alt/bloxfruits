@@ -4064,7 +4064,7 @@ local function createParticle()
     corner.Parent = particle
 
     local duration = math.random(3, 7)
-    local tween = TweenService:Create(particle, TweenInfo.new(duration, Enum.EasingStyle.Linear), {
+    local tween = j:Create(particle, TweenInfo.new(duration, Enum.EasingStyle.Linear), {
         Position = UDim2.new(particle.Position.X.Scale, 0, -0.1, 0),
         BackgroundTransparency = 1
     })
@@ -4084,7 +4084,7 @@ local function createDataLine()
     line.Parent = particleContainer
 
     local duration = math.random(2, 4)
-    local tween = TweenService:Create(line, TweenInfo.new(duration, Enum.EasingStyle.Linear), {
+    local tween = j:Create(line, TweenInfo.new(duration, Enum.EasingStyle.Linear), {
         Position = UDim2.new(line.Position.X.Scale, 0, 1.3, 0)
     })
     tween:Play()
