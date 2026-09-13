@@ -1,28 +1,39 @@
+-- 1. Aguarda o jogo carregar completamente
 repeat task.wait() until game:IsLoaded()
 
-local url = "https://raw.githubusercontent.com/scripting-alt/bloxfruits/refs/heads/main/Main.lua"
-local queue = queue_on_teleport or (syn and syn.queue_on_teleport)
+-- 2. Aguarda o Jogador Local, Personagem e Físicas carregarem
+local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer or Players.PlayerAdded:Wait()
+local Character = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
+Character:WaitForChild("HumanoidRootPart")
+LocalPlayer:WaitForChild("PlayerGui")
 
-game:GetService("GuiService").ErrorMessageChanged:Connect(function()
-    if queue then
-        queue("repeat task.wait() until game:IsLoaded() loadstring(game:HttpGet('" .. url .. "'))()")
-    end
-    task.wait(2)
-    game.ReplicatedStorage:WaitForChild("__ServerBrowser"):InvokeServer("teleport", game.JobId)
-end)
-
-spawn(function()
+-- 3. Tela de carregamento externa
+task.spawn(function()
     pcall(function()
         loadstring(game:HttpGet("https://raw.githubusercontent.com/scripting-alt/bloxfruits/refs/heads/main/utils/Loading.lua"))()
     end)
 end)
+
 task.wait(6)
 
+-- 4. Fila para teleporte automático
+local url = "https://raw.githubusercontent.com/scripting-alt/bloxfruits/refs/heads/main/Main.lua"
+local queue = queue_on_teleport or (syn and syn.queue_on_teleport)
+
+if queue then
+    task.spawn(function()
+        queue("repeat task.wait() until game:IsLoaded() loadstring(game:HttpGet('" .. url .. "'))()")
+    end)
+end
+
+-- 5. Verificação de instância única
 if _G.RedzHub then
     warn("[REDZ HUB] RedzHub is already running. Stopping execution.")
     return
 end
 
+-- 6. Carregamento dos módulos principais
 local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/scripting-alt/bloxfruits/refs/heads/main/library.luau"))()
 local pt_br = loadstring(game:HttpGet("https://raw.githubusercontent.com/scripting-alt/bloxfruits/refs/heads/main/translate/pt_br.lua"))()
 _G.RedzHub = true
