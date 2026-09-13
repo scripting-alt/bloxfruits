@@ -1,5 +1,5 @@
 local CONFIG = {
-    LOADING_DURATION = 15,
+    LOADING_DURATION = 6,
 }
 
 local Players = game:GetService("Players")
