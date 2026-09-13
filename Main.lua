@@ -5,8 +5,7 @@ repeat task.wait() until game:IsLoaded()
 local Players = game:GetService("Players")
 local LocalPlayer = Players.LocalPlayer or Players.PlayerAdded:Wait()
 LocalPlayer:WaitForChild("PlayerGui")
-
--- 3. Tela de carregamento externa
+task.wait(3)
 task.spawn(function()
     pcall(function()
         loadstring(game:HttpGet("https://raw.githubusercontent.com/scripting-alt/bloxfruits/refs/heads/main/utils/Loading.lua"))()
@@ -1857,9 +1856,11 @@ function reload()
         end
     end)
     workspace._WorldOrigin.WaterCFrame["Foam;"].CanCollide = _G.WaterWalk
-    game.Players.LocalPlayer.Character:SetAttribute("SpeedMultiplier",_G.Speed)
-    game.Players.LocalPlayer.Character:SetAttribute("DashLength",_G.DashDistance)
-    game.Players.LocalPlayer.Character.ChildAdded:Connect(function(v)
+    if game.Players.LocalPlayer and game.Players.LocalPlayer.Character then
+        game.Players.LocalPlayer.Character:SetAttribute("SpeedMultiplier",_G.Speed)
+        game.Players.LocalPlayer.Character:SetAttribute("DashLength",_G.DashDistance)
+        game.Players.LocalPlayer.Character.ChildAdded:Connect(function(v)
+    end
         if _G.AutoStorageFruits then
             storageFruit(v)
         end
