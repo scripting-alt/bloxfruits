@@ -1850,21 +1850,31 @@ function storageFruit(v)
 end
 
 function reload()
-    game.Players.LocalPlayer.Backpack.ChildAdded:Connect(function(v)
-        if _G.AutoStorageFruits then
+    local player = game.Players.LocalPlayer
+    if not player then return end
+
+    player.Backpack.ChildAdded:Connect(function(v)
+        if _G.AutoStorageFruits and typeof(storageFruit) == "function" then
             storageFruit(v)
         end
     end)
-    workspace._WorldOrigin.WaterCFrame["Foam;"].CanCollide = _G.WaterWalk
-    if game.Players.LocalPlayer and game.Players.LocalPlayer.Character then
-        game.Players.LocalPlayer.Character:SetAttribute("SpeedMultiplier",_G.Speed)
-        game.Players.LocalPlayer.Character:SetAttribute("DashLength",_G.DashDistance)
-        game.Players.LocalPlayer.Character.ChildAdded:Connect(function(v)
+
+    if workspace:FindFirstChild("_WorldOrigin") 
+       and workspace._WorldOrigin:FindFirstChild("WaterCFrame") 
+       and workspace._WorldOrigin.WaterCFrame:FindFirstChild("Foam;") then
+        workspace._WorldOrigin.WaterCFrame["Foam;"].CanCollide = _G.WaterWalk
     end
-        if _G.AutoStorageFruits then
-            storageFruit(v)
-        end
-    end)
+
+    if player.Character then
+        player.Character:SetAttribute("SpeedMultiplier", _G.Speed)
+        player.Character:SetAttribute("DashLength", _G.DashDistance)
+
+        player.Character.ChildAdded:Connect(function(v)
+            if _G.AutoStorageFruits and typeof(storageFruit) == "function" then
+                storageFruit(v)
+            end
+        end)
+    end
 end
 
 game.Players.LocalPlayer.CharacterAdded:connect(reload)
