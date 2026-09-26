@@ -29,19 +29,20 @@ task.wait(10)
 local url = "https://raw.githubusercontent.com/scripting-alt/bloxfruits/refs/heads/main/Main.lua"
 local queue = queue_on_teleport or (syn and syn.queue_on_teleport)
 
-if queue then
-    task.spawn(function()
-        local scriptQueue = string.format([[
-            repeat task.wait() until game:IsLoaded()
-            local s, c = pcall(game.HttpGet, game, "%s")
-            if s and c then
-                local f = loadstring(c)
-                if f then f() end
-            end
-        ]], url)
-        queue(scriptQueue)
-    end)
-end
+--if queue then
+--    task.spawn(function()
+--        local scriptQueue = string.format([[
+--            repeat task.wait() until game:IsLoaded()
+--            local s, c = pcall(game.HttpGet, game, "%s")
+--            if s and c then
+--                local f = loadstring(c)
+--                if f then f() end
+--            end
+--        ]], url)
+--        queue(scriptQueue)
+--    end)
+--end
+
 
 if _G.RedzHub then
     warn("[REDZ HUB] RedzHub is already running. Stopping execution.")
@@ -562,12 +563,18 @@ end
 
 local CurrentTween = nil
 
-function topos(TargetCFrame)
-    if not TargetCFrame then return end
+function topos(TargetCFrame, speed)
+    speed = speed or _G.TweenSpeed
+    if not TargetCFrame then
+        return
+    end
 
     local Player = game.Players.LocalPlayer
     local Character = Player.Character
-    if not Character then return end
+
+    if not Character then
+        return
+    end
 
     local Humanoid = Character:FindFirstChild("Humanoid")
     local HumanoidRootPart = Character:FindFirstChild("HumanoidRootPart")
@@ -576,112 +583,60 @@ function topos(TargetCFrame)
         return
     end
 
-    -- Cancela tween anterior se existir
-    if CurrentTween then
-        CurrentTween:Cancel()
-        CurrentTween = nil
-    end
+    local Distance = (TargetCFrame.Position - HumanoidRootPart.Position).Magnitude
 
     local NearestTeleporter = CheckNearestTeleporter(TargetCFrame)
     if NearestTeleporter then
         requestEntrance(NearestTeleporter)
         warn("[REDZ HUB] Teleported to nearest teleporter: " .. tostring(NearestTeleporter))
-        task.wait(0.2)
     end
 
-    -- Cria a PartTele invisível
     local PartTele = Character:FindFirstChild("PartTele")
+
     if not PartTele then
         PartTele = Instance.new("Part")
         PartTele.Name = "PartTele"
-        PartTele.Size = Vector3.new(6, 1, 6)
+        PartTele.Size = Vector3.new(10, 1, 10)
         PartTele.Anchored = true
         PartTele.Transparency = 1
-        PartTele.CanCollide = false
-        PartTele.CFrame = HumanoidRootPart.CFrame
+        PartTele.CanCollide = true
+        PartTele.CFrame = WaitHRP(Player).CFrame
         PartTele.Parent = Character
+
+        PartTele:GetPropertyChangedSignal("CFrame"):Connect(function()
+            if not TweenON then
+                return
+            end
+
+            task.wait()
+
+            local Root = WaitHRP(Player)
+            if Root then
+                --Root.CFrame = PartTele.CFrame
+            end
+        end)
     end
 
     TweenON = true
 
-    task.spawn(function()
-        -- CONFIGURAÇÕES DO CICLO
-        local FAST_SPEED = 300      -- Velocidade máxima
-        local SLOW_SPEED = 50       -- Velocidade de resfriamento (anti-rollback)
-        local FAST_DISTANCE = 150   -- Quantos studs ele anda no modo rápido antes de frear
-        local SLOW_DURATION = 3   -- Quantos segundos ele fica no modo lento (50 speed)
+    local Tween = game:GetService("TweenService"):Create(
+        PartTele,
+        TweenInfo.new(Distance / speed, Enum.EasingStyle.Linear),
+        {
+            CFrame = TargetCFrame
+        }
+    )
 
-        local isFast = true
+    Tween:Play()
 
-        while TweenON and Character and Humanoid.Health > 0 do
-            local currentPos = HumanoidRootPart.Position
-            local targetPos = TargetCFrame.Position
-            local totalDistance = (targetPos - currentPos).Magnitude
-
-            -- Chegou ao destino final
-            if totalDistance <= 6 then
-                PartTele.CFrame = TargetCFrame
-                break
+    Tween.Completed:Connect(function(State)
+        if State == Enum.PlaybackState.Completed then
+            if Character:FindFirstChild("PartTele") then
+                Character.PartTele:Destroy()
             end
 
-            local speed = FAST_SPEED
-            local stepDistance = totalDistance
-
-            -- Se a distância for longa, ativa o ciclo de alternância
-            if totalDistance > FAST_DISTANCE then
-                if isFast then
-                    -- FASE 1: RÁPIDO (300 Speed)
-                    speed = FAST_SPEED
-                    stepDistance = FAST_DISTANCE
-                else
-                    -- FASE 2: LENTO (50 Speed por ~2 segundos = anda ~100 studs)
-                    speed = SLOW_SPEED
-                    stepDistance = math.min(totalDistance, SLOW_SPEED * SLOW_DURATION)
-                end
-            else
-                -- Distância curta: vai direto na velocidade máxima
-                speed = FAST_SPEED
-                stepDistance = totalDistance
-            end
-
-            -- Calcula o próximo ponto do trajeto
-            local direction = (targetPos - currentPos).Unit
-            local nextPosition = currentPos + (direction * stepDistance)
-            local nextCFrame = CFrame.new(nextPosition, targetPos)
-
-            local tweenDuration = stepDistance / speed
-
-            CurrentTween = game:GetService("TweenService"):Create(
-                PartTele,
-                TweenInfo.new(tweenDuration, Enum.EasingStyle.Linear),
-                { CFrame = nextCFrame }
-            )
-
-            CurrentTween:Play()
-
-            -- Trava o HumanoidRootPart na PartTele com segurança
-            local conn
-            conn = game:GetService("RunService").Heartbeat:Connect(function()
-                if not TweenON or not PartTele or not PartTele.Parent then
-                    conn:Disconnect()
-                    return
-                end
-            end)
-
-            CurrentTween.Completed:Wait()
-            conn:Disconnect()
-
-            -- Alterna entre Rápido (300) e Devagar (50)
-            isFast = not isFast
-            task.wait(0.02)
+            TweenON = false
         end
-
-        -- Limpa a peça ao chegar
-        if Character:FindFirstChild("PartTele") then
-            Character.PartTele:Destroy()
-        end
-        TweenON = false
-        CurrentTween = nil
     end)
 end
 
@@ -4371,7 +4326,7 @@ local function GetNearestEnemy()
 
     for _, Entity in ipairs(Targets) do
         local Char = Entity:IsA("Player") and Entity.Character or Entity
-        
+        if Entity.Name == "Player" then continue end
         if Char and not IsFriendly(Entity) then
             local Hum = Char:FindFirstChildOfClass("Humanoid")
             local HRP = Char:FindFirstChild("HumanoidRootPart") or Char:FindFirstChild("PrimaryPart")
