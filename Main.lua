@@ -3,7 +3,7 @@ repeat task.wait() until game:IsLoaded()
 local Players = game:GetService("Players")
 local LocalPlayer = Players.LocalPlayer or Players.PlayerAdded:Wait()
 LocalPlayer:WaitForChild("PlayerGui")
-task.wait(3)
+task.wait(2)
 
 local function safeLoad(url)
     local success, content = pcall(game.HttpGet, game, url)
@@ -24,7 +24,7 @@ task.spawn(function()
     safeLoad("https://raw.githubusercontent.com/scripting-alt/bloxfruits/refs/heads/main/utils/Loading.lua")
 end)
 
-task.wait(10)
+task.wait(3)
 
 local url = "https://raw.githubusercontent.com/scripting-alt/bloxfruits/refs/heads/main/Main.lua"
 local queue = queue_on_teleport or (syn and syn.queue_on_teleport)
@@ -400,15 +400,19 @@ function BringMob(MobName)
     local NearestDistance = math.huge
     local playerPos = PlayerRoot.Position
 
+    -- Trata o parâmetro para minúsculas se for string
+    local isAll = typeof(MobName) == "string" and MobName:lower() == "all"
+
     for _, Enemy in ipairs(EnemiesFolder:GetChildren()) do
-        if Enemy.Name == MobName then
+        -- Aceita se for "all" OU se o nome do NPC for igual ao MobName
+        if isAll or Enemy.Name == MobName then
             local Humanoid = Enemy:FindFirstChild("Humanoid")
             local HRP = Enemy:FindFirstChild("HumanoidRootPart")
 
             if Humanoid and HRP and Humanoid.Health > 0 then
                 local dist = (HRP.Position - playerPos).Magnitude
 
-                if dist <= _G.BringDistance then
+                if dist <= (_G.BringDistance or 100) then
                     table.insert(ValidMobs, {Enemy = Enemy, Hum = Humanoid, HRP = HRP})
                     
                     if dist < NearestDistance then
@@ -433,8 +437,8 @@ function BringMob(MobName)
             HRP.CFrame = BringPos
         end
 
-        HRP.Velocity = Vector3.zero
-        HRP.RotVelocity = Vector3.zero
+        HRP.AssemblyLinearVelocity = Vector3.zero
+        HRP.AssemblyAngularVelocity = Vector3.zero
 
         Humanoid.WalkSpeed = 0
         Humanoid.JumpPower = 0
@@ -1891,7 +1895,7 @@ spawn(function()
     end
 end)
 
-spawn(function()
+task.spawn(function()
     while task.wait() do
         if not _G.AutoFarmNear or not checkStopFarm() then
             continue
@@ -1906,32 +1910,55 @@ spawn(function()
                 return
             end
 
+            local ClosestEnemy = nil
+            local ShortestDistance = 1000
+
             for _, Enemy in ipairs(workspace.Enemies:GetChildren()) do
                 local Humanoid = Enemy:FindFirstChild("Humanoid")
                 local EnemyHRP = Enemy:FindFirstChild("HumanoidRootPart")
 
-                if Humanoid and EnemyHRP 
-                and Humanoid.Health > 0 
-                and (HRP.Position - EnemyHRP.Position).Magnitude <= 1000 then
+                if Humanoid and EnemyHRP and Humanoid.Health > 0 then
+                    local Distance = (HRP.Position - EnemyHRP.Position).Magnitude
 
-                    LastHealth = Humanoid.Health
-                    StuckTime = 0
+                    if Distance < ShortestDistance then
+                        ShortestDistance = Distance
+                        ClosestEnemy = Enemy
+                    end
+                end
+            end
 
+            if ClosestEnemy then
+                local Humanoid = ClosestEnemy:FindFirstChild("Humanoid")
+                local EnemyHRP = ClosestEnemy:FindFirstChild("HumanoidRootPart")
+
+                if Humanoid and EnemyHRP then
                     repeat
-                        task.wait(_G.Fast_Delay)
+                        task.wait()
 
-                        if not Enemy.Parent then
+                        if not ClosestEnemy.Parent or Humanoid.Health <= 0 then
                             break
                         end
-                        if Humanoid.Health == LastHealth then
-                            StuckTime += 1
-                        else
-                            LastHealth = Humanoid.Health
-                            StuckTime = 0
+
+                        local CurrentDist = (HRP.Position - EnemyHRP.Position).Magnitude
+                        local FoundCloser = false
+                        
+                        for _, OtherEnemy in ipairs(workspace.Enemies:GetChildren()) do
+                            if OtherEnemy ~= ClosestEnemy then
+                                local OtherHum = OtherEnemy:FindFirstChild("Humanoid")
+                                local OtherHRP = OtherEnemy:FindFirstChild("HumanoidRootPart")
+
+                                if OtherHum and OtherHRP and OtherHum.Health > 0 then
+                                    local OtherDist = (HRP.Position - OtherHRP.Position).Magnitude
+                                    
+                                    if OtherDist < CurrentDist then
+                                        FoundCloser = true
+                                        break
+                                    end
+                                end
+                            end
                         end
 
-                        -- ficou travado
-                        if StuckTime >= 20 then
+                        if FoundCloser then
                             break
                         end
 
@@ -1939,17 +1966,14 @@ spawn(function()
                         AutoHaki()
                         EquipWeapon(_G.SelectTool)
                         BringPos = EnemyHRP.CFrame
-                        BringMob(Enemy.Name)
+                        BringMob("all")
 
                         EnemyHRP.Transparency = 1
-                        --EnemyHRP.CanCollide = false
 
                         Humanoid.WalkSpeed = 0
                         Humanoid.JumpPower = 0
 
                     until not _G.AutoFarmNear or Humanoid.Health <= 0
-
-                    break
                 end
             end
         end)
