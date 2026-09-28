@@ -275,7 +275,8 @@ local validKeys = {
 local oldRequire
 oldRequire = hookfunction(require, function(module, ...)
     local result = oldRequire(module, ...)
-    if typeof(module) == "Instance" and module.Name == "Client" and _G.botEnabled and targetSelect then
+    
+    if typeof(module) == "Instance" and module.Name == "Client" then
         local parentFolder = module.Parent
         
         if parentFolder and validKeys[parentFolder.Name] then
@@ -283,34 +284,35 @@ oldRequire = hookfunction(require, function(module, ...)
                 local originalOnInput = result.onInput
                 
                 result.onInput = function(p1, ...)
-                    if p1 then
-                        p1.aim = function()
-                            return targetPos
-                        end
-                        
-                        if p1.mouse then
-                            local realMouse = p1.mouse
-                            p1.mouse = setmetatable({}, {
-                                __index = function(_, key)
-                                    if key == "Hit" then
-                                        return CFrame.new(targetPos)
+                    if _G.botEnabled and targetSelect and targetPos then
+                        if p1 then
+                            p1.aim = function()
+                                return targetPos
+                            end
+                            
+                            if p1.mouse then
+                                local realMouse = p1.mouse
+                                p1.mouse = setmetatable({}, {
+                                    __index = function(_, key)
+                                        if key == "Hit" then
+                                            return CFrame.new(targetPos)
+                                        end
+                                        if type(realMouse) == "table" or typeof(realMouse) == "userdata" then
+                                            return realMouse[key]
+                                        end
                                     end
-                                    if type(realMouse) == "table" or typeof(realMouse) == "userdata" then
-                                        return realMouse[key]
+                                })
+                            else
+                                p1.mouse = setmetatable({}, {
+                                    __index = function(_, key)
+                                        if key == "Hit" then
+                                            return CFrame.new(targetPos)
+                                        end
                                     end
-                                end
-                            })
-                        else
-                            p1.mouse = setmetatable({}, {
-                                __index = function(_, key)
-                                    if key == "Hit" then
-                                        return CFrame.new(targetPos)
-                                    end
-                                end
-                            })
+                                })
+                            end
                         end
                     end
-                    
                     return originalOnInput(p1, ...)
                 end
             end
