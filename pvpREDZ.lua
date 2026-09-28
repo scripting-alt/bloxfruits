@@ -398,8 +398,8 @@ function Esp()
             local dist = math.floor((locHead.Position - head.Position).Magnitude / 3)
             local hp = math.max(0, math.floor((hum.Health / math.max(1, hum.MaxHealth)) * 100))
             
-            local lvlObj = p:FindFirstChild("Level", true)
-            local lvl = lvlObj and lvlObj.Value or 0
+            local lvlObj = p:FindFirstChild("Data"):FindFirstChild("Level")
+            local lvl = lvlObj.Value or 0
             
             local teamHex = "#" .. p.TeamColor.Color:ToHex()
             local tag, tagCol = getPvp(p, teamHex)
