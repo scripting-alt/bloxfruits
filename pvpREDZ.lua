@@ -264,23 +264,62 @@ local function isIgnoringSkill(char)
     return false
 end
 
---[[
-local old
-old = hookmetamethod(game, "__newindex", function(inst, prop, val)
-    if not checkcaller() and targetSelect ~= nil and targetPos then
-        local char = LocalPlayer.Character
-        if char and inst:IsDescendantOf(char) and not isIgnoringSkill(char) then
-            if inst:IsA("BodyGyro") and prop == "CFrame" then
-                local rootPos = (inst.Parent and inst.Parent:IsA("BasePart")) and inst.Parent.Position or val.Position
-                val = CFrame.new(rootPos, targetPos)
-            elseif inst:IsA("BasePart") and inst.Name == "HumanoidRootPart" and prop == "CFrame" then
-                val = CFrame.new(val.Position, targetPos)
+local validKeys = {
+    ["Z"] = true,
+    ["X"] = true,
+    ["C"] = true,
+    ["V"] = true,
+    ["F"] = false
+}
+
+local oldRequire
+oldRequire = hookfunction(require, function(module, ...)
+    local result = oldRequire(module, ...)
+    if typeof(module) == "Instance" and module.Name == "Client" and _G.botEnabled and targetSelect then
+        local parentFolder = module.Parent
+        
+        if parentFolder and validKeys[parentFolder.Name] then
+            if type(result) == "table" and result.onInput then
+                local originalOnInput = result.onInput
+                
+                result.onInput = function(p1, ...)
+                    if p1 then
+                        p1.aim = function()
+                            return targetPos
+                        end
+                        
+                        if p1.mouse then
+                            local realMouse = p1.mouse
+                            p1.mouse = setmetatable({}, {
+                                __index = function(_, key)
+                                    if key == "Hit" then
+                                        return CFrame.new(targetPos)
+                                    end
+                                    if type(realMouse) == "table" or typeof(realMouse) == "userdata" then
+                                        return realMouse[key]
+                                    end
+                                end
+                            })
+                        else
+                            p1.mouse = setmetatable({}, {
+                                __index = function(_, key)
+                                    if key == "Hit" then
+                                        return CFrame.new(targetPos)
+                                    end
+                                end
+                            })
+                        end
+                    end
+                    
+                    return originalOnInput(p1, ...)
+                end
             end
         end
     end
-    return old(inst, prop, val)
+    
+    return result
 end)
-]]
+
 task.spawn(function()
     while task.wait() do
         local char = game.Players.LocalPlayer.Character
