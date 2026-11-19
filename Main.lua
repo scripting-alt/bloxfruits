@@ -5,28 +5,66 @@ local LocalPlayer = Players.LocalPlayer or Players.PlayerAdded:Wait()
 LocalPlayer:WaitForChild("PlayerGui")
 task.wait(2)
 
-local function safeLoad(url)
-    local success, content = pcall(game.HttpGet, game, url)
-    if success and content then
-        local fn, err = loadstring(content)
-        if fn then
-            return fn()
-        else
-            warn("[REDZ HUB] Erro ao compilar: " .. url .. " -> " .. tostring(err))
-        end
-    else
-        warn("[REDZ HUB] Erro ao baixar: " .. url)
+local HUB_SOURCE = "https://raw.githubusercontent.com/scripting-alt/bloxfruits/refs/heads/main/"
+local LOAD_ATTEMPTS = 3
+local LOAD_RETRY_DELAY = 0.5
+
+if _G.RedzHub then
+    warn("[REDZ HUB] RedzHub is already running. Stopping execution.")
+    return
+end
+
+-- Reserve the guard before loading remote code so concurrent executions cannot boot twice.
+_G.RedzHub = "booting"
+
+local function releaseBootGuard()
+    if _G.RedzHub == "booting" then
+        _G.RedzHub = nil
     end
+end
+
+local function safeLoad(url, label, attempts)
+    label = label or url
+    attempts = attempts or LOAD_ATTEMPTS
+
+    local lastError = "empty response"
+    for attempt = 1, attempts do
+        local fetched, content = pcall(game.HttpGet, game, url)
+        if fetched and type(content) == "string" and #content > 0 then
+            local compiled, chunk, compileError = pcall(loadstring, content)
+            if compiled and type(chunk) == "function" then
+                local executed, result = pcall(chunk)
+                if executed then
+                    return result
+                end
+                lastError = result
+            else
+                lastError = compileError or chunk
+            end
+        else
+            lastError = content
+        end
+
+        if attempt < attempts then
+            task.wait(LOAD_RETRY_DELAY * attempt)
+        end
+    end
+
+    warn(string.format("[REDZ HUB] Falha ao carregar %s: %s", label, tostring(lastError)))
     return nil
 end
 
+local function loadHubModule(path, label)
+    return safeLoad(HUB_SOURCE .. path, label or path)
+end
+
 task.spawn(function()
-    safeLoad("https://raw.githubusercontent.com/scripting-alt/bloxfruits/refs/heads/main/utils/Loading.lua")
+    safeLoad(HUB_SOURCE .. "utils/Loading.lua", "tela de carregamento")
 end)
 
 task.wait(3)
 
-local url = "https://raw.githubusercontent.com/scripting-alt/bloxfruits/refs/heads/main/Main.lua"
+local url = HUB_SOURCE .. "Main.lua"
 local queue = queue_on_teleport or (syn and syn.queue_on_teleport)
 
 --if queue then
@@ -44,30 +82,33 @@ local queue = queue_on_teleport or (syn and syn.queue_on_teleport)
 --end
 
 
-if _G.RedzHub then
-    warn("[REDZ HUB] RedzHub is already running. Stopping execution.")
-    return
-end
-
-local Library = safeLoad("https://raw.githubusercontent.com/scripting-alt/bloxfruits/refs/heads/main/library.luau")
-local pt_br = safeLoad("https://raw.githubusercontent.com/scripting-alt/bloxfruits/refs/heads/main/translate/pt_br.lua")
+local Library = loadHubModule("library.luau", "interface")
+local pt_br = loadHubModule("translate/pt_br.lua", "tradução pt-BR")
 
 if not Library then
-    warn("[REDZ HUB] Falha crítica ao carregar a interface (Library). Execução interrompida.")
+    warn("[REDZ HUB] Falha crítica ao carregar a interface. Execução interrompida.")
+    releaseBootGuard()
     return
 end
 
-_G.RedzHub = true
+local configured, configureError = pcall(function()
+    if pt_br then
+        Library:AddTranslations("pt", pt_br)
+    end
+    Library:AddTranslations("en", {})
+    Library:UpdateTranslate("pt")
+end)
 
-if pt_br then
-    Library:AddTranslations("pt", pt_br)
+if not configured then
+    warn("[REDZ HUB] Falha ao configurar a interface: " .. tostring(configureError))
+    Library:Destroy()
+    releaseBootGuard()
+    return
 end
-Library:AddTranslations("en", {})
-Library:UpdateTranslate("pt")
 
 ScriptVersion = {
-    Version = "v7.9.8",
-    Date = "2026-09-13"
+    Version = "v7.9.9",
+    Date = "2026-11-19"
 }
 
 _G.SelectTool = "Melee"
@@ -103,7 +144,20 @@ Pos = CFrame.new(0,0,0)
 BringPos = CFrame.new(0,0,0)
 PosY = 30
 TweenON = false
-local WorldSea = workspace:GetAttribute("MAP") or "Sea1"
+
+local function getWorldSea()
+    local deadline = os.clock() + 10
+    local worldSea = workspace:GetAttribute("MAP")
+
+    while not worldSea and os.clock() < deadline do
+        task.wait(0.1)
+        worldSea = workspace:GetAttribute("MAP")
+    end
+
+    return worldSea or "Sea1"
+end
+
+local WorldSea = getWorldSea()
 local placeIDS = {
     Sea1 = 2753915549,
     Sea2 = 79091703265657,
@@ -125,15 +179,18 @@ elseif WorldSea == "Dungeons" then
 else
     warn("[REDZ HUB] Unknown World")
     Library:Destroy()
+    releaseBootGuard()
     return
 end
+
+_G.RedzHub = true
 
 local Window
 local RunService = game:GetService("RunService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local Net = ReplicatedStorage.Modules.Net
-local RegisterAttack = Net["RE/RegisterAttack"]
-local RegisterHit = Net["RE/RegisterHit"]
+local Net = ReplicatedStorage:WaitForChild("Modules"):WaitForChild("Net")
+local RegisterAttack = Net:WaitForChild("RE/RegisterAttack")
+local RegisterHit = Net:WaitForChild("RE/RegisterHit")
 local LastHealth = nil
 local StuckTime = 0
 
@@ -191,10 +248,14 @@ function checkStopFarm(farmAtual)
 end
 
 function checkEnemySpawns(EnemyName)
-    if ReplicatedStorage:FindFirstChild("FortBuilderReplicatedSpawnPositionsFolder"):FindFirstChild(EnemyName) then
-        return true, ReplicatedStorage:FindFirstChild("FortBuilderReplicatedSpawnPositionsFolder"):FindFirstChild(EnemyName).CFrame
+    local spawnFolder = ReplicatedStorage:FindFirstChild("FortBuilderReplicatedSpawnPositionsFolder")
+    local spawnPoint = spawnFolder and spawnFolder:FindFirstChild(EnemyName)
+
+    if spawnPoint and spawnPoint:IsA("BasePart") then
+        return true, spawnPoint.CFrame
     end
-    return false
+
+    return false, nil
 end
 
 local LocalPlayer = game.Players.LocalPlayer
@@ -559,44 +620,54 @@ function CheckNearestTeleporter(TargetCFrame)
 end
 
 function requestEntrance(entrance)
-    game.ReplicatedStorage.Remotes.CommF_:InvokeServer('requestEntrance', entrance)
-    local _HumanoidRootPart = game.Players.LocalPlayer.Character.HumanoidRootPart
-    _HumanoidRootPart.CFrame = _HumanoidRootPart.CFrame + Vector3.new(0, 50, 0)
+    if not entrance then
+        return false
+    end
+
+    local requested = pcall(function()
+        game.ReplicatedStorage.Remotes.CommF_:InvokeServer("requestEntrance", entrance)
+    end)
+    if not requested then
+        return false
+    end
+
+    local character = game.Players.LocalPlayer.Character
+    local root = character and character:FindFirstChild("HumanoidRootPart")
+    if root then
+        root.CFrame += Vector3.new(0, 50, 0)
+    end
+
     task.wait(0.5)
+    return true
 end
 
+local TweenService = game:GetService("TweenService")
 local CurrentTween = nil
+local TweenGeneration = 0
 
 function topos(TargetCFrame, speed)
-    speed = speed or _G.TweenSpeed
-    if not TargetCFrame then
+    if typeof(TargetCFrame) ~= "CFrame" then
         return
     end
 
     local Player = game.Players.LocalPlayer
     local Character = Player.Character
-
-    if not Character then
-        return
-    end
-
-    local Humanoid = Character:FindFirstChild("Humanoid")
-    local HumanoidRootPart = Character:FindFirstChild("HumanoidRootPart")
+    local Humanoid = Character and Character:FindFirstChild("Humanoid")
+    local HumanoidRootPart = Character and Character:FindFirstChild("HumanoidRootPart")
 
     if not Humanoid or Humanoid.Health <= 0 or not HumanoidRootPart then
         return
     end
 
-    local Distance = (TargetCFrame.Position - HumanoidRootPart.Position).Magnitude
-
     local NearestTeleporter = CheckNearestTeleporter(TargetCFrame)
-    if NearestTeleporter then
-        requestEntrance(NearestTeleporter)
-        warn("[REDZ HUB] Teleported to nearest teleporter: " .. tostring(NearestTeleporter))
+    if NearestTeleporter and requestEntrance(NearestTeleporter) then
+        HumanoidRootPart = Character:FindFirstChild("HumanoidRootPart")
+        if not HumanoidRootPart then
+            return
+        end
     end
 
     local PartTele = Character:FindFirstChild("PartTele")
-
     if not PartTele then
         PartTele = Instance.new("Part")
         PartTele.Name = "PartTele"
@@ -604,44 +675,41 @@ function topos(TargetCFrame, speed)
         PartTele.Anchored = true
         PartTele.Transparency = 1
         PartTele.CanCollide = true
-        PartTele.CFrame = WaitHRP(Player).CFrame
+        PartTele.CFrame = HumanoidRootPart.CFrame
         PartTele.Parent = Character
-
-        PartTele:GetPropertyChangedSignal("CFrame"):Connect(function()
-            if not TweenON then
-                return
-            end
-
-            task.wait()
-
-            local Root = WaitHRP(Player)
-            if Root then
-                --Root.CFrame = PartTele.CFrame
-            end
-        end)
     end
 
+    if CurrentTween then
+        CurrentTween:Cancel()
+        CurrentTween = nil
+    end
+
+    local travelSpeed = math.max(tonumber(speed) or tonumber(_G.TweenSpeed) or 200, 1)
+    local distance = (TargetCFrame.Position - HumanoidRootPart.Position).Magnitude
+    local generation = TweenGeneration + 1
+    TweenGeneration = generation
     TweenON = true
 
-    local Tween = game:GetService("TweenService"):Create(
+    local tween = TweenService:Create(
         PartTele,
-        TweenInfo.new(Distance / speed, Enum.EasingStyle.Linear),
-        {
-            CFrame = TargetCFrame
-        }
+        TweenInfo.new(math.max(distance / travelSpeed, 0.05), Enum.EasingStyle.Linear),
+        { CFrame = TargetCFrame }
     )
+    CurrentTween = tween
 
-    Tween:Play()
+    tween.Completed:Connect(function(state)
+        if generation ~= TweenGeneration or state ~= Enum.PlaybackState.Completed then
+            return
+        end
 
-    Tween.Completed:Connect(function(State)
-        if State == Enum.PlaybackState.Completed then
-            if Character:FindFirstChild("PartTele") then
-                Character.PartTele:Destroy()
-            end
-
-            TweenON = false
+        CurrentTween = nil
+        TweenON = false
+        if PartTele.Parent then
+            PartTele:Destroy()
         end
     end)
+
+    tween:Play()
 end
 
 function AutoHaki()
@@ -1490,9 +1558,16 @@ spawn(function()
 end)
 
 function stopTeleport()
+    TweenGeneration += 1
     TweenON = false
+
+    if CurrentTween then
+        CurrentTween:Cancel()
+        CurrentTween = nil
+    end
+
     local _LocalPlayer = game.Players.LocalPlayer
-    if _LocalPlayer.Character and _LocalPlayer.Character:FindFirstChild('PartTele') then
+    if _LocalPlayer.Character and _LocalPlayer.Character:FindFirstChild("PartTele") then
         _LocalPlayer.Character.PartTele:Destroy()
     end
 end
@@ -1605,19 +1680,12 @@ spawn(function()
     end
 end)
 
-workspace:GetDescendants(function(v)
-    if string.find(v.Name, "Fruit") then
-        Window:Notify({
-                Title = "Fruit Notification",
-                Content = "Fruit "..v.Name.." has spawned!",
-                Image = "rbxassetid://10709761889",
-                Duration = 15
-        })
-    end
-end)
-
 Number = math.random(1, 1000000)
-local FruitList = loadstring(game:HttpGet("https://raw.githubusercontent.com/scripting-alt/bloxfruits/refs/heads/main/utils/GetFruitNameModule.lua"))()
+local FruitList = loadHubModule("utils/GetFruitNameModule.lua", "nomes de frutas") or {
+    GetFruitName = function(fruit)
+        return fruit and fruit.Name or "Unknown Fruit"
+    end
+}
 
 function UpdatePlayerChams()
     local LevelCap = workspace:GetAttribute("LevelCap")
@@ -1822,50 +1890,73 @@ function UpdateDevilChams()
     end
 end
 
+local StorageInFlight = setmetatable({}, { __mode = "k" })
+local BackpackFruitConnection = nil
+local CharacterFruitConnection = nil
+
 function storageFruit(v)
-    if v:IsA("Tool") and string.find(v.Name, "Fruit") then
-        game:GetService("ReplicatedStorage").Remotes.CommF_:InvokeServer("StoreFruit",v:GetAttribute("OriginalName"),v)
+    if not (v:IsA("Tool") and string.find(v.Name, "Fruit", 1, true)) or StorageInFlight[v] then
+        return
+    end
+
+    StorageInFlight[v] = true
+    local fruitName = v:GetAttribute("OriginalName") or v.Name
+    local stored, storeError = pcall(function()
+        game:GetService("ReplicatedStorage").Remotes.CommF_:InvokeServer("StoreFruit", fruitName, v)
+    end)
+
+    if stored then
         Window:Notify({
-                Title = "Auto Storage Fruits",
-                Content = "Fruit "..v:GetAttribute("OriginalName").." stored successfully!",
-                Image = "rbxassetid://10709761889",
-                Duration = 15
+            Title = "Auto Storage Fruits",
+            Content = "Fruit " .. fruitName .. " stored successfully!",
+            Image = "rbxassetid://10709761889",
+            Duration = 15
         })
+    else
+        StorageInFlight[v] = nil
+        warn("[REDZ HUB] Falha ao guardar " .. fruitName .. ": " .. tostring(storeError))
     end
 end
 
-function reload()
+local function watchFruit(v)
+    if _G.AutoStorageFruits and typeof(storageFruit) == "function" then
+        storageFruit(v)
+    end
+end
+
+function reload(character)
     local player = game.Players.LocalPlayer
-    if not player then return end
+    if not player then
+        return
+    end
 
-    player.Backpack.ChildAdded:Connect(function(v)
-        if _G.AutoStorageFruits and typeof(storageFruit) == "function" then
-            storageFruit(v)
-        end
-    end)
+    if not BackpackFruitConnection then
+        BackpackFruitConnection = player:WaitForChild("Backpack").ChildAdded:Connect(watchFruit)
+    end
 
-    if workspace:FindFirstChild("_WorldOrigin") 
-       and workspace._WorldOrigin:FindFirstChild("WaterCFrame") 
+    if CharacterFruitConnection then
+        CharacterFruitConnection:Disconnect()
+        CharacterFruitConnection = nil
+    end
+
+    character = character or player.Character
+    if workspace:FindFirstChild("_WorldOrigin")
+       and workspace._WorldOrigin:FindFirstChild("WaterCFrame")
        and workspace._WorldOrigin.WaterCFrame:FindFirstChild("Foam;") then
         workspace._WorldOrigin.WaterCFrame["Foam;"].CanCollide = _G.WaterWalk
     end
 
-    if player.Character then
-        player.Character:SetAttribute("SpeedMultiplier", _G.Speed)
-        player.Character:SetAttribute("DashLength", _G.DashDistance)
-
-        player.Character.ChildAdded:Connect(function(v)
-            if _G.AutoStorageFruits and typeof(storageFruit) == "function" then
-                storageFruit(v)
-            end
-        end)
+    if character then
+        character:SetAttribute("SpeedMultiplier", _G.Speed)
+        character:SetAttribute("DashLength", _G.DashDistance)
+        CharacterFruitConnection = character.ChildAdded:Connect(watchFruit)
     end
 end
 
-game.Players.LocalPlayer.CharacterAdded:connect(reload)
-reload()
+game.Players.LocalPlayer.CharacterAdded:Connect(reload)
+reload(game.Players.LocalPlayer.Character)
 
-local GachaEvent = game:GetService("ReplicatedStorage").Modules.Net["RF/GachaNetworkRF"]
+local GachaEvent = Net:WaitForChild("RF/GachaNetworkRF")
 
 spawn(function()
     while task.wait(5) do
@@ -1989,9 +2080,7 @@ Window = Library:MakeWindow({
 Window:SetFlag("tweenSpeed_flag", 200)
 
 if getnamecallmethod and hookmetamethod then
-    pcall(function()
-        loadstring(game:HttpGet("https://raw.githubusercontent.com/scripting-alt/bloxfruits/refs/heads/main/utils/AutoShoot.lua"))()
-    end)
+    safeLoad(HUB_SOURCE .. "utils/AutoShoot.lua", "auto shoot")
 else
   Window:MakeNotification({
     Title = "Executor Not Detected",
@@ -2000,6 +2089,29 @@ else
     Duration = 15
   })
 end
+
+local FruitNotificationSeen = setmetatable({}, { __mode = "k" })
+_G.FruitNotifications = true
+
+local function announceFruitDrop(instance)
+    if not _G.FruitNotifications
+        or FruitNotificationSeen[instance]
+        or not instance:IsA("Tool")
+        or not string.find(instance.Name, "Fruit", 1, true)
+        or not instance:FindFirstChild("Handle") then
+        return
+    end
+
+    FruitNotificationSeen[instance] = true
+    Window:Notify({
+        Title = "Fruit Notification",
+        Content = "Fruit " .. instance.Name .. " has spawned!",
+        Image = "rbxassetid://10709761889",
+        Duration = 15
+    })
+end
+
+workspace.ChildAdded:Connect(announceFruitDrop)
 
 local Minimizer = Window:NewMinimizer({
   KeyCode = Enum.KeyCode.K
@@ -2220,6 +2332,15 @@ function debug(msg)
 end
 Tab_Fruit:AddSection("Fruits")
 Tab_Fruit:AddToggle({
+  Name = "Fruit Notifications",
+  Default = true,
+  Flag = "fruitNotifications_flag",
+  Callback = function(Value)
+    _G.FruitNotifications = Value
+  end
+})
+
+Tab_Fruit:AddToggle({
   Name = "Auto Storage Fruits",
   Default = false,
   Flag = "storageFruits_flag",
@@ -2323,7 +2444,11 @@ Tab_Visual:AddToggle({
 
 Tab_Visual:AddSection("Skins")
 
-local SkinsModule = loadstring(game:HttpGet("https://raw.githubusercontent.com/scripting-alt/bloxfruits/refs/heads/main/utils/SkinsModule.lua"))()
+local SkinsModule = loadHubModule("utils/SkinsModule.lua", "módulo de skins") or {
+    GetSkinData = function()
+        return nil
+    end
+}
 
 local PainSkin, PortalSkin = "Default", "Default"
 
@@ -3638,7 +3763,7 @@ Tab_Misc:AddButton({
             ["Low Quality Parts"] = true -- Lower quality parts
         }
     }
-    loadstring(game:HttpGet("https://raw.githubusercontent.com/CasperFlyModz/discord.gg-rips/main/FPSBooster.lua"))()
+    safeLoad("https://raw.githubusercontent.com/CasperFlyModz/discord.gg-rips/main/FPSBooster.lua", "FPS booster")
   end
 })
 
@@ -3950,7 +4075,14 @@ Tab_Dev:AddButton({
   end
 })
 
-local ButtonManager = loadstring(game:HttpGet("https://raw.githubusercontent.com/scripting-alt/bloxfruits/refs/heads/main/utils/ButtonsModule.lua"))()
+local ButtonManager = loadHubModule("utils/ButtonsModule.lua", "botões flutuantes") or {
+    GetButton = function()
+        return nil
+    end,
+    new = function()
+        return nil
+    end
+}
 
 local TeleportPositions = {
     Sea1 = {
@@ -4510,9 +4642,24 @@ task.spawn(function()
     end
 end)
 
-local TimerModule = loadstring(game:HttpGet("https://raw.githubusercontent.com/scripting-alt/bloxfruits/refs/heads/main/utils/TimerModule.lua"))()
-TimerModule:Init()
-TimerModule:SetFormatStyle("short")
+local TimerModule = loadHubModule("utils/TimerModule.lua", "timer do servidor") or {
+    Init = function() end,
+    SetFormatStyle = function() end,
+    GetUptime = function()
+        return "N/A"
+    end,
+    GetTimeUntil = function()
+        return "N/A"
+    end
+}
+
+local timerReady, timerError = pcall(function()
+    TimerModule:Init()
+    TimerModule:SetFormatStyle("short")
+end)
+if not timerReady then
+    warn("[REDZ HUB] Falha ao iniciar timer do servidor: " .. tostring(timerError))
+end
 
 Tab_Status:AddSection("Status")
 ServerTimerParagraph = Tab_Status:AddParagraph("Server Time : LOADING...")
